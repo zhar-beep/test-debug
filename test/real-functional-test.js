@@ -1,7 +1,8 @@
 /**
  * Rigorous Functional & System Integrity Test for Kasane Shell // Game Setup
  * Validates Gradle build specs, AndroidManifest, Kotlin bridge semantics,
- * UI DOM hierarchy, 2-step confirmation run, dark mode, and JS execution logic in node runtime.
+ * UI DOM hierarchy, 2-step confirmation run, Izin button, custom emoji picker,
+ * and zero AI-slop visual glitches.
  */
 
 const fs = require('fs');
@@ -76,8 +77,8 @@ it('User anime wallpaper and all 21 offline iOS 3D emojis are present', () => {
   });
 });
 
-// 5. DOM Structure & Top-Level Root Status
-it('Top-level root status card is located at the top and hero card is removed', () => {
+// 5. DOM Structure, Top-Level Root & Zero Punch-Hole Glitch
+it('Top-level root status card is at top, hero card is removed, and punch-hole glitch is eliminated', () => {
   const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
 
@@ -90,11 +91,13 @@ it('Top-level root status card is located at the top and hero card is removed', 
   assert(rootTeleCardIdx < fileListIdx, 'Root & Telemetry card must be above file-list');
   assert(!html.includes('Kasane Action RPG • Zero Lag'), 'Hero card section photographed by user must be removed');
   assert(!html.includes('id="view-root"'), 'Diagnostik tab must be removed');
+  assert(!html.includes('phone-camera-hole'), 'Punch hole glitch must be removed');
+  assert(!html.includes('alt="shield"'), 'Shield emoji slop must be removed');
   assert(!html.includes('Kill SIGKILL'), 'No geek jargon like Kill SIGKILL allowed');
 });
 
-// 6. JavaScript Logic, 2-Step Run & Force Stop (Ctrl+C)
-it('app.js exports valid JS syntax, 2-step confirmation, and Ctrl+C force stop', () => {
+// 6. JavaScript Logic, Izin Chmod, Emoji Picker & 2-Step Run
+it('app.js exports valid JS syntax, MT Manager Izin, Emoji Picker, and 2-step confirmation', () => {
   const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
   const code = fs.readFileSync(appJsPath, 'utf8');
 
@@ -103,6 +106,10 @@ it('app.js exports valid JS syntax, 2-step confirmation, and Ctrl+C force stop',
   assert(code.includes('requestRunScript'), 'Must define requestRunScript for 2-step confirmation');
   assert(code.includes('proceedToConfirmStep2'), 'Must define proceedToConfirmStep2');
   assert(code.includes('executeConfirmedScript'), 'Must define executeConfirmedScript');
+  assert(code.includes('openPermissionModal'), 'Must define openPermissionModal for Izin');
+  assert(code.includes('savePermissions'), 'Must define savePermissions');
+  assert(code.includes('openEmojiPicker'), 'Must define openEmojiPicker for custom script emoji');
+  assert(code.includes('selectScriptEmoji'), 'Must define selectScriptEmoji');
   assert(code.includes('stopCurrentScript'), 'Must define stopCurrentScript for force stop');
   assert(code.includes('copyTerminalLogs'), 'Must define copyTerminalLogs');
   assert(code.includes('copyLogById'), 'Must define copyLogById');

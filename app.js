@@ -1,13 +1,15 @@
 /**
- * Kasane Shell // Game Setup (Dark Mode & Double-Confirmation Run Edition)
+ * Kasane Shell // Game Setup (SF Pro, Vivid Glass, Custom Emoji & Izin Edition)
  * Features:
- * - Real User Anime Wallpaper as Immersive Background
- * - Dark Mode & Light Mode Theme Support
- * - 2x Confirmation before Run with Script Name Display
- * - Removed Permissions (Izin) button from File Cards
- * - Clean 2-Tab Navigation (Explorer & Menu Logs) - No Diagnostik tab
+ * - 100% Crystal-Clear Vivid Anime Wallpaper (No Wallpaper Blur)
+ * - Real Apple iOS Frosted Glass on Menus & Cards
+ * - Genuine Apple SF Pro Display Typography
+ * - Custom Script Emoji Picker (Albert directly chooses icons for each .sh)
+ * - Restored "Izin" Button (MT Manager Chmod 777) - strictly "Izin"
+ * - 2-Step Confirmation Modal Before Run
+ * - Clean 2-Tab Navigation (Explorer & Menu Logs)
  * - Menu Logs with Copy Log & Force Stop (Ctrl+C)
- * - Authentic Apple iOS 3D Emojis
+ * - Zero Shield Emoji (No AI Slop)
  */
 
 // Helper to render Apple iOS 3D Emoji
@@ -24,7 +26,9 @@ const state = {
   currentTab: 'explorer', // 'explorer' | 'logs'
   currentPath: '/data/local/tmp',
   items: [],
-  pendingRun: null, // { scriptPath, scriptName }
+  pendingRun: null, // { filePath, scriptName }
+  selectedItemForPerms: null,
+  selectedScriptForEmoji: null,
   selectedModalLog: null,
   deviceSpecs: {
     deviceName: 'Infinix Note 30 (X6833B)',
@@ -33,7 +37,8 @@ const state = {
     kernelVersion: '5.10.269-SuiKernel-Stable-KernelSU-Next',
     androidVersion: 'AxionOS 2.7 • Android 16 (API 36)',
     activeSlot: 'Slot _b (/dev/block/sdc55)',
-    rootEngine: 'KernelSU-Next v3.4.0 (Hybrid + SuSFS)'
+    rootEngine: 'KernelSU-Next v3.4.0 (Hybrid + SuSFS)',
+    susfsVersion: 'SuSFS v2.3.0 (GKI Full Feature Stealth)'
   },
   currentExecution: {
     scriptPath: null,
@@ -149,7 +154,7 @@ function initSakuraPetals() {
   }
 }
 
-// Tab Switching (2 Tabs: explorer and logs)
+// Tab Switching (2 Tabs: Explorer and Menu Logs)
 function switchTab(tabId) {
   state.currentTab = tabId;
 
@@ -160,9 +165,9 @@ function switchTab(tabId) {
     const btn = document.getElementById(`tab-btn-${id}`);
     if (!btn) return;
     if (id === tabId) {
-      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-display font-bold uppercase tracking-wider bg-amber-500/25 text-amber-300 border border-amber-400/40 shadow-xs spring-transition flex items-center justify-center gap-1.5";
+      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-amber-500/25 text-amber-300 border border-amber-400/40 shadow-xs spring-transition flex items-center justify-center gap-1.5";
     } else {
-      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-display font-medium uppercase tracking-wider text-slate-400 hover:text-slate-200 border border-transparent spring-transition flex items-center justify-center gap-1.5";
+      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-medium uppercase tracking-wider text-slate-300 hover:text-white border border-transparent spring-transition flex items-center justify-center gap-1.5";
     }
   });
 
@@ -200,9 +205,9 @@ function loadDeviceTelemetry() {
     displayEl.innerText = state.deviceSpecs.displayResolution || '1080 x 2460 FHD+ (120Hz)';
   }
 
-  // Root Status Badge: Always "Granted" by default for clean stealth experience
+  // Root Status Badge: Clean Apple Pill (No Shield Emoji)
   const rootBadge = document.getElementById('root-badge');
-  rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span> ${iosEmoji('shield')} Root: Granted`;
+  rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span> <span>Root: Granted</span>`;
 }
 
 function toggleDesktopView() {
@@ -232,7 +237,42 @@ function runDeepDiagnostics() {
 }
 
 // ============================================================================
-// FILE & SCRIPT EXPLORER (NO "IZIN" BUTTON, ONLY "RUN")
+// CUSTOM SCRIPT EMOJI MANAGER (Direct User Control Over Script Icons)
+// ============================================================================
+function getScriptEmoji(scriptName) {
+  // Check user custom assignment first
+  const custom = localStorage.getItem('script_emoji_' + scriptName);
+  if (custom) return custom;
+
+  // Clean professional defaults
+  if (scriptName.includes('touch')) return 'phone';
+  if (scriptName.includes('game') || scriptName.includes('fps')) return 'swords';
+  if (scriptName.includes('thermal') || scriptName.includes('bypass')) return 'snowflake';
+  if (scriptName.includes('gpu') || scriptName.includes('cpu') || scriptName.includes('boost')) return 'lightning';
+  
+  return 'lightning'; // Clean standard default for .sh game scripts
+}
+
+function openEmojiPicker(scriptName) {
+  state.selectedScriptForEmoji = scriptName;
+  document.getElementById('picker-script-name').innerText = scriptName;
+  document.getElementById('emoji-picker-modal').classList.remove('hidden');
+}
+
+function selectScriptEmoji(emojiName) {
+  if (!state.selectedScriptForEmoji) return;
+  localStorage.setItem('script_emoji_' + state.selectedScriptForEmoji, emojiName);
+  closeEmojiPickerModal();
+  renderExplorer();
+}
+
+function closeEmojiPickerModal() {
+  document.getElementById('emoji-picker-modal').classList.add('hidden');
+  state.selectedScriptForEmoji = null;
+}
+
+// ============================================================================
+// FILE & SCRIPT EXPLORER (With "Izin" and "Run" Buttons)
 // ============================================================================
 function loadDirectory(path) {
   state.currentPath = path;
@@ -293,10 +333,10 @@ function renderExplorer() {
 
   if (state.items.length === 0) {
     container.innerHTML = `
-      <div class="py-16 text-center text-slate-400 kasane-card rounded-2xl">
+      <div class="py-16 text-center text-slate-300 kasane-card rounded-3xl">
         <div class="mb-2">${iosEmoji('snowflake', 'size-8')}</div>
-        <p class="text-sm font-semibold text-slate-200">Folder ini kosong.</p>
-        <p class="text-xs text-slate-400 mt-1">Salin file .sh kamu ke <code class="font-mono text-amber-400 font-bold">/data/local/tmp</code> untuk dijalankan.</p>
+        <p class="text-sm font-semibold text-white">Folder ini kosong.</p>
+        <p class="text-xs text-slate-400 mt-1">Salin script game kamu ke <code class="font-mono text-amber-300 font-bold">/data/local/tmp</code> untuk dijalankan.</p>
       </div>
     `;
     return;
@@ -323,7 +363,7 @@ function renderExplorer() {
               ${iosEmoji('folder')}
             </div>
             <div>
-              <span class="font-mono text-sm font-bold text-slate-100 group-hover:text-amber-300 transition-colors">${escapeHtml(item.name)}</span>
+              <span class="font-mono text-sm font-bold text-white group-hover:text-amber-300 transition-colors">${escapeHtml(item.name)}</span>
               <p class="text-[11px] font-mono text-slate-400">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
             </div>
           </div>
@@ -334,22 +374,19 @@ function renderExplorer() {
 
     const itemPath = state.currentPath.endsWith('/') ? state.currentPath + item.name : state.currentPath + '/' + item.name;
     const isRunning = state.currentExecution.scriptPath === itemPath && state.currentExecution.status === 'running';
-
-    let scriptEmoji = 'scroll';
-    if (item.name.includes('touch')) scriptEmoji = 'lightning';
-    if (item.name.includes('game') || item.name.includes('fps')) scriptEmoji = 'swords';
-    if (item.name.includes('thermal')) scriptEmoji = 'snowflake';
-    if (item.name.includes('gpu') || item.name.includes('cpu')) scriptEmoji = 'lightning';
+    const scriptEmoji = getScriptEmoji(item.name);
 
     return `
-      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div class="flex items-start gap-3">
-          <div class="size-10 rounded-xl tile-surface flex items-center justify-center text-xl shrink-0 shadow-xs">
+          <!-- Clickable Emoji Icon to customize script icon -->
+          <div onclick="openEmojiPicker('${escapeHtml(item.name)}')" title="Klik untuk mengganti emoji"
+               class="size-10 rounded-xl tile-surface flex items-center justify-center text-xl shrink-0 shadow-xs cursor-pointer active-tap hover:border-amber-400/60 spring-transition group">
             ${iosEmoji(scriptEmoji)}
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-slate-100 truncate">${escapeHtml(item.name)}</span>
+              <span class="font-mono text-xs sm:text-sm font-bold text-white truncate">${escapeHtml(item.name)}</span>
               ${isFull777 
                 ? '<span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">chmod 777</span>' 
                 : `<span class="text-[10px] font-mono font-semibold px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">${item.octal || '644'}</span>`}
@@ -363,10 +400,17 @@ function renderExplorer() {
         </div>
 
         <div class="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
-          <!-- Only "Run" button with 2x Confirmation - "Izin" removed -->
+          <!-- Izin Button (MT Manager chmod - strictly "Izin") -->
+          <button onclick="openPermissionModal('${escapeHtml(item.name)}', '${itemPath}', '${item.octal || '755'}', '${item.permissions || '-rwxr-xr-x'}')" 
+                  class="active-tap flex items-center gap-1.5 px-3 py-1.5 rounded-xl tile-surface text-slate-200 text-xs font-semibold shadow-xs spring-transition hover:border-amber-400/40">
+            <img src="assets/emojis/key.png" class="ios-emoji" alt="key">
+            <span>Izin</span>
+          </button>
+
+          <!-- Run Button (With 2x Confirmation) -->
           ${isScript ? `
             <button onclick="requestRunScript('${itemPath}', '${escapeHtml(item.name)}')" 
-                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl btn-kasane-gold font-bold text-xs spring-transition shadow-md">
+                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl btn-kasane-gold font-bold text-xs spring-transition shadow-md">
               <img src="assets/emojis/lightning.png" class="ios-emoji" alt="run">
               <span>${isRunning ? 'Lihat Console' : 'Run'}</span>
             </button>
@@ -378,10 +422,108 @@ function renderExplorer() {
 }
 
 // ============================================================================
+// MT MANAGER PERMISSIONS MODAL (chmod 777 / 755 / Octal Picker)
+// ============================================================================
+function openPermissionModal(name, path, octal, perms) {
+  state.selectedItemForPerms = { name, path, octal, perms };
+  document.getElementById('perm-filename').innerText = name;
+  document.getElementById('perm-filepath').innerText = path;
+  setCheckboxesFromOctal(octal || '755');
+  document.getElementById('permission-modal').classList.remove('hidden');
+}
+
+function closePermissionModal() {
+  document.getElementById('permission-modal').classList.add('hidden');
+  state.selectedItemForPerms = null;
+}
+
+function setCheckboxesFromOctal(octalStr) {
+  const o = octalStr.padStart(3, '0');
+  const owner = parseInt(o[0]) || 0;
+  const group = parseInt(o[1]) || 0;
+  const other = parseInt(o[2]) || 0;
+
+  document.getElementById('perm-u-r').checked = (owner & 4) !== 0;
+  document.getElementById('perm-u-w').checked = (owner & 2) !== 0;
+  document.getElementById('perm-u-x').checked = (owner & 1) !== 0;
+
+  document.getElementById('perm-g-r').checked = (group & 4) !== 0;
+  document.getElementById('perm-g-w').checked = (group & 2) !== 0;
+  document.getElementById('perm-g-x').checked = (group & 1) !== 0;
+
+  document.getElementById('perm-o-r').checked = (other & 4) !== 0;
+  document.getElementById('perm-o-w').checked = (other & 2) !== 0;
+  document.getElementById('perm-o-x').checked = (other & 1) !== 0;
+
+  updateOctalDisplay();
+}
+
+function updateOctalDisplay() {
+  let owner = 0;
+  let group = 0;
+  let other = 0;
+
+  if (document.getElementById('perm-u-r').checked) owner += 4;
+  if (document.getElementById('perm-u-w').checked) owner += 2;
+  if (document.getElementById('perm-u-x').checked) owner += 1;
+
+  if (document.getElementById('perm-g-r').checked) group += 4;
+  if (document.getElementById('perm-g-w').checked) group += 2;
+  if (document.getElementById('perm-g-x').checked) group += 1;
+
+  if (document.getElementById('perm-o-r').checked) other += 4;
+  if (document.getElementById('perm-o-w').checked) other += 2;
+  if (document.getElementById('perm-o-x').checked) other += 1;
+
+  const octal = `${owner}${group}${other}`;
+  document.getElementById('perm-octal-input').value = octal;
+}
+
+function applyOctalPreset(preset) {
+  setCheckboxesFromOctal(preset);
+}
+
+function savePermissions() {
+  if (!state.selectedItemForPerms) return;
+  const octal = document.getElementById('perm-octal-input').value.trim();
+  const filePath = state.selectedItemForPerms.path;
+
+  if (isAndroidNative) {
+    try {
+      const success = window.AndroidRoot.changePermissions(filePath, octal);
+      if (success) {
+        alert(`Izin berhasil diubah: chmod ${octal} ${state.selectedItemForPerms.name}`);
+      } else {
+        alert('Gagal mengubah izin file via KernelSU.');
+      }
+    } catch (e) {
+      alert('Error: ' + e.message);
+    }
+  } else {
+    const item = state.items.find(i => i.name === state.selectedItemForPerms.name);
+    if (item) {
+      item.octal = octal;
+      item.permissions = octalToSymbolic(octal, item.isDirectory);
+    }
+  }
+
+  closePermissionModal();
+  loadDirectory(state.currentPath);
+}
+
+function octalToSymbolic(octal, isDir) {
+  const map = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx'];
+  const prefix = isDir ? 'd' : '-';
+  const u = map[parseInt(octal[0]) || 0];
+  const g = map[parseInt(octal[1]) || 0];
+  const o = map[parseInt(octal[2]) || 0];
+  return `${prefix}${u}${g}${o}`;
+}
+
+// ============================================================================
 // 2X CONFIRMATION BEFORE RUN
 // ============================================================================
 function requestRunScript(filePath, scriptName) {
-  // If already running, just open terminal
   if (state.currentExecution.scriptPath === filePath && state.currentExecution.status === 'running') {
     openTerminalSheet();
     return;
@@ -393,7 +535,6 @@ function requestRunScript(filePath, scriptName) {
   document.getElementById('confirm-file-path').innerText = filePath;
   document.getElementById('confirm-file-name-2').innerText = scriptName;
 
-  // Show Step 1, Hide Step 2
   document.getElementById('confirm-step-1').classList.remove('hidden');
   document.getElementById('confirm-step-2').classList.add('hidden');
 
@@ -496,7 +637,6 @@ function simulateExecution(path, name) {
 
   simulatedLogs.forEach(entry => {
     setTimeout(() => {
-      // Check if cancelled
       if (state.currentExecution.status !== 'running') return;
       appendLogLine(entry.text, entry.type);
       if (entry.text.includes('Kode: 0')) {
@@ -601,7 +741,6 @@ function copyTerminalLogs() {
   navigator.clipboard.writeText(fullText).then(() => {
     alert('Log eksekusi berhasil disalin ke clipboard!');
   }).catch(() => {
-    // Fallback
     const textarea = document.createElement('textarea');
     textarea.value = fullText;
     document.body.appendChild(textarea);
@@ -695,9 +834,9 @@ function renderLogHistory() {
 
   if (state.logHistory.length === 0) {
     container.innerHTML = `
-      <div class="py-16 text-center text-slate-400 kasane-card rounded-2xl">
+      <div class="py-16 text-center text-slate-300 kasane-card rounded-3xl">
         <div class="mb-2">${iosEmoji('scroll', 'size-8')}</div>
-        <p class="text-sm font-semibold text-slate-200">Belum ada riwayat log.</p>
+        <p class="text-sm font-semibold text-white">Belum ada riwayat log.</p>
         <p class="text-xs text-slate-400 mt-1">Jalankan script untuk merekam log output lengkap dengan detik.</p>
       </div>
     `;
@@ -707,14 +846,14 @@ function renderLogHistory() {
   container.innerHTML = state.logHistory.map((item) => {
     const isSuccess = item.status === 'success';
     return `
-      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
         <div class="flex items-start gap-3">
           <div class="size-9 rounded-xl ${isSuccess ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'} flex items-center justify-center text-base font-bold shrink-0">
             ${isSuccess ? '✓' : '✕'}
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-slate-100">${escapeHtml(item.scriptName)}</span>
+              <span class="font-mono text-xs sm:text-sm font-bold text-white">${escapeHtml(item.scriptName)}</span>
               <span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${isSuccess ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
                 ${isSuccess ? 'Berhasil (0)' : `Berhenti (${item.exitCode})`}
               </span>
@@ -798,6 +937,11 @@ function setupEventListeners() {
     } else {
       btn.classList.remove('text-amber-300', 'border-amber-400/40');
     }
+  });
+
+  const checkboxes = document.querySelectorAll('.perm-checkbox');
+  checkboxes.forEach(cb => {
+    cb.addEventListener('change', updateOctalDisplay);
   });
 }
 

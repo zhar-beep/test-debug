@@ -47,4 +47,11 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+
+    // Open Source Root Community Tools (GitHub):
+    // 1. topjohnwu libsu (standard Android root shell library by John Wu)
+    implementation("com.github.topjohnwu.libsu:core:5.2.2")
+    
+    // 2. scottyab rootbeer (industry standard root detection verification library)
+    implementation("com.scottyab:rootbeer-lib:0.1.0")
 }

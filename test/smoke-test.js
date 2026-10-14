@@ -1,7 +1,8 @@
 /**
- * Real Smoke Test Suite for Kasane Shell // Game Setup (Dark Mode & 2-Step Run)
+ * Real Smoke Test Suite for Kasane Shell // Game Setup (SF Pro, Vivid Glass, Custom Emoji & Izin)
  * Validates DOM integrity, CSS rules, timestamp formatting,
- * 2-step confirmation modal, absence of deleted hero card/diagnostics,
+ * 2-step confirmation modal, MT Manager chmod modal, custom emoji picker,
+ * absence of punch-hole glitch and shield emoji slop,
  * asset files, and Android Kotlin bridge integrity.
  */
 
@@ -47,8 +48,8 @@ runTest('Asset Verification: Offline Apple iOS 3D Emojis pack exists', () => {
   });
 });
 
-// 2. Verify HTML DOM Structure
-runTest('HTML Verification: All critical UI elements & IDs exist', () => {
+// 2. Verify HTML DOM Structure & Zero AI Slop
+runTest('HTML Verification: All critical UI elements, modals & clean header exist', () => {
   const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
 
@@ -60,6 +61,12 @@ runTest('HTML Verification: All critical UI elements & IDs exist', () => {
   // Verify Hero section photographed by user is REMOVED
   assert(!html.includes('Kasane Action RPG • Zero Lag'), 'Hero card section photographed by user must be removed');
   assert(!html.includes('id="view-root"'), 'Diagnostik tab must be removed as requested');
+
+  // Verify NO punch-hole glitch overlapping header
+  assert(!html.includes('phone-camera-hole'), 'Ugly punch-hole simulator must be eliminated to prevent overlapping badges');
+
+  // Verify NO shield emoji slop in root badge
+  assert(!html.includes('alt="shield"'), 'Shield emoji must be removed from header root badge');
 
   const requiredIds = [
     'sakura-container',
@@ -76,6 +83,8 @@ runTest('HTML Verification: All critical UI elements & IDs exist', () => {
     'file-list',
     'path-breadcrumbs',
     'btn-folder-up',
+    'permission-modal',
+    'emoji-picker-modal',
     'run-confirm-modal',
     'confirm-step-1',
     'confirm-step-2',
@@ -105,8 +114,8 @@ runTest('UX Verification: No "SIGKILL" or cryptic jargon in index.html buttons',
   assert(html.includes('Hentikan Script (Ctrl+C)'), 'Must contain user-friendly "Hentikan Script (Ctrl+C)" action');
 });
 
-// 4. Verify Stylesheet Rules
-runTest('CSS Verification: Kasane aesthetic classes & dark mode exist', () => {
+// 4. Verify Stylesheet Rules, SF Pro & Crisp Wallpaper
+runTest('CSS Verification: SF Pro typography, vivid unblurred wallpaper & frosted cards exist', () => {
   const cssPath = path.join(__dirname, '../app/src/main/assets/web/styles.css');
   const css = fs.readFileSync(cssPath, 'utf8');
 
@@ -119,27 +128,32 @@ runTest('CSS Verification: Kasane aesthetic classes & dark mode exist', () => {
     'btn-kasane-gold',
     'btn-kasane-danger',
     'sheet-terminal-surface',
-    'dynamic-island',
-    'font-display',
-    'font-serif-italic'
+    'dynamic-island'
   ];
 
   requiredClasses.forEach(cls => {
     assert(css.includes(`.${cls}`), `Missing CSS class .${cls} in styles.css`);
   });
 
+  assert(css.includes('SF Pro Display'), 'Apple SF Pro Display typography must be imported');
   assert(css.includes('html.light') || css.includes('body.light'), 'Light mode overrides must exist in styles.css');
-  assert(css.includes('Syne'), 'Syne display typography must be imported');
+  
+  // Verify wallpaper itself is NOT blurred with full-viewport blur
+  assert(!css.includes('.user-glass-overlay {\n  position: fixed;\n  inset: 0;\n  background: var(--wallpaper-overlay);\n  backdrop-filter: blur(14px)'), 'Wallpaper must remain 100% sharp and unblurred');
 });
 
-// 5. Test 2-Step Confirmation & Run Logic in JavaScript
-runTest('Logic Verification: 2-step confirmation and script execution', () => {
+// 5. Test 2-Step Confirmation, Izin Chmod & Custom Emoji Logic
+runTest('Logic Verification: 2-step confirmation, MT Manager Izin & Emoji Picker in app.js', () => {
   const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
   const code = fs.readFileSync(appJsPath, 'utf8');
 
   assert(code.includes('requestRunScript'), 'Must contain requestRunScript');
   assert(code.includes('proceedToConfirmStep2'), 'Must contain proceedToConfirmStep2');
   assert(code.includes('executeConfirmedScript'), 'Must contain executeConfirmedScript');
+  assert(code.includes('openPermissionModal'), 'Must contain openPermissionModal for Izin');
+  assert(code.includes('savePermissions'), 'Must contain savePermissions');
+  assert(code.includes('openEmojiPicker'), 'Must contain openEmojiPicker');
+  assert(code.includes('selectScriptEmoji'), 'Must contain selectScriptEmoji');
   assert(code.includes('stopCurrentScript'), 'Must contain stopCurrentScript (Force Stop)');
   assert(code.includes('copyLogById'), 'Must contain copyLogById');
   assert(code.includes('toggleTheme'), 'Must contain toggleTheme');
@@ -169,6 +183,7 @@ runTest('Android Bridge Verification: RootBridge.kt contains required methods', 
   assert(kt.includes('fun getDeviceSpecs(): String'), 'Missing getDeviceSpecs method');
   assert(kt.includes('fun runRootDiagnostics(): String'), 'Missing runRootDiagnostics method');
   assert(kt.includes('fun listDirectory(dirPath: String): String'), 'Missing listDirectory method');
+  assert(kt.includes('fun changePermissions(filePath: String, octal: String): Boolean'), 'Missing changePermissions method');
   assert(kt.includes('fun runScript(scriptPath: String)'), 'Missing runScript method');
   assert(kt.includes('fun killProcess()'), 'Missing killProcess method');
 });
