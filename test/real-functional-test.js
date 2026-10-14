@@ -1,7 +1,7 @@
 /**
  * Rigorous Functional & System Integrity Test for Kasane Shell // Game Setup
  * Validates Gradle build specs, AndroidManifest, Kotlin bridge semantics,
- * UI DOM hierarchy, and JS execution logic in node runtime.
+ * UI DOM hierarchy, 2-step confirmation run, dark mode, and JS execution logic in node runtime.
  */
 
 const fs = require('fs');
@@ -77,7 +77,7 @@ it('User anime wallpaper and all 21 offline iOS 3D emojis are present', () => {
 });
 
 // 5. DOM Structure & Top-Level Root Status
-it('Top-level root status card is located at the top of the interface', () => {
+it('Top-level root status card is located at the top and hero card is removed', () => {
   const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
 
@@ -88,17 +88,25 @@ it('Top-level root status card is located at the top of the interface', () => {
   assert(rootHeaderIdx !== -1, 'Root badge element must exist in header');
   assert(rootTeleCardIdx !== -1, 'Status Root & Spesifikasi HP card must exist');
   assert(rootTeleCardIdx < fileListIdx, 'Root & Telemetry card must be above file-list');
+  assert(!html.includes('Kasane Action RPG • Zero Lag'), 'Hero card section photographed by user must be removed');
+  assert(!html.includes('id="view-root"'), 'Diagnostik tab must be removed');
   assert(!html.includes('Kill SIGKILL'), 'No geek jargon like Kill SIGKILL allowed');
 });
 
-// 6. JavaScript Logic & Syntax Evaluation
-it('app.js exports valid JS syntax and passes node evaluation test', () => {
+// 6. JavaScript Logic, 2-Step Run & Force Stop (Ctrl+C)
+it('app.js exports valid JS syntax, 2-step confirmation, and Ctrl+C force stop', () => {
   const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
   const code = fs.readFileSync(appJsPath, 'utf8');
 
   // Verify timestamp formatting
-  const matchTimestamp = code.includes('getExactTimestamp()');
-  assert(matchTimestamp, 'Must define getExactTimestamp');
+  assert(code.includes('getExactTimestamp()'), 'Must define getExactTimestamp');
+  assert(code.includes('requestRunScript'), 'Must define requestRunScript for 2-step confirmation');
+  assert(code.includes('proceedToConfirmStep2'), 'Must define proceedToConfirmStep2');
+  assert(code.includes('executeConfirmedScript'), 'Must define executeConfirmedScript');
+  assert(code.includes('stopCurrentScript'), 'Must define stopCurrentScript for force stop');
+  assert(code.includes('copyTerminalLogs'), 'Must define copyTerminalLogs');
+  assert(code.includes('copyLogById'), 'Must define copyLogById');
+  assert(code.includes('toggleTheme'), 'Must define toggleTheme for dark mode');
 
   // Verify mockFS contains gaming scripts
   assert(code.includes('touch_boost_120hz.sh'), 'Must contain touch_boost_120hz.sh');

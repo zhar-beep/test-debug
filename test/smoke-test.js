@@ -1,6 +1,7 @@
 /**
- * Real Smoke Test Suite for Kasane Shell // Game Setup
- * Validates DOM integrity, CSS rules, JS permissions math, timestamp formatting,
+ * Real Smoke Test Suite for Kasane Shell // Game Setup (Dark Mode & 2-Step Run)
+ * Validates DOM integrity, CSS rules, timestamp formatting,
+ * 2-step confirmation modal, absence of deleted hero card/diagnostics,
  * asset files, and Android Kotlin bridge integrity.
  */
 
@@ -56,14 +57,17 @@ runTest('HTML Verification: All critical UI elements & IDs exist', () => {
   const fileListIndex = html.indexOf('id="file-list"');
   assert(rootIndex > 0 && rootIndex < fileListIndex, 'Root status card must be positioned at the top above the file list');
 
+  // Verify Hero section photographed by user is REMOVED
+  assert(!html.includes('Kasane Action RPG • Zero Lag'), 'Hero card section photographed by user must be removed');
+  assert(!html.includes('id="view-root"'), 'Diagnostik tab must be removed as requested');
+
   const requiredIds = [
     'sakura-container',
+    'btn-theme-toggle',
     'view-explorer',
     'view-logs',
-    'view-root',
     'tab-btn-explorer',
     'tab-btn-logs',
-    'tab-btn-root',
     'hud-device-name',
     'hud-kernel-version',
     'hud-android-version',
@@ -72,16 +76,20 @@ runTest('HTML Verification: All critical UI elements & IDs exist', () => {
     'file-list',
     'path-breadcrumbs',
     'btn-folder-up',
+    'run-confirm-modal',
+    'confirm-step-1',
+    'confirm-step-2',
+    'confirm-file-name',
     'terminal-sheet',
     'console-title',
     'console-start-time',
     'console-timer',
     'terminal-content',
     'dynamic-island',
-    'permission-modal',
     'detailed-log-modal',
     'modal-log-title',
-    'modal-log-content'
+    'modal-log-content',
+    'logs-running-banner'
   ];
 
   requiredIds.forEach(id => {
@@ -94,45 +102,47 @@ runTest('UX Verification: No "SIGKILL" or cryptic jargon in index.html buttons',
   const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
   assert(!html.includes('Kill SIGKILL'), 'Found forbidden jargon "Kill SIGKILL" in UI');
-  assert(html.includes('Hentikan'), 'Must contain user-friendly "Hentikan" action');
+  assert(html.includes('Hentikan Script (Ctrl+C)'), 'Must contain user-friendly "Hentikan Script (Ctrl+C)" action');
 });
 
 // 4. Verify Stylesheet Rules
-runTest('CSS Verification: Kasane aesthetic classes exist', () => {
+runTest('CSS Verification: Kasane aesthetic classes & dark mode exist', () => {
   const cssPath = path.join(__dirname, '../app/src/main/assets/web/styles.css');
   const css = fs.readFileSync(cssPath, 'utf8');
 
   const requiredClasses = [
-    'kasane-wallpaper-bg',
-    'kasane-mist-overlay',
+    'user-wallpaper-bg',
+    'user-glass-overlay',
     'sakura-container',
     'sakura-petal',
     'kasane-card',
     'btn-kasane-gold',
+    'btn-kasane-danger',
     'sheet-terminal-surface',
-    'dynamic-island'
+    'dynamic-island',
+    'font-display',
+    'font-serif-italic'
   ];
 
   requiredClasses.forEach(cls => {
     assert(css.includes(`.${cls}`), `Missing CSS class .${cls} in styles.css`);
   });
+
+  assert(css.includes('html.light') || css.includes('body.light'), 'Light mode overrides must exist in styles.css');
+  assert(css.includes('Syne'), 'Syne display typography must be imported');
 });
 
-// 5. Test Octal & Permissions Math in JavaScript
-runTest('Logic Verification: Octal to symbolic conversion math', () => {
-  function octalToSymbolic(octal, isDir) {
-    const map = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx'];
-    const prefix = isDir ? 'd' : '-';
-    const u = map[parseInt(octal[0]) || 0];
-    const g = map[parseInt(octal[1]) || 0];
-    const o = map[parseInt(octal[2]) || 0];
-    return `${prefix}${u}${g}${o}`;
-  }
+// 5. Test 2-Step Confirmation & Run Logic in JavaScript
+runTest('Logic Verification: 2-step confirmation and script execution', () => {
+  const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
+  const code = fs.readFileSync(appJsPath, 'utf8');
 
-  assert.strictEqual(octalToSymbolic('777', false), '-rwxrwxrwx');
-  assert.strictEqual(octalToSymbolic('755', false), '-rwxr-xr-x');
-  assert.strictEqual(octalToSymbolic('755', true), 'drwxr-xr-x');
-  assert.strictEqual(octalToSymbolic('644', false), '-rw-r--r--');
+  assert(code.includes('requestRunScript'), 'Must contain requestRunScript');
+  assert(code.includes('proceedToConfirmStep2'), 'Must contain proceedToConfirmStep2');
+  assert(code.includes('executeConfirmedScript'), 'Must contain executeConfirmedScript');
+  assert(code.includes('stopCurrentScript'), 'Must contain stopCurrentScript (Force Stop)');
+  assert(code.includes('copyLogById'), 'Must contain copyLogById');
+  assert(code.includes('toggleTheme'), 'Must contain toggleTheme');
 });
 
 // 6. Test Exact Timestamp Formatting (Must contain Hours, Minutes, and Seconds [HH:mm:ss])
@@ -159,7 +169,6 @@ runTest('Android Bridge Verification: RootBridge.kt contains required methods', 
   assert(kt.includes('fun getDeviceSpecs(): String'), 'Missing getDeviceSpecs method');
   assert(kt.includes('fun runRootDiagnostics(): String'), 'Missing runRootDiagnostics method');
   assert(kt.includes('fun listDirectory(dirPath: String): String'), 'Missing listDirectory method');
-  assert(kt.includes('fun changePermissions(filePath: String, octal: String): Boolean'), 'Missing changePermissions method');
   assert(kt.includes('fun runScript(scriptPath: String)'), 'Missing runScript method');
   assert(kt.includes('fun killProcess()'), 'Missing killProcess method');
 });

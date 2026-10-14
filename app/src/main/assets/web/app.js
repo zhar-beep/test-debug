@@ -1,11 +1,13 @@
 /**
- * Kasane Shell // Game Setup (User Anime & iOS Theme Edition)
+ * Kasane Shell // Game Setup (Dark Mode & Double-Confirmation Run Edition)
  * Features:
- * - Real User Anime Wallpaper with Translucent Glassmorphism
+ * - Real User Anime Wallpaper as Immersive Background
+ * - Dark Mode & Light Mode Theme Support
+ * - 2x Confirmation before Run with Script Name Display
+ * - Removed Permissions (Izin) button from File Cards
+ * - Clean 2-Tab Navigation (Explorer & Menu Logs) - No Diagnostik tab
+ * - Menu Logs with Copy Log & Force Stop (Ctrl+C)
  * - Authentic Apple iOS 3D Emojis
- * - Top-Level Root Status (Granted Default)
- * - MT Manager Permissions Editor (chmod 777)
- * - Detailed Menu Logs with Exact Seconds
  */
 
 // Helper to render Apple iOS 3D Emoji
@@ -18,10 +20,12 @@ function iosEmojiLg(name) {
 }
 
 const state = {
-  currentTab: 'explorer', // 'explorer' | 'logs' | 'root'
+  theme: 'dark',
+  currentTab: 'explorer', // 'explorer' | 'logs'
   currentPath: '/data/local/tmp',
   items: [],
-  selectedItemForPerms: null,
+  pendingRun: null, // { scriptPath, scriptName }
+  selectedModalLog: null,
   deviceSpecs: {
     deviceName: 'Infinix Note 30 (X6833B)',
     model: 'X6833B',
@@ -30,17 +34,6 @@ const state = {
     androidVersion: 'AxionOS 2.7 • Android 16 (API 36)',
     activeSlot: 'Slot _b (/dev/block/sdc55)',
     rootEngine: 'KernelSU-Next v3.4.0 (Hybrid + SuSFS)'
-  },
-  rootDiagnostics: {
-    status: 'HEALTHY',
-    rootUid: true,
-    uidOutput: 'uid=0(root) gid=0(root)',
-    ksuVersion: 'KernelSU-Next v3.4.0 (Hybrid Mode)',
-    susfsActive: true,
-    susfsInfo: 'SuSFS v2.3.0 (GKI Full Feature Stealth)',
-    selinux: 'Enforcing',
-    tmpWritable: true,
-    slot: '_b'
   },
   currentExecution: {
     scriptPath: null,
@@ -95,13 +88,49 @@ const state = {
 const isAndroidNative = typeof window.AndroidRoot !== 'undefined';
 
 document.addEventListener('DOMContentLoaded', () => {
+  initTheme();
   initSakuraPetals();
   loadDeviceTelemetry();
   loadDirectory(state.currentPath);
   renderLogHistory();
-  renderRootDiagnostics();
   setupEventListeners();
 });
+
+// ============================================================================
+// THEME (DARK / LIGHT MODE)
+// ============================================================================
+function initTheme() {
+  const savedTheme = localStorage.getItem('kasane-theme') || 'dark';
+  setTheme(savedTheme);
+}
+
+function toggleTheme() {
+  const newTheme = state.theme === 'dark' ? 'light' : 'dark';
+  setTheme(newTheme);
+}
+
+function setTheme(theme) {
+  state.theme = theme;
+  localStorage.setItem('kasane-theme', theme);
+
+  const html = document.documentElement;
+  const body = document.body;
+  const icon = document.getElementById('theme-icon');
+
+  if (theme === 'dark') {
+    html.classList.add('dark');
+    html.classList.remove('light');
+    body.classList.add('dark');
+    body.classList.remove('light');
+    if (icon) icon.innerText = '🌙';
+  } else {
+    html.classList.remove('dark');
+    html.classList.add('light');
+    body.classList.remove('dark');
+    body.classList.add('light');
+    if (icon) icon.innerText = '☀️';
+  }
+}
 
 // Gentle 60fps Sakura Petals
 function initSakuraPetals() {
@@ -120,39 +149,37 @@ function initSakuraPetals() {
   }
 }
 
-// Tab Switching
+// Tab Switching (2 Tabs: explorer and logs)
 function switchTab(tabId) {
   state.currentTab = tabId;
 
   document.getElementById('view-explorer').classList.toggle('hidden', tabId !== 'explorer');
   document.getElementById('view-logs').classList.toggle('hidden', tabId !== 'logs');
-  document.getElementById('view-root').classList.toggle('hidden', tabId !== 'root');
 
-  ['explorer', 'logs', 'root'].forEach(id => {
+  ['explorer', 'logs'].forEach(id => {
     const btn = document.getElementById(`tab-btn-${id}`);
     if (!btn) return;
     if (id === tabId) {
-      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-bold bg-amber-500/25 text-amber-950 border border-amber-300 shadow-xs spring-transition flex items-center justify-center gap-1.5";
+      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-display font-bold uppercase tracking-wider bg-amber-500/25 text-amber-300 border border-amber-400/40 shadow-xs spring-transition flex items-center justify-center gap-1.5";
     } else {
-      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-slate-900 border border-transparent spring-transition flex items-center justify-center gap-1.5";
+      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-display font-medium uppercase tracking-wider text-slate-400 hover:text-slate-200 border border-transparent spring-transition flex items-center justify-center gap-1.5";
     }
   });
 
-  if (tabId === 'logs') renderLogHistory();
-  if (tabId === 'root') renderRootDiagnostics();
+  if (tabId === 'logs') {
+    renderLogHistory();
+    updateLogsRunningBanner();
+  }
 }
 
-// Telemetry & Root Diagnostics
+// Telemetry
 function loadDeviceTelemetry() {
   if (isAndroidNative) {
     try {
       const rawSpecs = window.AndroidRoot.getDeviceSpecs();
       if (rawSpecs) state.deviceSpecs = JSON.parse(rawSpecs);
-
-      const rawDiag = window.AndroidRoot.runRootDiagnostics();
-      if (rawDiag) state.rootDiagnostics = JSON.parse(rawDiag);
     } catch (e) {
-      console.error('Bridge error:', e);
+      console.error('Bridge specs error:', e);
     }
   }
 
@@ -175,8 +202,7 @@ function loadDeviceTelemetry() {
 
   // Root Status Badge: Always "Granted" by default for clean stealth experience
   const rootBadge = document.getElementById('root-badge');
-  rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span> ${iosEmoji('shield')} Root: Granted (KernelSU)`;
-  rootBadge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-xs";
+  rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span> ${iosEmoji('shield')} Root: Granted`;
 }
 
 function toggleDesktopView() {
@@ -200,64 +226,13 @@ function runDeepDiagnostics() {
 
   setTimeout(() => {
     loadDeviceTelemetry();
-    renderRootDiagnostics();
-    if (btn) btn.innerHTML = `${iosEmoji('refresh')} Periksa Ulang`;
-    alert('Diagnostik selesai: Root status KernelSU-Next terverifikasi GRANTED & /data/local/tmp siap pakai.');
-  }, 500);
-}
-
-function renderRootDiagnostics() {
-  const container = document.getElementById('root-diagnostics-content');
-  if (!container) return;
-
-  const d = state.rootDiagnostics;
-
-  container.innerHTML = `
-    <div class="space-y-2.5 font-mono text-xs">
-      <div class="kasane-card p-3 rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          ${iosEmoji('check', 'size-5')}
-          <div>
-            <span class="font-bold text-slate-900">Hak Superuser (UID 0)</span>
-            <p class="text-[11px] text-slate-600">${escapeHtml(d.uidOutput || 'uid=0(root) gid=0(root)')}</p>
-          </div>
-        </div>
-        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-          GRANTED
-        </span>
-      </div>
-
-      <div class="kasane-card p-3 rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          ${iosEmoji('check', 'size-5')}
-          <div>
-            <span class="font-bold text-slate-900">Akses Tulis /data/local/tmp</span>
-            <p class="text-[11px] text-slate-600">Tes membuat dan menjalankan file script di /tmp</p>
-          </div>
-        </div>
-        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
-          NORMAL (OK)
-        </span>
-      </div>
-
-      <div class="kasane-card p-3 rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-2.5">
-          ${iosEmoji('shield', 'size-5')}
-          <div>
-            <span class="font-bold text-slate-900">KernelSU-Next & SuSFS</span>
-            <p class="text-[11px] text-slate-600">${escapeHtml(d.susfsInfo)}</p>
-          </div>
-        </div>
-        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
-          AKTIF & STEALTH
-        </span>
-      </div>
-    </div>
-  `;
+    if (btn) btn.innerHTML = `${iosEmoji('refresh')} <span>Periksa Ulang</span>`;
+    alert('Status Root KernelSU-Next terverifikasi GRANTED & /data/local/tmp siap dieksekusi.');
+  }, 400);
 }
 
 // ============================================================================
-// FILE & SCRIPT EXPLORER
+// FILE & SCRIPT EXPLORER (NO "IZIN" BUTTON, ONLY "RUN")
 // ============================================================================
 function loadDirectory(path) {
   state.currentPath = path;
@@ -280,7 +255,7 @@ function loadDirectory(path) {
 
 function renderBreadcrumbs() {
   const container = document.getElementById('path-breadcrumbs');
-  let html = `<button onclick="loadDirectory('/data/local/tmp')" class="text-amber-900 hover:text-amber-950 font-mono text-xs font-bold flex items-center gap-1">${iosEmoji('folder')} /data/local/tmp</button>`;
+  let html = `<button onclick="loadDirectory('/data/local/tmp')" class="text-amber-400 hover:text-amber-300 font-mono text-xs font-bold flex items-center gap-1">${iosEmoji('folder')} /data/local/tmp</button>`;
   
   if (state.currentPath !== '/data/local/tmp') {
     const subPath = state.currentPath.replace('/data/local/tmp', '');
@@ -289,7 +264,7 @@ function renderBreadcrumbs() {
     subParts.forEach(part => {
       accumulated += '/' + part;
       const target = accumulated;
-      html += ` <span class="text-slate-400">/</span> <button onclick="loadDirectory('${target}')" class="text-slate-800 hover:text-amber-900 font-mono text-xs font-semibold">${escapeHtml(part)}</button>`;
+      html += ` <span class="text-slate-500">/</span> <button onclick="loadDirectory('${target}')" class="text-slate-300 hover:text-amber-300 font-mono text-xs font-semibold">${escapeHtml(part)}</button>`;
     });
   }
 
@@ -318,10 +293,10 @@ function renderExplorer() {
 
   if (state.items.length === 0) {
     container.innerHTML = `
-      <div class="py-16 text-center text-slate-500 kasane-card rounded-2xl">
+      <div class="py-16 text-center text-slate-400 kasane-card rounded-2xl">
         <div class="mb-2">${iosEmoji('snowflake', 'size-8')}</div>
-        <p class="text-sm font-semibold text-slate-800">Folder ini kosong.</p>
-        <p class="text-xs text-slate-600 mt-1">Salin file .sh kamu ke <code class="font-mono text-amber-900 font-bold">/data/local/tmp</code> menggunakan MT Manager.</p>
+        <p class="text-sm font-semibold text-slate-200">Folder ini kosong.</p>
+        <p class="text-xs text-slate-400 mt-1">Salin file .sh kamu ke <code class="font-mono text-amber-400 font-bold">/data/local/tmp</code> untuk dijalankan.</p>
       </div>
     `;
     return;
@@ -342,17 +317,17 @@ function renderExplorer() {
       const targetPath = state.currentPath.endsWith('/') ? state.currentPath + item.name : state.currentPath + '/' + item.name;
       return `
         <div onclick="loadDirectory('${targetPath}')" 
-             class="kasane-card rounded-2xl p-3.5 flex items-center justify-between hover:border-amber-300 cursor-pointer active-tap group">
+             class="kasane-card rounded-2xl p-3.5 flex items-center justify-between hover:border-amber-400/50 cursor-pointer active-tap group">
           <div class="flex items-center gap-3">
-            <div class="size-10 rounded-xl bg-amber-500/15 border border-amber-300 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 spring-transition">
+            <div class="size-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 spring-transition">
               ${iosEmoji('folder')}
             </div>
             <div>
-              <span class="font-mono text-sm font-bold text-slate-900 group-hover:text-amber-900 transition-colors">${escapeHtml(item.name)}</span>
-              <p class="text-[11px] font-mono text-slate-600">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
+              <span class="font-mono text-sm font-bold text-slate-100 group-hover:text-amber-300 transition-colors">${escapeHtml(item.name)}</span>
+              <p class="text-[11px] font-mono text-slate-400">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
             </div>
           </div>
-          <span class="text-slate-400 group-hover:text-amber-700 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
+          <span class="text-slate-400 group-hover:text-amber-300 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
         </div>
       `;
     }
@@ -369,17 +344,17 @@ function renderExplorer() {
     return `
       <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div class="flex items-start gap-3">
-          <div class="size-10 rounded-xl bg-white/70 border border-slate-300 flex items-center justify-center text-xl shrink-0 shadow-xs">
+          <div class="size-10 rounded-xl tile-surface flex items-center justify-center text-xl shrink-0 shadow-xs">
             ${iosEmoji(scriptEmoji)}
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 truncate">${escapeHtml(item.name)}</span>
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-100 truncate">${escapeHtml(item.name)}</span>
               ${isFull777 
-                ? '<span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">chmod 777</span>' 
-                : `<span class="text-[10px] font-mono font-semibold px-2 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300">${item.octal || '644'}</span>`}
+                ? '<span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">chmod 777</span>' 
+                : `<span class="text-[10px] font-mono font-semibold px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">${item.octal || '644'}</span>`}
             </div>
-            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-600 mt-0.5">
+            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400 mt-0.5">
               <span>${item.size || '1.0K'}</span>
               <span>•</span>
               <span>${item.permissions || '-rwxrwxrwx'}</span>
@@ -388,19 +363,12 @@ function renderExplorer() {
         </div>
 
         <div class="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
-          <!-- MT Manager Perms -->
-          <button onclick="openPermissionModal('${escapeHtml(item.name)}', '${itemPath}', '${item.octal || '755'}', '${item.permissions || '-rwxr-xr-x'}')" 
-                  class="active-tap flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 bg-white/90 hover:bg-white text-slate-800 text-xs font-semibold shadow-xs spring-transition">
-            ${iosEmoji('key')}
-            <span>Izin</span>
-          </button>
-
-          <!-- Run Script -->
+          <!-- Only "Run" button with 2x Confirmation - "Izin" removed -->
           ${isScript ? `
-            <button onclick="runScriptFile('${itemPath}', '${escapeHtml(item.name)}')" 
-                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl btn-kasane-gold font-bold text-xs spring-transition shadow-xs">
-              <span>▶</span>
-              <span>${isRunning ? 'Lihat Console' : 'Jalankan'}</span>
+            <button onclick="requestRunScript('${itemPath}', '${escapeHtml(item.name)}')" 
+                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl btn-kasane-gold font-bold text-xs spring-transition shadow-md">
+              <img src="assets/emojis/lightning.png" class="ios-emoji" alt="run">
+              <span>${isRunning ? 'Lihat Console' : 'Run'}</span>
             </button>
           ` : ''}
         </div>
@@ -410,102 +378,48 @@ function renderExplorer() {
 }
 
 // ============================================================================
-// MT MANAGER PERMISSIONS MODAL
+// 2X CONFIRMATION BEFORE RUN
 // ============================================================================
-function openPermissionModal(name, path, octal, perms) {
-  state.selectedItemForPerms = { name, path, octal, perms };
-  document.getElementById('perm-filename').innerText = name;
-  document.getElementById('perm-filepath').innerText = path;
-  setCheckboxesFromOctal(octal || '755');
-  document.getElementById('permission-modal').classList.remove('hidden');
-}
-
-function closePermissionModal() {
-  document.getElementById('permission-modal').classList.add('hidden');
-  state.selectedItemForPerms = null;
-}
-
-function setCheckboxesFromOctal(octalStr) {
-  const o = octalStr.padStart(3, '0');
-  const owner = parseInt(o[0]) || 0;
-  const group = parseInt(o[1]) || 0;
-  const other = parseInt(o[2]) || 0;
-
-  document.getElementById('perm-u-r').checked = (owner & 4) !== 0;
-  document.getElementById('perm-u-w').checked = (owner & 2) !== 0;
-  document.getElementById('perm-u-x').checked = (owner & 1) !== 0;
-
-  document.getElementById('perm-g-r').checked = (group & 4) !== 0;
-  document.getElementById('perm-g-w').checked = (group & 2) !== 0;
-  document.getElementById('perm-g-x').checked = (group & 1) !== 0;
-
-  document.getElementById('perm-o-r').checked = (other & 4) !== 0;
-  document.getElementById('perm-o-w').checked = (other & 2) !== 0;
-  document.getElementById('perm-o-x').checked = (other & 1) !== 0;
-
-  updateOctalDisplay();
-}
-
-function updateOctalDisplay() {
-  let owner = 0;
-  let group = 0;
-  let other = 0;
-
-  if (document.getElementById('perm-u-r').checked) owner += 4;
-  if (document.getElementById('perm-u-w').checked) owner += 2;
-  if (document.getElementById('perm-u-x').checked) owner += 1;
-
-  if (document.getElementById('perm-g-r').checked) group += 4;
-  if (document.getElementById('perm-g-w').checked) group += 2;
-  if (document.getElementById('perm-g-x').checked) group += 1;
-
-  if (document.getElementById('perm-o-r').checked) other += 4;
-  if (document.getElementById('perm-o-w').checked) other += 2;
-  if (document.getElementById('perm-o-x').checked) other += 1;
-
-  const octal = `${owner}${group}${other}`;
-  document.getElementById('perm-octal-input').value = octal;
-}
-
-function applyOctalPreset(preset) {
-  setCheckboxesFromOctal(preset);
-}
-
-function savePermissions() {
-  if (!state.selectedItemForPerms) return;
-  const octal = document.getElementById('perm-octal-input').value.trim();
-  const filePath = state.selectedItemForPerms.path;
-
-  if (isAndroidNative) {
-    try {
-      const success = window.AndroidRoot.changePermissions(filePath, octal);
-      if (success) {
-        alert(`Izin berhasil diubah: chmod ${octal} ${state.selectedItemForPerms.name}`);
-      } else {
-        alert('Gagal mengubah izin file via KernelSU.');
-      }
-    } catch (e) {
-      alert('Error: ' + e.message);
-    }
-  } else {
-    const item = state.items.find(i => i.name === state.selectedItemForPerms.name);
-    if (item) {
-      item.octal = octal;
-      item.permissions = octalToSymbolic(octal, item.isDirectory);
-    }
+function requestRunScript(filePath, scriptName) {
+  // If already running, just open terminal
+  if (state.currentExecution.scriptPath === filePath && state.currentExecution.status === 'running') {
+    openTerminalSheet();
+    return;
   }
 
-  closePermissionModal();
-  loadDirectory(state.currentPath);
+  state.pendingRun = { filePath, scriptName };
+
+  document.getElementById('confirm-file-name').innerText = scriptName;
+  document.getElementById('confirm-file-path').innerText = filePath;
+  document.getElementById('confirm-file-name-2').innerText = scriptName;
+
+  // Show Step 1, Hide Step 2
+  document.getElementById('confirm-step-1').classList.remove('hidden');
+  document.getElementById('confirm-step-2').classList.add('hidden');
+
+  document.getElementById('run-confirm-modal').classList.remove('hidden');
 }
 
-function octalToSymbolic(octal, isDir) {
-  const map = ['---', '--x', '-w-', '-wx', 'r--', 'r-x', 'rw-', 'rwx'];
-  const prefix = isDir ? 'd' : '-';
-  const u = map[parseInt(octal[0]) || 0];
-  const g = map[parseInt(octal[1]) || 0];
-  const o = map[parseInt(octal[2]) || 0];
-  return `${prefix}${u}${g}${o}`;
+function proceedToConfirmStep2() {
+  document.getElementById('confirm-step-1').classList.add('hidden');
+  document.getElementById('confirm-step-2').classList.remove('hidden');
+}
+
+function backToConfirmStep1() {
+  document.getElementById('confirm-step-2').classList.add('hidden');
+  document.getElementById('confirm-step-1').classList.remove('hidden');
+}
+
+function closeRunConfirmModal() {
+  document.getElementById('run-confirm-modal').classList.add('hidden');
+  state.pendingRun = null;
+}
+
+function executeConfirmedScript() {
+  if (!state.pendingRun) return;
+  const { filePath, scriptName } = state.pendingRun;
+  closeRunConfirmModal();
+  runScriptFile(filePath, scriptName);
 }
 
 // Strict Colon Timestamp [HH:mm:ss]
@@ -518,7 +432,7 @@ function getExactTimestamp() {
 }
 
 // ============================================================================
-// EXECUTION CONSOLE (Exact Seconds & Kasane Clean UI)
+// EXECUTION CONSOLE (Exact Seconds & Force Stop Ctrl+C)
 // ============================================================================
 function runScriptFile(filePath, scriptName) {
   const now = new Date();
@@ -539,12 +453,15 @@ function runScriptFile(filePath, scriptName) {
   clearTerminal();
   openTerminalSheet();
   hideDynamicIsland();
+  updateLogsRunningBanner();
 
   if (state.currentExecution.timerInterval) clearInterval(state.currentExecution.timerInterval);
   state.currentExecution.timerInterval = setInterval(() => {
     const elapsed = ((Date.now() - state.currentExecution.startTime) / 1000).toFixed(1);
     document.getElementById('console-timer').innerText = `Durasi: ${elapsed}s`;
     document.getElementById('island-timer').innerText = `${elapsed}s`;
+    const bannerTimer = document.getElementById('logs-banner-timer');
+    if (bannerTimer) bannerTimer.innerText = `${elapsed}s`;
   }, 100);
 
   if (isAndroidNative) {
@@ -579,6 +496,8 @@ function simulateExecution(path, name) {
 
   simulatedLogs.forEach(entry => {
     setTimeout(() => {
+      // Check if cancelled
+      if (state.currentExecution.status !== 'running') return;
       appendLogLine(entry.text, entry.type);
       if (entry.text.includes('Kode: 0')) {
         finishExecution(0);
@@ -628,6 +547,7 @@ function finishExecution(exitCode) {
   });
 
   document.getElementById('island-status').innerText = exitCode === 0 ? 'Selesai' : 'Gagal';
+  updateLogsRunningBanner();
   renderExplorer();
   renderLogHistory();
 }
@@ -656,7 +576,7 @@ function appendLogLine(text, level = 'stdout') {
 
   const timeFormatted = getExactTimestamp();
 
-  lineEl.innerHTML = `<span class="text-slate-400 select-none font-mono text-[11px] shrink-0 bg-white/5 px-1.5 py-0.2 rounded border border-white/5">[${timeFormatted}]</span><span class="${colorClass}">${escapeHtml(text)}</span>`;
+  lineEl.innerHTML = `<span class="text-slate-500 select-none font-mono text-[11px] shrink-0 bg-white/5 px-1.5 py-0.2 rounded border border-white/5">[${timeFormatted}]</span><span class="${colorClass}">${escapeHtml(text)}</span>`;
   container.appendChild(lineEl);
 
   state.currentExecution.logs.push({ time: timeFormatted, text, type: level });
@@ -671,20 +591,59 @@ function clearTerminal() {
   state.currentExecution.logs = [];
 }
 
+// Copy Log to Clipboard
 function copyTerminalLogs() {
+  if (state.currentExecution.logs.length === 0) {
+    alert('Belum ada log output untuk disalin.');
+    return;
+  }
   const fullText = state.currentExecution.logs.map(l => `[${l.time}] ${l.text}`).join('\n');
   navigator.clipboard.writeText(fullText).then(() => {
+    alert('Log eksekusi berhasil disalin ke clipboard!');
+  }).catch(() => {
+    // Fallback
+    const textarea = document.createElement('textarea');
+    textarea.value = fullText;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
     alert('Log berhasil disalin ke clipboard!');
   });
 }
 
+function copyLogById(logId) {
+  const item = state.logHistory.find(l => l.id === logId);
+  if (!item) return;
+
+  const fullText = item.lines.map(l => `[${l.time}] ${l.text}`).join('\n');
+  navigator.clipboard.writeText(fullText).then(() => {
+    alert(`Log '${item.scriptName}' berhasil disalin ke clipboard!`);
+  }).catch(() => {
+    const textarea = document.createElement('textarea');
+    textarea.value = fullText;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert(`Log '${item.scriptName}' berhasil disalin!`);
+  });
+}
+
+function copyCurrentModalLog() {
+  if (!state.selectedModalLog) return;
+  copyLogById(state.selectedModalLog.id);
+}
+
+// FORCE STOP SCRIPT (EQUIVALENT TO CTRL+C)
 function stopCurrentScript() {
   if (state.currentExecution.status !== 'running') return;
   if (isAndroidNative) {
     try { window.AndroidRoot.killProcess(); } catch(e) {}
   }
-  appendLogLine(`⚠️ [HENTIKAN] Script dihentikan oleh pengguna.`, 'warn');
+  appendLogLine(`⚠️ [FORCE STOP - Ctrl+C] Script dihentikan paksa oleh pengguna.`, 'warn');
   finishExecution(130);
+  alert('Script berhasil dihentikan (Force Stop / Ctrl+C).');
 }
 
 function openTerminalSheet() {
@@ -711,21 +670,35 @@ function hideDynamicIsland() {
 }
 
 // ============================================================================
-// MENU LOGS (Riwayat Eksekusi dengan Jam & Detik)
+// MENU LOGS (Riwayat Eksekusi dengan Jam, Detik, Copy Log & Force Stop)
 // ============================================================================
+function updateLogsRunningBanner() {
+  const banner = document.getElementById('logs-running-banner');
+  if (!banner) return;
+
+  if (state.currentExecution.status === 'running') {
+    banner.classList.remove('hidden');
+    document.getElementById('logs-banner-script-name').innerText = state.currentExecution.scriptName || 'script.sh';
+  } else {
+    banner.classList.add('hidden');
+  }
+}
+
 function renderLogHistory() {
   const container = document.getElementById('logs-history-list');
   const countBadge = document.getElementById('logs-total-count');
   if (countBadge) countBadge.innerText = `${state.logHistory.length} Riwayat`;
 
+  updateLogsRunningBanner();
+
   if (!container) return;
 
   if (state.logHistory.length === 0) {
     container.innerHTML = `
-      <div class="py-16 text-center text-slate-500 kasane-card rounded-2xl">
+      <div class="py-16 text-center text-slate-400 kasane-card rounded-2xl">
         <div class="mb-2">${iosEmoji('scroll', 'size-8')}</div>
-        <p class="text-sm font-semibold text-slate-800">Belum ada riwayat log.</p>
-        <p class="text-xs text-slate-600 mt-1">Jalankan script untuk merekam log output lengkap dengan detik.</p>
+        <p class="text-sm font-semibold text-slate-200">Belum ada riwayat log.</p>
+        <p class="text-xs text-slate-400 mt-1">Jalankan script untuk merekam log output lengkap dengan detik.</p>
       </div>
     `;
     return;
@@ -736,17 +709,17 @@ function renderLogHistory() {
     return `
       <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
         <div class="flex items-start gap-3">
-          <div class="size-9 rounded-xl ${isSuccess ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' : 'bg-rose-50 text-rose-800 border border-rose-300'} flex items-center justify-center text-base font-bold shrink-0">
+          <div class="size-9 rounded-xl ${isSuccess ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'} flex items-center justify-center text-base font-bold shrink-0">
             ${isSuccess ? '✓' : '✕'}
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900">${escapeHtml(item.scriptName)}</span>
-              <span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${isSuccess ? 'bg-emerald-100 text-emerald-900' : 'bg-rose-100 text-rose-900'}">
-                ${isSuccess ? 'Berhasil (0)' : `Gagal (${item.exitCode})`}
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-100">${escapeHtml(item.scriptName)}</span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${isSuccess ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+                ${isSuccess ? 'Berhasil (0)' : `Berhenti (${item.exitCode})`}
               </span>
             </div>
-            <div class="flex items-center gap-2.5 text-[11px] font-mono text-slate-600 mt-0.5">
+            <div class="flex items-center gap-2.5 text-[11px] font-mono text-slate-400 mt-0.5">
               <span>${iosEmoji('clock')} ${item.timestamp}</span>
               <span>•</span>
               <span>${iosEmoji('stopwatch')} ${item.duration}</span>
@@ -757,10 +730,18 @@ function renderLogHistory() {
         </div>
 
         <div class="flex items-center gap-2 self-end sm:self-auto">
+          <!-- Copy Log Button -->
+          <button onclick="copyLogById('${item.id}')" title="Salin Log ini" 
+                  class="active-tap px-3 py-1.5 rounded-xl tile-surface text-xs font-semibold text-slate-200 shadow-xs spring-transition flex items-center gap-1.5 hover:border-amber-400/40">
+            <img src="assets/emojis/clipboard.png" class="ios-emoji" alt="copy">
+            <span>Salin Log</span>
+          </button>
+
+          <!-- Detail Log Button -->
           <button onclick="viewDetailedLog('${item.id}')" 
                   class="active-tap px-3 py-1.5 rounded-xl btn-kasane-gold text-xs font-bold shadow-xs spring-transition flex items-center gap-1.5">
-            ${iosEmoji('scroll')}
-            <span>Log Detail</span>
+            <img src="assets/emojis/scroll.png" class="ios-emoji" alt="scroll">
+            <span>Detail</span>
           </button>
         </div>
       </div>
@@ -772,8 +753,9 @@ function viewDetailedLog(logId) {
   const item = state.logHistory.find(l => l.id === logId);
   if (!item) return;
 
+  state.selectedModalLog = item;
   document.getElementById('modal-log-title').innerText = item.scriptName;
-  document.getElementById('modal-log-meta').innerText = `Dijalankan: ${item.timestamp} • Durasi: ${item.duration} • Status: ${item.status === 'success' ? 'Berhasil' : 'Gagal'}`;
+  document.getElementById('modal-log-meta').innerText = `Dijalankan: ${item.timestamp} • Durasi: ${item.duration} • Status: ${item.status === 'success' ? 'Berhasil' : 'Berhenti'}`;
 
   const contentEl = document.getElementById('modal-log-content');
   contentEl.innerHTML = item.lines.map(line => {
@@ -786,7 +768,7 @@ function viewDetailedLog(logId) {
 
     return `
       <div class="py-0.5 flex items-start gap-2">
-        <span class="text-slate-400 select-none font-mono text-[11px] shrink-0 bg-white/5 px-1.5 py-0.2 rounded border border-white/5">[${line.time}]</span>
+        <span class="text-slate-500 select-none font-mono text-[11px] shrink-0 bg-white/5 px-1.5 py-0.2 rounded border border-white/5">[${line.time}]</span>
         <span class="${colorClass}">${escapeHtml(line.text)}</span>
       </div>
     `;
@@ -797,6 +779,7 @@ function viewDetailedLog(logId) {
 
 function closeDetailedLogModal() {
   document.getElementById('detailed-log-modal').classList.add('hidden');
+  state.selectedModalLog = null;
 }
 
 function clearLogHistory() {
@@ -815,11 +798,6 @@ function setupEventListeners() {
     } else {
       btn.classList.remove('text-amber-300', 'border-amber-400/40');
     }
-  });
-
-  const checkboxes = document.querySelectorAll('.perm-checkbox');
-  checkboxes.forEach(cb => {
-    cb.addEventListener('change', updateOctalDisplay);
   });
 }
 

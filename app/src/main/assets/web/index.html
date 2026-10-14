@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -9,13 +9,14 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
             kasane: {
-              gold: '#d97706',
-              jade: '#059669',
-              crimson: '#e11d48',
+              gold: '#f59e0b',
+              jade: '#10b981',
+              crimson: '#f43f5e',
               slate: '#0f172a'
             }
           }
@@ -26,19 +27,19 @@
   
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="text-slate-900 antialiased mode-phone-mockup">
+<body class="dark antialiased mode-phone-mockup">
 
-  <!-- Full Background: User's Uploaded Anime Wallpaper with Translucent Glass -->
-  <div class="user-wallpaper-bg"></div>
-  <div class="user-glass-overlay"></div>
+  <!-- Full Background: User's Uploaded Anime Artwork as Comprehensive Wallpaper -->
+  <div class="user-wallpaper-bg kasane-wallpaper-bg"></div>
+  <div class="user-glass-overlay kasane-mist-overlay"></div>
 
-  <!-- Falling Sakura Petals Drift (Lightweight 60fps) -->
+  <!-- Falling Sakura Petals Drift (Lightweight 60fps GPU) -->
   <div id="sakura-container" class="sakura-container"></div>
 
   <!-- Desktop View Mode Switcher -->
   <div class="hidden sm:flex fixed top-3 right-4 z-50 items-center gap-2">
     <button id="btn-desktop-toggle" onclick="toggleDesktopView()" 
-            class="active-tap px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/85 hover:bg-white text-slate-800 border border-slate-300 shadow-md spring-transition flex items-center gap-1.5">
+            class="active-tap px-3.5 py-1.5 rounded-full text-xs font-semibold bg-slate-900/85 hover:bg-slate-900 text-slate-100 border border-white/20 shadow-lg spring-transition flex items-center gap-1.5">
       <img src="assets/emojis/phone.png" class="ios-emoji" alt="phone">
       <span>Mode Layar Lebar</span>
     </button>
@@ -55,23 +56,31 @@
     <!-- Top Navigation Bar -->
     <header class="sticky top-0 z-40 kasane-nav px-4 sm:px-5 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <div class="relative flex items-center justify-center size-9 rounded-2xl bg-amber-500/15 border border-amber-300 shadow-xs">
+        <div class="relative flex items-center justify-center size-9 rounded-2xl bg-amber-500/20 border border-amber-400/40 shadow-xs">
           <img src="assets/emojis/sakura.png" class="ios-emoji-lg" alt="sakura">
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <span class="font-extrabold text-xs tracking-tight uppercase text-slate-950">KASANE</span>
-            <span class="text-[9px] font-mono tracking-wider text-amber-900 font-bold uppercase px-1.5 py-0.2 rounded-full bg-amber-100 border border-amber-300">GAME SETUP</span>
+            <span class="font-display font-extrabold text-xs tracking-wider uppercase text-white dark:text-white">KASANE</span>
+            <span class="text-[9px] font-mono tracking-wider text-amber-300 font-bold uppercase px-1.5 py-0.2 rounded-full bg-amber-500/20 border border-amber-400/30">GAME SETUP</span>
           </div>
-          <p class="text-[10px] text-slate-600 font-mono">Infinix Note 30 • FHD+ (1080x2460)</p>
+          <p class="text-[10px] text-slate-400 font-mono">Infinix Note 30 • FHD+ (1080x2460)</p>
         </div>
       </div>
 
-      <!-- Root Granted Live Badge (iOS Shield) -->
-      <div id="root-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-xs">
-        <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
-        <img src="assets/emojis/shield.png" class="ios-emoji" alt="shield">
-        <span>Root: Granted (KernelSU)</span>
+      <div class="flex items-center gap-2">
+        <!-- Dark / Light Mode Switcher -->
+        <button id="btn-theme-toggle" onclick="toggleTheme()" title="Ganti Tema (Dark / Light)"
+                class="active-tap size-8 rounded-full tile-surface flex items-center justify-center shadow-xs spring-transition hover:border-amber-400/50">
+          <span id="theme-icon">🌙</span>
+        </button>
+
+        <!-- Root Granted Live Badge (iOS Shield) -->
+        <div id="root-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 shadow-xs">
+          <span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <img src="assets/emojis/shield.png" class="ios-emoji" alt="shield">
+          <span>Root: Granted</span>
+        </div>
       </div>
     </header>
 
@@ -79,13 +88,13 @@
     <main class="flex-1 px-4 py-3.5 space-y-3.5 pb-28">
 
       <!-- =====================================================================
-           TOP-LEVEL STATUS ROOT & HARDWARE TELEMETRY CARD (PINDAH KE ATAS)
+           TOP-LEVEL STATUS ROOT & HARDWARE TELEMETRY CARD
            ===================================================================== -->
       <section class="kasane-card rounded-2xl p-3.5 shadow-md space-y-2.5">
-        <div class="flex items-center justify-between border-b border-white/60 pb-2">
+        <div class="flex items-center justify-between border-b border-white/10 pb-2">
           <div class="flex items-center gap-1.5">
             <img src="assets/emojis/shield.png" class="ios-emoji" alt="shield">
-            <h2 class="font-bold text-xs text-slate-900">Status Root & Spesifikasi HP</h2>
+            <h2 class="font-display font-bold text-xs uppercase tracking-wide text-white dark:text-white">Status Root & Spesifikasi HP</h2>
           </div>
           <button id="btn-recheck-root" onclick="runDeepDiagnostics()" 
                   class="active-tap px-2.5 py-1 rounded-xl btn-kasane-gold text-[10px] font-bold shadow-xs spring-transition flex items-center gap-1">
@@ -98,118 +107,73 @@
         <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
           
           <!-- Phone Model -->
-          <div class="bg-white/70 p-2 rounded-xl border border-white/80 shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-600 text-[10px]">
+          <div class="tile-surface p-2 rounded-xl shadow-xs space-y-0.5">
+            <div class="flex items-center gap-1 text-slate-400 text-[10px]">
               <img src="assets/emojis/phone.png" class="ios-emoji" alt="phone">
               <span class="uppercase tracking-wider font-semibold">Perangkat HP</span>
             </div>
-            <p id="hud-device-name" class="font-bold text-slate-900 truncate">Infinix Note 30 (X6833B)</p>
+            <p id="hud-device-name" class="font-bold text-slate-200 truncate">Infinix Note 30 (X6833B)</p>
           </div>
 
           <!-- Display Resolution -->
-          <div class="bg-white/70 p-2 rounded-xl border border-white/80 shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-600 text-[10px]">
+          <div class="tile-surface p-2 rounded-xl shadow-xs space-y-0.5">
+            <div class="flex items-center gap-1 text-slate-400 text-[10px]">
               <img src="assets/emojis/display.png" class="ios-emoji" alt="display">
               <span class="uppercase tracking-wider font-semibold">Layar FHD+</span>
             </div>
-            <p id="hud-display-resolution" class="font-bold text-amber-900 truncate">1080 x 2460 (120Hz)</p>
+            <p id="hud-display-resolution" class="font-bold text-amber-400 truncate">1080 x 2460 (120Hz)</p>
           </div>
 
           <!-- Kernel Version -->
-          <div class="bg-white/70 p-2 rounded-xl border border-white/80 shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-600 text-[10px]">
+          <div class="tile-surface p-2 rounded-xl shadow-xs space-y-0.5">
+            <div class="flex items-center gap-1 text-slate-400 text-[10px]">
               <img src="assets/emojis/gear.png" class="ios-emoji" alt="gear">
               <span class="uppercase tracking-wider font-semibold">Kernel</span>
             </div>
-            <p id="hud-kernel-version" class="font-bold text-amber-900 truncate">5.10.269-SuiKernel</p>
+            <p id="hud-kernel-version" class="font-bold text-amber-400 truncate">5.10.269-SuiKernel</p>
           </div>
 
           <!-- OS / ROM -->
-          <div class="bg-white/70 p-2 rounded-xl border border-white/80 shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-600 text-[10px]">
+          <div class="tile-surface p-2 rounded-xl shadow-xs space-y-0.5">
+            <div class="flex items-center gap-1 text-slate-400 text-[10px]">
               <img src="assets/emojis/label.png" class="ios-emoji" alt="label">
               <span class="uppercase tracking-wider font-semibold">OS / ROM</span>
             </div>
-            <p id="hud-android-version" class="font-bold text-slate-900 truncate">AxionOS 2.7 • Android 16</p>
+            <p id="hud-android-version" class="font-bold text-slate-200 truncate">AxionOS 2.7 • Android 16</p>
           </div>
 
           <!-- Active Slot -->
-          <div class="bg-white/70 p-2 rounded-xl border border-white/80 shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-600 text-[10px]">
+          <div class="tile-surface p-2 rounded-xl shadow-xs space-y-0.5">
+            <div class="flex items-center gap-1 text-slate-400 text-[10px]">
               <img src="assets/emojis/slot.png" class="ios-emoji" alt="slot">
               <span class="uppercase tracking-wider font-semibold">Slot Aktif</span>
             </div>
-            <p id="hud-active-slot" class="font-bold text-emerald-800 truncate">Slot _b (/dev/block/sdc55)</p>
+            <p id="hud-active-slot" class="font-bold text-emerald-400 truncate">Slot _b (/dev/block/sdc55)</p>
           </div>
 
           <!-- Target Folder -->
-          <div class="bg-white/70 p-2 rounded-xl border border-white/80 shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-600 text-[10px]">
+          <div class="tile-surface p-2 rounded-xl shadow-xs space-y-0.5">
+            <div class="flex items-center gap-1 text-slate-400 text-[10px]">
               <img src="assets/emojis/folder.png" class="ios-emoji" alt="folder">
               <span class="uppercase tracking-wider font-semibold">Workspace</span>
             </div>
-            <p class="font-bold text-amber-900 truncate">/data/local/tmp</p>
+            <p class="font-bold text-amber-400 truncate">/data/local/tmp</p>
           </div>
 
         </div>
       </section>
 
-      <!-- Hero Card with User's Uploaded Anime Artwork -->
-      <section class="kasane-card rounded-2xl p-3.5 relative overflow-hidden shadow-md">
-        <div class="relative z-10 flex items-center justify-between gap-3">
-          
-          <div class="space-y-1.5 flex-1">
-            <div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100/95 border border-amber-300 text-amber-900 text-[10px] font-bold">
-              <img src="assets/emojis/sakura.png" class="ios-emoji" alt="sakura">
-              <span>Kasane Action RPG • Zero Lag</span>
-            </div>
-
-            <h1 class="text-lg sm:text-xl font-extrabold tracking-tight text-slate-950 leading-tight">
-              Game Script Runner
-              <span class="block bg-gradient-to-r from-amber-700 via-rose-700 to-emerald-700 bg-clip-text text-transparent">
-                KernelSU-Next v3.4.0
-              </span>
-            </h1>
-
-            <p class="text-[11px] text-slate-700 leading-relaxed">
-              Jalankan script game, atur izin <strong class="text-slate-950">chmod 777</strong>, dan pantau log detik di Infinix Note 30.
-            </p>
-          </div>
-
-          <!-- User's Uploaded Anime Artwork Avatar -->
-          <div class="relative shrink-0">
-            <div class="relative w-28 h-32 rounded-2xl overflow-hidden border-2 border-white/90 shadow-md group">
-              <img src="assets/user-anime.jpg" 
-                   alt="User Anime Artwork" 
-                   class="size-full object-cover object-top group-hover:scale-105 spring-transition">
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
-              <div class="absolute bottom-1 inset-x-1 text-center">
-                <span class="text-[8px] font-mono tracking-widest text-white uppercase px-1.5 py-0.2 rounded-full bg-black/60 backdrop-blur-md">
-                  KASANE MAIDEN
-                </span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <!-- Main Navigation Tabs (3 Core Tabs) -->
+      <!-- Main Navigation Tabs (2 Clean Tabs: Explorer & Menu Logs) -->
       <div class="kasane-card rounded-2xl p-1 flex items-center justify-between gap-1 shadow-xs">
         <button id="tab-btn-explorer" onclick="switchTab('explorer')" 
-                class="active-tap flex-1 py-2 rounded-xl text-xs font-bold bg-amber-500/25 text-amber-950 border border-amber-300 shadow-xs spring-transition flex items-center justify-center gap-1.5">
+                class="active-tap flex-1 py-2 rounded-xl text-xs font-display font-bold uppercase tracking-wider bg-amber-500/25 text-amber-300 border border-amber-400/40 shadow-xs spring-transition flex items-center justify-center gap-1.5">
           <img src="assets/emojis/folder.png" class="ios-emoji" alt="folder">
           <span>Explorer</span>
         </button>
         <button id="tab-btn-logs" onclick="switchTab('logs')" 
-                class="active-tap flex-1 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-slate-900 border border-transparent spring-transition flex items-center justify-center gap-1.5">
+                class="active-tap flex-1 py-2 rounded-xl text-xs font-display font-medium uppercase tracking-wider text-slate-400 hover:text-slate-200 border border-transparent spring-transition flex items-center justify-center gap-1.5">
           <img src="assets/emojis/scroll.png" class="ios-emoji" alt="scroll">
           <span>Menu Logs</span>
-        </button>
-        <button id="tab-btn-root" onclick="switchTab('root')" 
-                class="active-tap flex-1 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-slate-900 border border-transparent spring-transition flex items-center justify-center gap-1.5">
-          <img src="assets/emojis/shield.png" class="ios-emoji" alt="shield">
-          <span>Diagnostik</span>
         </button>
       </div>
 
@@ -218,11 +182,11 @@
            ======================================================================= -->
       <div id="view-explorer" class="space-y-3">
         
-        <!-- Path Bar & Controls (MT Manager Style) -->
+        <!-- Path Bar & Controls -->
         <div class="kasane-card rounded-2xl p-2.5 flex items-center justify-between gap-2 shadow-xs">
           <div class="flex items-center gap-1.5 min-w-0">
             <button id="btn-folder-up" onclick="navigateUp()" title="Kembali ke Folder Atas"
-                    class="active-tap size-8 rounded-xl border border-slate-300 bg-white/90 hover:bg-white text-slate-800 font-bold flex items-center justify-center spring-transition shrink-0 shadow-xs text-xs">
+                    class="active-tap size-8 rounded-xl tile-surface text-slate-200 font-bold flex items-center justify-center spring-transition shrink-0 shadow-xs text-xs">
               ▲
             </button>
             <div id="path-breadcrumbs" class="flex items-center gap-1 overflow-x-auto no-scrollbar font-mono text-xs">
@@ -231,9 +195,9 @@
           </div>
 
           <div class="flex items-center gap-1.5 shrink-0">
-            <span id="items-count" class="text-[11px] font-mono font-bold text-slate-700">0 item</span>
+            <span id="items-count" class="text-[11px] font-mono font-bold text-slate-400">0 item</span>
             <button onclick="loadDirectory(state.currentPath)" title="Segarkan" 
-                    class="active-tap size-8 rounded-xl border border-slate-300 bg-white/90 hover:bg-white flex items-center justify-center spring-transition shadow-xs">
+                    class="active-tap size-8 rounded-xl tile-surface flex items-center justify-center spring-transition shadow-xs">
               <img src="assets/emojis/refresh.png" class="ios-emoji" alt="refresh">
             </button>
           </div>
@@ -246,20 +210,50 @@
       </div>
 
       <!-- =======================================================================
-           VIEW 2: MENU LOGS TAB (Riwayat Eksekusi dengan Jam & Detik)
+           VIEW 2: MENU LOGS TAB (Riwayat Eksekusi, Copy Log, & Force Stop Ctrl+C)
            ======================================================================= -->
       <div id="view-logs" class="space-y-3 hidden">
+        
+        <!-- Active Script Running Banner (if active) -->
+        <div id="logs-running-banner" class="hidden kasane-card rounded-2xl p-3.5 border-amber-500/40 bg-amber-500/10 space-y-2.5 shadow-md">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="size-2.5 rounded-full bg-rose-500 animate-ping"></span>
+              <span class="font-mono text-xs font-bold text-amber-300 uppercase tracking-wide">Script Sedang Berjalan</span>
+            </div>
+            <span id="logs-banner-timer" class="font-mono text-xs text-slate-300 font-bold">0.0s</span>
+          </div>
+          <p id="logs-banner-script-name" class="font-mono text-sm font-bold text-white truncate">script.sh</p>
+          
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="stopCurrentScript()" title="Hentikan Paksa (Ctrl+C)"
+                    class="active-tap flex-1 py-1.5 rounded-xl btn-kasane-danger text-xs font-bold shadow-md spring-transition flex items-center justify-center gap-1.5">
+              <img src="assets/emojis/stop.png" class="ios-emoji" alt="stop">
+              <span>Hentikan Script (Ctrl+C)</span>
+            </button>
+            <button onclick="copyTerminalLogs()" title="Salin Log Live"
+                    class="active-tap px-3 py-1.5 rounded-xl tile-surface text-slate-200 text-xs font-semibold spring-transition flex items-center gap-1">
+              <img src="assets/emojis/clipboard.png" class="ios-emoji" alt="copy">
+              <span>Salin Log</span>
+            </button>
+            <button onclick="openTerminalSheet()" title="Buka Console"
+                    class="active-tap px-3 py-1.5 rounded-xl tile-surface text-slate-200 text-xs font-semibold spring-transition">
+              Console ➔
+            </button>
+          </div>
+        </div>
+
         <div class="kasane-card rounded-2xl p-3 flex items-center justify-between gap-2 shadow-xs">
           <div>
-            <h2 class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+            <h2 class="font-display font-bold text-xs uppercase tracking-wide text-white dark:text-white flex items-center gap-1.5">
               <img src="assets/emojis/scroll.png" class="ios-emoji" alt="scroll">
               <span>Riwayat Eksekusi & Logs</span>
             </h2>
-            <p class="text-[11px] text-slate-600 mt-0.5">Tercatat lengkap dengan durasi, jam, dan detik detail.</p>
+            <p class="text-[11px] text-slate-400 mt-0.5">Tercatat lengkap dengan durasi, jam, dan detik detail.</p>
           </div>
           <div class="flex items-center gap-1.5">
-            <span id="logs-total-count" class="text-[11px] font-mono font-bold text-slate-700">0 Riwayat</span>
-            <button onclick="clearLogHistory()" class="active-tap px-2.5 py-1 rounded-xl border border-rose-300 bg-rose-50 text-rose-800 text-[11px] font-bold hover:bg-rose-100 spring-transition">
+            <span id="logs-total-count" class="text-[11px] font-mono font-bold text-slate-400">0 Riwayat</span>
+            <button onclick="clearLogHistory()" class="active-tap px-2.5 py-1 rounded-xl border border-rose-500/40 bg-rose-500/15 text-rose-300 text-[11px] font-bold hover:bg-rose-500/25 spring-transition">
               Hapus
             </button>
           </div>
@@ -271,103 +265,88 @@
         </div>
       </div>
 
-      <!-- =======================================================================
-           VIEW 3: ROOT & KERNEL STATUS TAB
-           ======================================================================= -->
-      <div id="view-root" class="space-y-3 hidden">
-        <div class="kasane-card rounded-2xl p-4 shadow-sm space-y-3">
-          <div class="border-b border-white/60 pb-2">
-            <h2 class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-              <img src="assets/emojis/shield.png" class="ios-emoji" alt="shield">
-              <span>Rincian Diagnostik KernelSU & SuSFS</span>
-            </h2>
-            <p class="text-[11px] text-slate-600 mt-0.5">Pemeriksaan integritas root & izin tulis direktori /tmp.</p>
-          </div>
-
-          <div id="root-diagnostics-content" class="pt-1">
-            <!-- Injected via app.js -->
-          </div>
-        </div>
-      </div>
-
     </main>
 
   </div>
 
   <!-- =========================================================================
-       MT MANAGER PERMISSIONS MODAL (chmod 777 / 755 / Octal Picker)
+       2-STEP SCRIPT RUN CONFIRMATION MODAL (2x Konfirmasi Sebelum Eksekusi)
        ========================================================================= -->
-  <div id="permission-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm hidden">
-    <div class="w-full max-w-sm bg-white/95 rounded-3xl p-5 border border-white space-y-4 shadow-2xl">
-      <div class="flex items-start justify-between">
-        <div>
-          <div class="flex items-center gap-1.5">
-            <img src="assets/emojis/key.png" class="ios-emoji" alt="key">
-            <h3 class="font-bold text-sm text-slate-900">Izin File (MT Manager)</h3>
+  <div id="run-confirm-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/75 backdrop-blur-md hidden">
+    <div class="w-full max-w-sm kasane-card bg-slate-900/95 text-slate-100 rounded-3xl p-5 border border-white/20 space-y-4 shadow-2xl">
+      
+      <!-- Step 1 View -->
+      <div id="confirm-step-1" class="space-y-3.5">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="size-8 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center">
+              <img src="assets/emojis/swords.png" class="ios-emoji" alt="swords">
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-sm text-white uppercase tracking-wide">Konfirmasi Eksekusi (1/2)</h3>
+              <p class="text-[11px] text-slate-400">Verifikasi target script sebelum dijalankan.</p>
+            </div>
           </div>
-          <p id="perm-filename" class="font-mono text-xs font-semibold text-amber-900 truncate max-w-[240px]">touch_boost.sh</p>
-          <p id="perm-filepath" class="font-mono text-[10px] text-slate-500 truncate max-w-[240px]">/data/local/tmp/touch_boost.sh</p>
-        </div>
-        <button onclick="closePermissionModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
-      </div>
-
-      <!-- 9-Checkbox Matrix -->
-      <div class="bg-slate-50/90 p-3 rounded-2xl border border-slate-200 space-y-2.5 font-mono text-xs">
-        <div class="grid grid-cols-4 gap-2 text-center text-[10px] text-slate-500 pb-1.5 border-b border-slate-200 uppercase font-semibold">
-          <span class="text-left text-slate-600">Peran</span>
-          <span>Baca (4)</span>
-          <span>Tulis (2)</span>
-          <span>Eksekusi (1)</span>
+          <button onclick="closeRunConfirmModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
         </div>
 
-        <div class="grid grid-cols-4 gap-2 items-center text-center">
-          <span class="text-left text-amber-900 font-bold text-[11px]">Owner (u)</span>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-u-r" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-u-w" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-u-x" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
+        <div class="tile-surface p-3 rounded-2xl space-y-1 font-mono">
+          <span class="text-[10px] text-slate-400 uppercase tracking-wider block">File Script:</span>
+          <p id="confirm-file-name" class="font-bold text-amber-300 text-sm break-all">touch_boost.sh</p>
+          <p id="confirm-file-path" class="text-[10px] text-slate-400 truncate">/data/local/tmp/touch_boost.sh</p>
         </div>
 
-        <div class="grid grid-cols-4 gap-2 items-center text-center">
-          <span class="text-left text-slate-700 font-bold text-[11px]">Group (g)</span>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-g-r" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-g-w" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-g-x" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          Apakah kamu yakin ingin mengeksekusi script game ini menggunakan akses Superuser (Root)?
+        </p>
 
-        <div class="grid grid-cols-4 gap-2 items-center text-center">
-          <span class="text-left text-slate-700 font-bold text-[11px]">Other (o)</span>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-o-r" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-o-w" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-o-x" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
-        </div>
-      </div>
-
-      <!-- Octal Display & Quick 1-Click Presets -->
-      <div class="space-y-1.5">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold text-slate-700">Kode Octal:</span>
-          <input type="text" id="perm-octal-input" readonly class="w-20 text-center font-mono font-bold text-sm py-1 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 shadow-inner">
-        </div>
-
-        <div class="grid grid-cols-3 gap-1.5 pt-1 font-mono text-[10px]">
-          <button onclick="applyOctalPreset('777')" class="active-tap py-1.5 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold hover:bg-emerald-200 spring-transition">
-            Set 777 (Full)
+        <div class="flex items-center justify-end gap-2 pt-1 border-t border-white/10">
+          <button onclick="closeRunConfirmModal()" class="px-3.5 py-1.5 rounded-xl border border-white/15 text-slate-300 text-xs font-semibold hover:bg-white/5">
+            Batal
           </button>
-          <button onclick="applyOctalPreset('755')" class="active-tap py-1.5 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 font-bold hover:bg-amber-200 spring-transition">
-            Set 755 (Exe)
-          </button>
-          <button onclick="applyOctalPreset('644')" class="active-tap py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 font-semibold hover:bg-slate-200 spring-transition">
-            Set 644 (Read)
+          <button onclick="proceedToConfirmStep2()" class="active-tap px-4 py-1.5 rounded-xl btn-kasane-gold font-bold text-xs shadow-md spring-transition flex items-center gap-1.5">
+            <span>Lanjut (1/2)</span>
+            <span>➔</span>
           </button>
         </div>
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-1">
-        <button onclick="closePermissionModal()" class="px-3.5 py-1.5 rounded-xl border border-slate-300 text-slate-600 font-medium text-xs hover:bg-slate-50">Batal</button>
-        <button onclick="savePermissions()" class="active-tap px-4 py-1.5 rounded-xl btn-kasane-gold font-bold text-xs shadow-md spring-transition">
-          Terapkan
-        </button>
+      <!-- Step 2 View (Security Confirmation) -->
+      <div id="confirm-step-2" class="space-y-3.5 hidden">
+        <div class="flex items-start justify-between">
+          <div class="flex items-center gap-2">
+            <div class="size-8 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center">
+              <img src="assets/emojis/shield.png" class="ios-emoji" alt="shield">
+            </div>
+            <div>
+              <h3 class="font-display font-bold text-sm text-rose-300 uppercase tracking-wide">Konfirmasi Keamanan (2/2)</h3>
+              <p class="text-[11px] text-slate-400">Peringatan hak akses Root KernelSU.</p>
+            </div>
+          </div>
+          <button onclick="closeRunConfirmModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 space-y-1.5">
+          <div class="flex items-center gap-1.5 text-rose-300 font-bold text-xs font-mono">
+            <span>⚠️</span>
+            <span>PERINGATAN ROOT KERNELSU</span>
+          </div>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Script <strong id="confirm-file-name-2" class="font-mono text-amber-300">script.sh</strong> akan dieksekusi langsung di <code class="text-rose-300 font-mono">/data/local/tmp</code> sebagai Root (UID 0).
+          </p>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 pt-1 border-t border-white/10">
+          <button onclick="backToConfirmStep1()" class="px-3.5 py-1.5 rounded-xl border border-white/15 text-slate-300 text-xs font-semibold hover:bg-white/5">
+            ⬅ Kembali
+          </button>
+          <button onclick="executeConfirmedScript()" class="active-tap px-4 py-1.5 rounded-xl btn-kasane-danger font-bold text-xs shadow-md spring-transition flex items-center gap-1.5">
+            <img src="assets/emojis/lightning.png" class="ios-emoji" alt="lightning">
+            <span>⚡ Run Sekarang</span>
+          </button>
+        </div>
       </div>
+
     </div>
   </div>
 
@@ -375,7 +354,7 @@
        EXECUTION CONSOLE: iOS Bottom Sheet Terminal (Kasane Clean Slate)
        ========================================================================= -->
   <div id="sheet-backdrop" onclick="closeTerminalSheet()" 
-       class="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm pointer-events-none opacity-0 spring-transition"></div>
+       class="fixed inset-0 z-50 bg-slate-950/65 backdrop-blur-md pointer-events-none opacity-0 spring-transition"></div>
 
   <div id="terminal-sheet" 
        class="fixed inset-x-0 bottom-0 z-50 max-w-lg mx-auto h-[85vh] sm:h-[75vh] sheet-terminal-surface rounded-t-[32px] bottom-sheet flex flex-col overflow-hidden shadow-2xl">
@@ -414,7 +393,7 @@
         <button onclick="clearTerminal()" title="Bersihkan Layar" class="p-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-xs spring-transition">
           <img src="assets/emojis/broom.png" class="ios-emoji" alt="clear">
         </button>
-        <button onclick="stopCurrentScript()" title="Hentikan Script" class="active-tap px-2.5 py-1 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-300 text-xs font-bold hover:bg-rose-500/30 spring-transition flex items-center gap-1">
+        <button onclick="stopCurrentScript()" title="Hentikan Script (Ctrl+C)" class="active-tap px-2.5 py-1 rounded-xl btn-kasane-danger text-xs font-bold spring-transition flex items-center gap-1">
           <img src="assets/emojis/stop.png" class="ios-emoji" alt="stop">
           <span>Hentikan</span>
         </button>
@@ -425,7 +404,7 @@
     </div>
 
     <!-- Terminal Content Area -->
-    <div id="terminal-content" class="flex-1 p-3.5 font-mono text-xs overflow-y-auto bg-[#090d16] text-slate-200 space-y-1">
+    <div id="terminal-content" class="flex-1 p-3.5 font-mono text-xs overflow-y-auto bg-[#06080e] text-slate-200 space-y-1">
       <!-- Stream lines injected via app.js with exact seconds -->
     </div>
 
@@ -452,7 +431,7 @@
   </div>
 
   <!-- Modal: Detail Log History -->
-  <div id="detailed-log-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm hidden">
+  <div id="detailed-log-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md hidden">
     <div class="w-full max-w-lg bg-slate-900 text-slate-100 rounded-3xl p-5 border border-white/15 space-y-3.5 shadow-2xl flex flex-col max-h-[85vh]">
       <div class="flex items-start justify-between border-b border-white/10 pb-2.5">
         <div>
@@ -465,11 +444,15 @@
         <button onclick="closeDetailedLogModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
       </div>
 
-      <div id="modal-log-content" class="flex-1 p-3 bg-black/60 rounded-2xl border border-white/5 font-mono text-xs overflow-y-auto space-y-1">
+      <div id="modal-log-content" class="flex-1 p-3 bg-black/70 rounded-2xl border border-white/5 font-mono text-xs overflow-y-auto space-y-1">
         <!-- Lines injected dynamically -->
       </div>
 
-      <div class="flex items-center justify-end gap-2 pt-1 border-t border-white/10">
+      <div class="flex items-center justify-between gap-2 pt-1 border-t border-white/10">
+        <button id="modal-copy-btn" onclick="copyCurrentModalLog()" class="active-tap px-3.5 py-1.5 rounded-xl btn-kasane-gold text-xs font-bold shadow-xs flex items-center gap-1.5">
+          <img src="assets/emojis/clipboard.png" class="ios-emoji" alt="copy">
+          <span>Salin Seluruh Log</span>
+        </button>
         <button onclick="closeDetailedLogModal()" class="px-3.5 py-1.5 rounded-xl border border-white/15 text-slate-300 text-xs hover:bg-white/5">Tutup</button>
       </div>
     </div>
