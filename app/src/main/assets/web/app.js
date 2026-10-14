@@ -1,38 +1,46 @@
 /**
- * Game Setup — Android Root Script & Permissions Manager (KernelSU)
- * Features MT Manager-style File Explorer & Permission Editor + iOS Execution Console
+ * Kasane Shell // Game Setup - Luminous Anime Nature & Root Orchestrator
+ * Fully synchronized with https://kasane.aura.build/
  */
 
 const state = {
   currentPath: '/data/local/tmp',
   items: [],
   selectedItemForPerms: null,
+  deviceSpecs: {
+    deviceName: 'Infinix Note 30 (X6833B)',
+    model: 'X6833B',
+    kernelVersion: '5.10.269-SuiKernel-Stable-KernelSU-Next',
+    androidVersion: 'AxionOS 2.7 • Android 16 (API 36)',
+    activeSlot: '_b (/dev/block/sdc55)',
+    rootEngine: 'KernelSU-Next v3.4.0 (Hybrid + SuSFS)'
+  },
   currentExecution: {
     scriptPath: null,
     scriptName: null,
-    status: 'idle', // 'idle' | 'running' | 'success' | 'error'
+    status: 'idle',
     startTime: 0,
     timerInterval: null,
     pid: null,
     logs: [],
     autoScroll: true
   },
-  // Rich mock filesystem for PC browser preview
+  // High fidelity mock filesystem for testing inside browser
   mockFS: {
     '/data/local/tmp': [
       { name: 'game_boosters', isDirectory: true, permissions: 'drwxr-xr-x', octal: '755', size: '4.0K', isScript: false },
-      { name: 'touch_driver', isDirectory: true, permissions: 'drwxr-xr-x', octal: '755', size: '4.0K', isScript: false },
-      { name: 'touch_boost_120hz.sh', isDirectory: false, permissions: '-rwxrwxrwx', octal: '777', size: '1.2K', isScript: true },
-      { name: 'mlbb_vulkan_render.sh', isDirectory: false, permissions: '-rwxr-xr-x', octal: '755', size: '2.4K', isScript: true },
-      { name: 'thermal_bypass_45fps.sh', isDirectory: false, permissions: '-rw-r--r--', octal: '644', size: '840B', isScript: true },
-      { name: 'gpu_governor_lock.sh', isDirectory: false, permissions: '-rwxrwxrwx', octal: '777', size: '1.8K', isScript: true }
+      { name: 'touch_tuning', isDirectory: true, permissions: 'drwxr-xr-x', octal: '755', size: '4.0K', isScript: false },
+      { name: 'touch_boost_120hz.sh', isDirectory: false, permissions: '-rwxrwxrwx', octal: '777', size: '1.4K', isScript: true, tag: 'touch' },
+      { name: 'mlbb_extreme_fps.sh', isDirectory: false, permissions: '-rwxr-xr-x', octal: '755', size: '2.1K', isScript: true, tag: 'game' },
+      { name: 'thermal_bypass_drop.sh', isDirectory: false, permissions: '-rw-r--r--', octal: '644', size: '940B', isScript: true, tag: 'thermal' },
+      { name: 'gpu_governor_lock.sh', isDirectory: false, permissions: '-rwxrwxrwx', octal: '777', size: '1.8K', isScript: true, tag: 'perf' }
     ],
     '/data/local/tmp/game_boosters': [
-      { name: 'genshin_fps_unlock.sh', isDirectory: false, permissions: '-rwxr-xr-x', octal: '755', size: '1.5K', isScript: true },
-      { name: 'pubg_smooth_extreme.sh', isDirectory: false, permissions: '-rwxrwxrwx', octal: '777', size: '3.1K', isScript: true }
+      { name: 'genshin_60fps_stable.sh', isDirectory: false, permissions: '-rwxr-xr-x', octal: '755', size: '1.6K', isScript: true, tag: 'game' },
+      { name: 'pubg_smooth_90fps.sh', isDirectory: false, permissions: '-rwxrwxrwx', octal: '777', size: '3.2K', isScript: true, tag: 'game' }
     ],
-    '/data/local/tmp/touch_driver': [
-      { name: 'poll_rate_overclock.sh', isDirectory: false, permissions: '-rwxr-xr-x', octal: '755', size: '920B', isScript: true }
+    '/data/local/tmp/touch_tuning': [
+      { name: 'poll_rate_240hz.sh', isDirectory: false, permissions: '-rwxr-xr-x', octal: '755', size: '890B', isScript: true, tag: 'touch' }
     ]
   }
 };
@@ -40,29 +48,48 @@ const state = {
 const isAndroidNative = typeof window.AndroidRoot !== 'undefined';
 
 document.addEventListener('DOMContentLoaded', () => {
-  checkRootEnvironment();
+  loadDeviceTelemetry();
   loadDirectory(state.currentPath);
   setupEventListeners();
 });
 
-function checkRootEnvironment() {
+// Load real device specs (Phone model, kernel version, slot, root)
+function loadDeviceTelemetry() {
+  if (isAndroidNative) {
+    try {
+      const rawSpecs = window.AndroidRoot.getDeviceSpecs();
+      if (rawSpecs) {
+        state.deviceSpecs = JSON.parse(rawSpecs);
+      }
+    } catch (e) {
+      console.error('Failed to load device specs from native bridge:', e);
+    }
+  }
+
+  // Populate UI Telemetry
+  document.getElementById('hud-device-name').innerText = state.deviceSpecs.deviceName || 'Infinix Note 30';
+  document.getElementById('hud-kernel-version').innerText = state.deviceSpecs.kernelVersion || '5.10.269-SuiKernel';
+  document.getElementById('hud-android-version').innerText = state.deviceSpecs.androidVersion || 'Android 16';
+  document.getElementById('hud-active-slot').innerText = state.deviceSpecs.activeSlot || '_b';
+  document.getElementById('hud-root-engine').innerText = state.deviceSpecs.rootEngine || 'KernelSU-Next Active';
+
   const rootBadge = document.getElementById('root-badge');
   if (isAndroidNative) {
     try {
       const isRooted = window.AndroidRoot.checkRoot();
       if (isRooted) {
-        rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span> KernelSU Active`;
-        rootBadge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-emerald-500/30 bg-emerald-500/10 text-emerald-400";
+        rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span> 🛡️ KernelSU Active`;
+        rootBadge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm";
       } else {
-        rootBadge.innerHTML = `<span class="size-2 rounded-full bg-rose-400"></span> Root Denied`;
-        rootBadge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-rose-500/30 bg-rose-500/10 text-rose-400";
+        rootBadge.innerHTML = `<span class="size-2 rounded-full bg-rose-500"></span> ⚠️ Root Denied`;
+        rootBadge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 shadow-sm";
       }
     } catch (e) {
       console.error(e);
     }
   } else {
-    rootBadge.innerHTML = `<span class="size-2 rounded-full bg-purple-400 animate-pulse"></span> Preview Simulator`;
-    rootBadge.className = "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-purple-500/30 bg-purple-500/10 text-purple-300";
+    rootBadge.innerHTML = `<span class="size-2 rounded-full bg-amber-500 animate-pulse"></span> 🌸 Kasane Preview (Sim)`;
+    rootBadge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 shadow-sm";
   }
 }
 
@@ -87,14 +114,11 @@ function loadDirectory(path) {
   renderExplorer();
 }
 
-// Render Breadcrumb Path Bar
 function renderBreadcrumbs() {
   const container = document.getElementById('path-breadcrumbs');
-  const parts = state.currentPath.split('/').filter(p => p.length > 0);
   
-  let html = `<button onclick="loadDirectory('/data/local/tmp')" class="text-purple-300 hover:text-white font-mono text-xs font-semibold">/tmp</button>`;
+  let html = `<button onclick="loadDirectory('/data/local/tmp')" class="text-amber-700 hover:text-amber-900 font-mono text-xs font-bold flex items-center gap-1">📁 /data/local/tmp</button>`;
   
-  // If navigated into a subfolder
   if (state.currentPath !== '/data/local/tmp') {
     const subPath = state.currentPath.replace('/data/local/tmp', '');
     const subParts = subPath.split('/').filter(p => p.length > 0);
@@ -103,13 +127,12 @@ function renderBreadcrumbs() {
     subParts.forEach(part => {
       accumulated += '/' + part;
       const target = accumulated;
-      html += ` <span class="text-zinc-600">/</span> <button onclick="loadDirectory('${target}')" class="text-zinc-200 hover:text-purple-300 font-mono text-xs">${escapeHtml(part)}</button>`;
+      html += ` <span class="text-slate-400">/</span> <button onclick="loadDirectory('${target}')" class="text-slate-700 hover:text-amber-700 font-mono text-xs font-semibold">${escapeHtml(part)}</button>`;
     });
   }
 
   container.innerHTML = html;
   
-  // Show / Hide "Go Up" Button
   const btnUp = document.getElementById('btn-folder-up');
   if (state.currentPath === '/data/local/tmp') {
     btnUp.classList.add('opacity-40', 'pointer-events-none');
@@ -118,7 +141,6 @@ function renderBreadcrumbs() {
   }
 }
 
-// Navigate up one directory level
 function navigateUp() {
   if (state.currentPath === '/data/local/tmp') return;
   const parts = state.currentPath.split('/').filter(p => p.length > 0);
@@ -127,7 +149,7 @@ function navigateUp() {
   loadDirectory(parent);
 }
 
-// Render Files and Folders List
+// Render File & Folder Explorer
 function renderExplorer() {
   const container = document.getElementById('file-list');
   const countBadge = document.getElementById('items-count');
@@ -135,16 +157,15 @@ function renderExplorer() {
 
   if (state.items.length === 0) {
     container.innerHTML = `
-      <div class="py-16 text-center text-zinc-500">
-        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="mx-auto mb-2 opacity-50"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg>
-        <p class="text-xs">No files or shell scripts found in this directory.</p>
-        <p class="text-[11px] text-zinc-600 mt-1">Place .sh scripts inside /data/local/tmp using MT Manager or root explorer.</p>
+      <div class="py-16 text-center text-slate-500 kasane-card rounded-2xl">
+        <span class="text-3xl block mb-2">🍃</span>
+        <p class="text-sm font-medium text-slate-700">No scripts or folders found here.</p>
+        <p class="text-xs text-slate-500 mt-1">Place your .sh files into <code class="font-mono text-amber-700 font-semibold">/data/local/tmp</code> using MT Manager.</p>
       </div>
     `;
     return;
   }
 
-  // Sort folders first, then scripts, then other files
   const sorted = [...state.items].sort((a, b) => {
     if (a.isDirectory && !b.isDirectory) return -1;
     if (!a.isDirectory && b.isDirectory) return 1;
@@ -158,43 +179,48 @@ function renderExplorer() {
     const isFull777 = item.octal === '777';
 
     if (isDir) {
-      // Folder Item
       const targetPath = state.currentPath.endsWith('/') ? state.currentPath + item.name : state.currentPath + '/' + item.name;
       return `
         <div onclick="loadDirectory('${targetPath}')" 
-             class="glass-panel rounded-2xl p-3.5 flex items-center justify-between hover:border-purple-500/30 cursor-pointer active-tap spring-transition group">
-          <div class="flex items-center gap-3">
-            <div class="size-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 spring-transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 18a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+             class="kasane-card rounded-2xl p-4 flex items-center justify-between hover:border-amber-300 cursor-pointer active-tap group">
+          <div class="flex items-center gap-3.5">
+            <div class="size-11 rounded-xl bg-amber-50 border border-amber-200/80 flex items-center justify-center text-xl group-hover:scale-105 spring-transition shadow-sm">
+              📁
             </div>
             <div>
-              <span class="font-mono text-sm font-semibold text-zinc-100 group-hover:text-purple-300 transition-colors">${escapeHtml(item.name)}</span>
-              <p class="text-[11px] font-mono text-zinc-500">Subfolder • ${item.permissions || 'drwxr-xr-x'}</p>
+              <span class="font-mono text-sm font-bold text-slate-800 group-hover:text-amber-700 transition-colors">${escapeHtml(item.name)}</span>
+              <p class="text-xs font-mono text-slate-500">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
             </div>
           </div>
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-zinc-600 group-hover:text-purple-300 group-hover:translate-x-1 spring-transition"><polyline points="9 18 15 12 9 6"/></svg>
+          <span class="text-slate-400 group-hover:text-amber-600 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
         </div>
       `;
     }
 
-    // File / Script Item
     const itemPath = state.currentPath.endsWith('/') ? state.currentPath + item.name : state.currentPath + '/' + item.name;
     const isRunning = state.currentExecution.scriptPath === itemPath && state.currentExecution.status === 'running';
 
+    // Anime Game Setup thematic emoji badge
+    let scriptEmoji = '📜';
+    if (item.name.includes('touch')) scriptEmoji = '⚡';
+    if (item.name.includes('game') || item.name.includes('mlbb') || item.name.includes('fps')) scriptEmoji = '⚔️';
+    if (item.name.includes('thermal')) scriptEmoji = '❄️';
+    if (item.name.includes('gpu') || item.name.includes('cpu')) scriptEmoji = '🚀';
+
     return `
-      <div class="glass-panel rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:border-purple-500/30 spring-transition group">
-        <div class="flex items-start gap-3">
-          <div class="size-10 rounded-xl ${isScript ? 'bg-indigo-500/10 border border-indigo-500/20 text-indigo-400' : 'bg-zinc-800 text-zinc-400'} flex items-center justify-center shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"></polyline><line x1="12" y1="19" x2="20" y2="19"></line></svg>
+      <div class="kasane-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 group">
+        <div class="flex items-start gap-3.5">
+          <div class="size-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-xl shrink-0 shadow-sm">
+            ${scriptEmoji}
           </div>
           <div class="min-w-0">
-            <div class="flex items-center gap-2">
-              <span class="font-mono text-sm font-semibold text-zinc-100 truncate">${escapeHtml(item.name)}</span>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-mono text-sm font-bold text-slate-800 truncate">${escapeHtml(item.name)}</span>
               ${isFull777 
-                ? '<span class="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">777</span>' 
-                : `<span class="text-[10px] font-mono px-1.5 py-0.2 rounded ${isExecutable ? 'bg-purple-500/10 text-purple-300 border border-purple-500/20' : 'bg-zinc-800 text-zinc-400'}">${item.octal || '644'}</span>`}
+                ? '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">chmod 777</span>' 
+                : `<span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full ${isExecutable ? 'bg-amber-100 text-amber-800 border border-amber-300' : 'bg-slate-200 text-slate-600'}">${item.octal || '644'}</span>`}
             </div>
-            <div class="flex items-center gap-2 text-[11px] font-mono text-zinc-500 mt-0.5">
+            <div class="flex items-center gap-2 text-xs font-mono text-slate-500 mt-0.5">
               <span>${item.size || '1.0K'}</span>
               <span>•</span>
               <span>${item.permissions || '-rwxrwxrwx'}</span>
@@ -206,18 +232,18 @@ function renderExplorer() {
         <div class="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
           <!-- Chmod Permission Button -->
           <button onclick="openPermissionModal('${escapeHtml(item.name)}', '${itemPath}', '${item.octal || '755'}', '${item.permissions || '-rwxr-xr-x'}')" 
-                  title="MT Manager style Permission Editor"
-                  class="active-tap flex items-center gap-1.5 px-3 py-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300 text-xs font-mono spring-transition">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  title="MT Manager Permission Editor"
+                  class="active-tap flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm spring-transition">
+            <span>🗝️</span>
             <span>Perms</span>
           </button>
 
-          <!-- Run Script Button (if .sh) -->
+          <!-- Run Script Button -->
           ${isScript ? `
             <button onclick="runScriptFile('${itemPath}', '${escapeHtml(item.name)}')" 
-                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium text-xs shadow-lg shadow-purple-600/20 hover:brightness-110 spring-transition">
-              <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              <span>${isRunning ? 'View Logs' : 'Run Script'}</span>
+                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl btn-kasane-gold font-semibold text-xs spring-transition shadow-sm">
+              <span>▶</span>
+              <span>${isRunning ? 'Viewing Logs' : 'Run Script'}</span>
             </button>
           ` : ''}
         </div>
@@ -227,7 +253,7 @@ function renderExplorer() {
 }
 
 // ============================================================================
-// MT MANAGER STYLE PERMISSIONS MODAL (chmod 777 / 755 / octal calculation)
+// MT MANAGER PERMISSIONS MODAL
 // ============================================================================
 function openPermissionModal(name, path, octal, perms) {
   state.selectedItemForPerms = { name, path, octal, perms };
@@ -235,7 +261,6 @@ function openPermissionModal(name, path, octal, perms) {
   document.getElementById('perm-filename').innerText = name;
   document.getElementById('perm-filepath').innerText = path;
   
-  // Parse octal or perms to set checkboxes
   setCheckboxesFromOctal(octal || '755');
   document.getElementById('permission-modal').classList.remove('hidden');
 }
@@ -371,18 +396,19 @@ function runScriptFile(filePath, scriptName) {
 }
 
 function simulateExecution(path, name) {
-  appendLogLine(`[SYS] Game Setup (KernelSU-Next v3.4.0 Engine)`, 'sys');
-  appendLogLine(`[SYS] Target: ${path}`, 'sys');
-  appendLogLine(`[SYS] Executing: chmod +x "${path}" && sh "${path}"`, 'sys');
+  appendLogLine(`🌸 [KASANE] Engine: KernelSU-Next v3.4.0 (SuSFS Active)`, 'sys');
+  appendLogLine(`📱 [DEVICE] ${state.deviceSpecs.deviceName}`, 'sys');
+  appendLogLine(`⚙️ [KERNEL] ${state.deviceSpecs.kernelVersion}`, 'sys');
+  appendLogLine(`📜 [EXEC] chmod +x "${path}" && sh "${path}"`, 'sys');
   appendLogLine(`------------------------------------------------------------`, 'dim');
 
   const simulatedLogs = [
     { text: `[INFO] Initializing high performance game profile...`, type: 'info', delay: 300 },
     { text: `[INFO] Locking CPU Big cores to maximum frequency step...`, type: 'info', delay: 700 },
-    { text: `[INFO] Adjusting touch sampling buffer to 240Hz...`, type: 'info', delay: 1100 },
-    { text: `[WARN] Overriding thermal limits for display engine...`, type: 'warn', delay: 1500 },
-    { text: `[SUCCESS] Profile locked. Latency reduced by 14ms.`, type: 'success', delay: 2000 },
-    { text: `[SYS] Process completed with exit code 0.`, type: 'sys', delay: 2300 }
+    { text: `[INFO] Overriding touch panel sampling to 240Hz...`, type: 'info', delay: 1100 },
+    { text: `[WARN] Relaxing thermal governor ceiling to prevent frame drops...`, type: 'warn', delay: 1500 },
+    { text: `[SUCCESS] Profile locked. Input latency dropped by 14ms.`, type: 'success', delay: 2000 },
+    { text: `🌸 [KASANE] Execution completed with exit code 0.`, type: 'sys', delay: 2300 }
   ];
 
   simulatedLogs.forEach(entry => {
@@ -402,10 +428,10 @@ window.onNativeLogReceived = function(line, type) {
 
 window.onNativeExecutionFinished = function(exitCode) {
   if (exitCode === 0) {
-    appendLogLine(`[SUCCESS] Process completed with exit code 0.`, 'success');
+    appendLogLine(`🌸 [SUCCESS] Process finished with exit code 0.`, 'success');
     finishExecution(0);
   } else {
-    appendLogLine(`[ERROR] Process terminated with exit code ${exitCode}.`, 'error');
+    appendLogLine(`❌ [ERROR] Process terminated with exit code ${exitCode}.`, 'error');
     finishExecution(exitCode);
   }
 };
@@ -422,7 +448,7 @@ function finishExecution(exitCode) {
     updateConsoleStatus(`FAILED (${exitCode})`, 'rose');
   }
 
-  document.getElementById('island-status').innerText = exitCode === 0 ? 'Completed' : 'Failed';
+  document.getElementById('island-status').innerText = exitCode === 0 ? 'Done 0' : 'Failed';
   renderExplorer();
 }
 
@@ -440,16 +466,16 @@ function appendLogLine(text, level = 'stdout') {
   const lineEl = document.createElement('div');
   lineEl.className = 'py-0.5 leading-relaxed break-all';
 
-  let colorClass = 'text-zinc-200';
-  if (level === 'sys') colorClass = 'text-purple-400 font-medium';
-  if (level === 'dim') colorClass = 'text-zinc-600';
-  if (level === 'info') colorClass = 'text-cyan-300';
+  let colorClass = 'text-slate-200';
+  if (level === 'sys') colorClass = 'text-amber-300 font-medium';
+  if (level === 'dim') colorClass = 'text-slate-500';
+  if (level === 'info') colorClass = 'text-sky-300';
   if (level === 'warn') colorClass = 'text-amber-300';
   if (level === 'success') colorClass = 'text-emerald-300 font-semibold';
   if (level === 'error') colorClass = 'text-rose-400 font-semibold';
 
   const time = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  lineEl.innerHTML = `<span class="text-zinc-600 mr-2 select-none text-[10px]">[${time}]</span><span class="${colorClass}">${escapeHtml(text)}</span>`;
+  lineEl.innerHTML = `<span class="text-slate-500 mr-2 select-none text-[10px]">[${time}]</span><span class="${colorClass}">${escapeHtml(text)}</span>`;
   container.appendChild(lineEl);
 
   state.currentExecution.logs.push(`[${time}] ${text}`);
@@ -474,7 +500,7 @@ function killCurrentProcess() {
   if (isAndroidNative) {
     try { window.AndroidRoot.killProcess(); } catch(e) {}
   }
-  appendLogLine(`[WARN] SIGKILL signal sent by user. Process terminated.`, 'warn');
+  appendLogLine(`⚠️ [SIGKILL] Process killed by user.`, 'warn');
   finishExecution(137);
 }
 
@@ -506,13 +532,12 @@ function setupEventListeners() {
     state.currentExecution.autoScroll = !state.currentExecution.autoScroll;
     const btn = document.getElementById('btn-autoscroll');
     if (state.currentExecution.autoScroll) {
-      btn.classList.add('text-purple-300', 'border-purple-500/40');
+      btn.classList.add('text-amber-400', 'border-amber-400/40');
     } else {
-      btn.classList.remove('text-purple-300', 'border-purple-500/40');
+      btn.classList.remove('text-amber-400', 'border-amber-400/40');
     }
   });
 
-  // Checkbox listeners in permission modal
   const checkboxes = document.querySelectorAll('.perm-checkbox');
   checkboxes.forEach(cb => {
     cb.addEventListener('change', updateOctalDisplay);

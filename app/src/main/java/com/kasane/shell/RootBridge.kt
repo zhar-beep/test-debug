@@ -1,6 +1,7 @@
 package com.kasane.shell
 
 import android.app.Activity
+import android.os.Build
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import kotlinx.coroutines.*
@@ -28,8 +29,71 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
     }
 
     /**
-     * Lists files and subfolders in target directory using root shell (handles /data/local/tmp permissions)
-     * Returns JSON array string
+     * Reads real hardware, kernel version, phone model, and OS specifications
+     */
+    @JavascriptInterface
+    fun getDeviceSpecs(): String {
+        val specs = JSONObject()
+        try {
+            // Read phone manufacturer and model
+            val manufacturer = Build.MANUFACTURER.replaceFirstChar { it.uppercase() }
+            val model = Build.MODEL
+            val device = Build.DEVICE
+            specs.put("deviceName", "$manufacturer $model ($device)")
+            specs.put("model", model)
+
+            // Read Android OS Version & SDK
+            val androidVer = Build.VERSION.RELEASE
+            val sdkInt = Build.VERSION.SDK_INT
+            specs.put("androidVersion", "Android $androidVer (API $sdkInt)")
+
+            // Read Kernel Version directly from /proc/version
+            var kernelStr = System.getProperty("os.version") ?: "5.10.269"
+            try {
+                val procFile = File("/proc/version")
+                if (procFile.exists()) {
+                    kernelStr = procFile.readText().trim()
+                }
+            } catch (e: Exception) {
+                // fallback to uname
+                try {
+                    val p = Runtime.getRuntime().exec("uname -r")
+                    kernelStr = BufferedReader(InputStreamReader(p.inputStream)).readLine() ?: kernelStr
+                } catch (ignored: Exception) {}
+            }
+            specs.put("kernelVersion", kernelStr)
+
+            // Read active slot via getprop ro.boot.slot_suffix
+            var slot = "_b"
+            try {
+                val p = Runtime.getRuntime().exec("getprop ro.boot.slot_suffix")
+                val slotRead = BufferedReader(InputStreamReader(p.inputStream)).readLine()?.trim()
+                if (!slotRead.isNullOrEmpty()) {
+                    slot = slotRead
+                }
+            } catch (ignored: Exception) {}
+            specs.put("activeSlot", slot)
+
+            // Check KernelSU version
+            var ksuVer = "KernelSU-Next Active"
+            try {
+                val p = Runtime.getRuntime().exec(arrayOf("su", "-c", "ksud -V 2>/dev/null || echo 'KernelSU Active'"))
+                val ksuRead = BufferedReader(InputStreamReader(p.inputStream)).readLine()?.trim()
+                if (!ksuRead.isNullOrEmpty()) {
+                    ksuVer = ksuRead
+                }
+            } catch (ignored: Exception) {}
+            specs.put("rootEngine", ksuVer)
+
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        return specs.toString()
+    }
+
+    /**
+     * Lists files and subfolders in target directory using root shell
      */
     @JavascriptInterface
     fun listDirectory(dirPath: String): String {
@@ -37,7 +101,6 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
         val itemsArray = JSONArray()
 
         try {
-            // Use root shell to execute ls -la with full stats
             val cmd = "ls -la \"$safePath\""
             val process = Runtime.getRuntime().exec(arrayOf("su", "-c", cmd))
             val reader = BufferedReader(InputStreamReader(process.inputStream))
@@ -47,7 +110,6 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
                 val raw = line?.trim() ?: continue
                 if (raw.startsWith("total") || raw.isEmpty()) continue
 
-                // Format: -rwxr-xr-x 1 root root 1024 Oct 14 15:30 script.sh
                 val parts = raw.split("\\s+".toRegex())
                 if (parts.size >= 8) {
                     val perms = parts[0]
@@ -77,7 +139,7 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
     }
 
     /**
-     * MT Manager style chmod tool (e.g. chmod 777 /data/local/tmp/script.sh)
+     * MT Manager style chmod tool
      */
     @JavascriptInterface
     fun changePermissions(filePath: String, octal: String): Boolean {
@@ -94,8 +156,8 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
     fun runScript(scriptPath: String) {
         scope.launch {
             try {
-                sendLogLine("[SYS] Initializing Game Setup root execution daemon...", "sys")
-                sendLogLine("[SYS] Target: $scriptPath", "sys")
+                sendLogLine("🌸 [KASANE] Initializing Root Execution Daemon...", "sys")
+                sendLogLine("📜 [TARGET] $scriptPath", "sys")
 
                 // Auto grant execute permission before running
                 Runtime.getRuntime().exec(arrayOf("su", "-c", "chmod +x \"$scriptPath\"")).waitFor()
@@ -107,7 +169,6 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
 
                 currentProcess = process
 
-                // Stream stdout
                 val stdoutJob = launch {
                     val stdoutReader = BufferedReader(InputStreamReader(process.inputStream))
                     var line: String?
@@ -116,7 +177,6 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
                     }
                 }
 
-                // Stream stderr
                 val stderrJob = launch {
                     val stderrReader = BufferedReader(InputStreamReader(process.errorStream))
                     var errLine: String?
@@ -149,7 +209,7 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
         try {
             currentProcess?.destroyForcibly()
             currentProcess = null
-            sendLogLine("[WARN] Root process killed forcibly via SIGKILL.", "warn")
+            sendLogLine("⚠️ [WARN] Process forcibly terminated via SIGKILL.", "warn")
         } catch (e: Exception) {
             sendLogLine("[ERROR] Failed to kill process: ${e.message}", "error")
         }

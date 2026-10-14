@@ -1,20 +1,31 @@
 /* ==========================================================================
-   Kasane Shell (KuroScript) - Aesthetic Design System
-   Synthesized from: 21st.dev (Qronos) + Kasane (Aura RPG) + iOS Human Interface
+   Kasane RPG Design System (https://kasane.aura.build/ Inspiration)
+   Aesthetic: Luminous Misty Nature & Action RPG, Frosted Glass, Inter Typography
+   Clean & Bright without being blinding ("Cerah tapi jangan cerah banget")
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --bg-main: #07070a;
-  --bg-card: rgba(18, 17, 24, 0.72);
-  --bg-card-hover: rgba(26, 24, 36, 0.85);
-  --border-subtle: rgba(255, 255, 255, 0.08);
-  --border-active: rgba(168, 85, 247, 0.4);
-  --accent-kasane: #a855f7;
-  --accent-glow: rgba(168, 85, 247, 0.15);
-  --accent-nature: #10b981;
-  --accent-rose: #f43f5e;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Luminous Kasane Nature Palette */
+  --bg-mist: #eef2f5;
+  --card-glass: rgba(255, 255, 255, 0.84);
+  --card-glass-hover: rgba(255, 255, 255, 0.94);
+  --card-border: rgba(255, 255, 255, 0.75);
+  --card-shadow: 0 10px 30px -5px rgba(22, 34, 51, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  
+  --text-main: #0f172a;      /* Slate 900 */
+  --text-body: #334155;      /* Slate 700 */
+  --text-muted: #64748b;     /* Slate 500 */
+  
+  /* Kasane Character / Nature Accents */
+  --kasane-gold: #d97706;    /* Amber 600 */
+  --kasane-jade: #059669;    /* Emerald 600 */
+  --kasane-sakura: #e11d48;  /* Rose 600 */
+  --kasane-blue: #2563eb;    /* Royal Blue 600 */
 }
 
 * {
@@ -26,123 +37,98 @@
 body {
   margin: 0;
   padding: 0;
-  background-color: var(--bg-main);
-  color: #f8fafc;
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  overflow-x: hidden;
+  font-family: var(--font-sans);
+  letter-spacing: -0.015em;
+  color: var(--text-main);
+  background-color: var(--bg-mist);
   min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
 }
 
-/* Monospace font for logs & code */
+/* Background Wallpaper with Misty Kasane Overlay */
+.kasane-wallpaper-bg {
+  position: fixed;
+  inset: 0;
+  background-image: url('assets/wallpaper.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0;
+  transform: scale(1.02);
+  filter: brightness(0.92) contrast(1.05);
+}
+
+.kasane-mist-overlay {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(241, 245, 249, 0.88) 0%,
+    rgba(226, 232, 240, 0.82) 40%,
+    rgba(248, 250, 252, 0.90) 100%
+  );
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Typography styles */
 .font-mono {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--font-mono);
 }
 
-/* Glassmorphism Classes */
-.glass-panel {
-  background: var(--bg-card);
+/* Luminous Glassmorphic Cards */
+.kasane-card {
+  background: var(--card-glass);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--card-shadow);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.glass-nav {
-  background: rgba(8, 8, 12, 0.78);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-subtle);
+.kasane-card:hover {
+  background: var(--card-glass-hover);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 36px -8px rgba(22, 34, 51, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-.glass-sheet {
-  background: rgba(10, 10, 14, 0.88);
-  backdrop-filter: blur(32px) saturate(200%);
-  -webkit-backdrop-filter: blur(32px) saturate(200%);
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  border-left: 1px solid rgba(255, 255, 255, 0.08);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+.kasane-nav {
+  background: rgba(255, 255, 255, 0.86);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.03);
 }
 
-/* Subtle Animated Ambient Background Glows */
-.ambient-glow-violet {
-  position: fixed;
-  top: -10%;
-  right: -10%;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.14) 0%, rgba(0, 0, 0, 0) 70%);
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(60px);
+/* Golden / Amber Button ala Kasane.aura.build (.button-gold) */
+.btn-kasane-gold {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+  color: #ffffff;
+  border: 1px solid #f59e0b;
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.15);
 }
 
-.ambient-glow-emerald {
-  position: fixed;
-  bottom: 10%;
-  left: -10%;
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(70px);
+.btn-kasane-gold:hover {
+  background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  filter: brightness(1.05);
 }
 
-/* Pulsing and Shimmer effects */
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.8; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.96); }
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 3s infinite ease-in-out;
-}
-
-@keyframes terminal-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.cursor-blink {
-  display: inline-block;
-  width: 8px;
-  height: 15px;
-  background-color: #a855f7;
-  animation: terminal-blink 1s infinite;
-  vertical-align: middle;
-  margin-left: 4px;
-}
-
-/* Custom Sleek Scrollbar */
-::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* iOS Spring Transitions */
+/* Spring tap transitions */
 .spring-transition {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .active-tap:active {
-  transform: scale(0.96);
+  transform: scale(0.97);
 }
 
-/* Bottom Sheet Sliding Animation */
+/* iOS Bottom Sheet with Clean Dark-Console Contrast */
 .bottom-sheet {
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
   transform: translateY(100%);
 }
 
@@ -150,9 +136,16 @@ body {
   transform: translateY(0);
 }
 
+.sheet-terminal-surface {
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(32px) saturate(190%);
+  -webkit-backdrop-filter: blur(32px) saturate(190%);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
 /* Dynamic Island Floating Pill */
 .dynamic-island {
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   transform: translateY(120px);
   opacity: 0;
 }
@@ -160,4 +153,39 @@ body {
 .dynamic-island.visible {
   transform: translateY(0);
   opacity: 1;
+}
+
+/* Blinking cursor in terminal */
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 7px;
+  height: 14px;
+  background-color: #38bdf8;
+  animation: terminal-blink 1s infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.45);
 }
