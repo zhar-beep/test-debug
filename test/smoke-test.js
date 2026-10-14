@@ -28,17 +28,33 @@ function runTest(testName, fn) {
 }
 
 // 1. Verify Assets
-runTest('Asset Verification: kasane-preview.png exists and is valid', () => {
-  const assetPath = path.join(__dirname, '../app/src/main/assets/web/assets/kasane-preview.png');
-  assert(fs.existsSync(assetPath), 'kasane-preview.png must exist');
-  const stats = fs.statSync(assetPath);
-  assert(stats.size > 100000, `Asset size should be >100KB, got ${stats.size} bytes`);
+runTest('Asset Verification: user-anime.jpg and kasane assets exist', () => {
+  const userAnimeWeb = path.join(__dirname, '../app/src/main/assets/web/assets/user-anime.jpg');
+  const userAnimeRoot = path.join(__dirname, '../assets/user-anime.jpg');
+  assert(fs.existsSync(userAnimeWeb), 'user-anime.jpg must exist in web assets');
+  assert(fs.existsSync(userAnimeRoot), 'user-anime.jpg must exist in root assets');
+  assert(fs.statSync(userAnimeWeb).size > 10000, 'user-anime.jpg size must be valid');
+});
+
+runTest('Asset Verification: Offline Apple iOS 3D Emojis pack exists', () => {
+  const emojiDir = path.join(__dirname, '../app/src/main/assets/web/assets/emojis');
+  assert(fs.existsSync(emojiDir), 'emojis directory must exist');
+  const requiredEmojis = ['sakura.png', 'shield.png', 'phone.png', 'display.png', 'gear.png', 'folder.png', 'scroll.png', 'swords.png', 'key.png'];
+  requiredEmojis.forEach(emoji => {
+    const p = path.join(emojiDir, emoji);
+    assert(fs.existsSync(p), `Missing iOS emoji: ${emoji}`);
+  });
 });
 
 // 2. Verify HTML DOM Structure
 runTest('HTML Verification: All critical UI elements & IDs exist', () => {
   const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
   const html = fs.readFileSync(htmlPath, 'utf8');
+
+  // Verify Root status is at the top of the interface
+  const rootIndex = html.indexOf('root-badge');
+  const fileListIndex = html.indexOf('id="file-list"');
+  assert(rootIndex > 0 && rootIndex < fileListIndex, 'Root status card must be positioned at the top above the file list');
 
   const requiredIds = [
     'sakura-container',

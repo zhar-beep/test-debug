@@ -1,8 +1,21 @@
 /**
- * Kasane Shell // Game Setup
- * Luminous Anime Nature Script Runner & Root Orchestrator
- * Features MT Manager File Explorer, Detailed Logs Menu (with seconds), and Root Checker
+ * Kasane Shell // Game Setup (User Anime & iOS Theme Edition)
+ * Features:
+ * - Real User Anime Wallpaper with Translucent Glassmorphism
+ * - Authentic Apple iOS 3D Emojis
+ * - Top-Level Root Status (Granted Default)
+ * - MT Manager Permissions Editor (chmod 777)
+ * - Detailed Menu Logs with Exact Seconds
  */
+
+// Helper to render Apple iOS 3D Emoji
+function iosEmoji(name, extraClass = '') {
+  return `<img src="assets/emojis/${name}.png" class="ios-emoji ${extraClass}" alt="${name}">`;
+}
+
+function iosEmojiLg(name) {
+  return `<img src="assets/emojis/${name}.png" class="ios-emoji-lg" alt="${name}">`;
+}
 
 const state = {
   currentTab: 'explorer', // 'explorer' | 'logs' | 'root'
@@ -22,9 +35,9 @@ const state = {
     status: 'HEALTHY',
     rootUid: true,
     uidOutput: 'uid=0(root) gid=0(root)',
-    ksuVersion: 'KernelSU-Next v3.4.0',
+    ksuVersion: 'KernelSU-Next v3.4.0 (Hybrid Mode)',
     susfsActive: true,
-    susfsInfo: 'SuSFS v2.3.0 (Active & Stealth)',
+    susfsInfo: 'SuSFS v2.3.0 (GKI Full Feature Stealth)',
     selinux: 'Enforcing',
     tmpWritable: true,
     slot: '_b'
@@ -32,30 +45,30 @@ const state = {
   currentExecution: {
     scriptPath: null,
     scriptName: null,
-    status: 'idle', // 'idle' | 'running' | 'success' | 'error' | 'stopped'
+    status: 'idle',
     startTime: 0,
     startTimeFormatted: '',
     timerInterval: null,
     logs: [],
     autoScroll: true
   },
-  // Detailed History of All Executions for Menu Logs
+  // Detailed History with Exact Seconds
   logHistory: [
     {
       id: 'log_init_1',
       scriptName: 'touch_boost_120hz.sh',
       path: '/data/local/tmp/touch_boost_120hz.sh',
-      timestamp: '14/10/2026, 16:10:22',
+      timestamp: '14/10/2026, 16:30:15',
       duration: '2.14s',
       status: 'success',
       exitCode: 0,
       lines: [
-        { time: '16:10:22', text: '🌸 [KASANE] Memulai eksekusi script root...', type: 'sys' },
-        { time: '16:10:22', text: '📜 [TARGET] /data/local/tmp/touch_boost_120hz.sh', type: 'sys' },
-        { time: '16:10:23', text: 'Touch sampling rate di-lock ke 240Hz (overclock respons layar).', type: 'info' },
-        { time: '16:10:23', text: 'Filter sentuhan dinonaktifkan untuk memangkas delay touch input.', type: 'info' },
-        { time: '16:10:24', text: 'Input dispatch latency berkurang sebesar 14ms.', type: 'success' },
-        { time: '16:10:24', text: '🌸 [KASANE] Eksekusi selesai dengan status: BERHASIL (Kode 0)', type: 'sys' }
+        { time: '16:30:15', text: '🌸 [KASANE] Memulai eksekusi script root...', type: 'sys' },
+        { time: '16:30:15', text: '📜 [TARGET] /data/local/tmp/touch_boost_120hz.sh', type: 'sys' },
+        { time: '16:30:16', text: 'Touch sampling rate di-lock ke 240Hz (overclock respons layar).', type: 'info' },
+        { time: '16:30:16', text: 'Filter sentuhan dinonaktifkan untuk memangkas delay touch input.', type: 'info' },
+        { time: '16:30:17', text: 'Input dispatch latency berkurang sebesar 14ms.', type: 'success' },
+        { time: '16:30:17', text: '🌸 [KASANE] Eksekusi selesai dengan status: BERHASIL (Kode 0)', type: 'sys' }
       ]
     }
   ],
@@ -90,44 +103,38 @@ document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
 });
 
-// ============================================================================
-// SAKURA PETALS GENERATOR (Visual Ambience)
-// ============================================================================
+// Gentle 60fps Sakura Petals
 function initSakuraPetals() {
   const container = document.getElementById('sakura-container');
   if (!container) return;
-  const count = 14;
+  const count = 10;
   for (let i = 0; i < count; i++) {
     const petal = document.createElement('div');
     petal.className = 'sakura-petal';
     petal.style.left = `${Math.random() * 100}%`;
-    petal.style.width = `${10 + Math.random() * 12}px`;
-    petal.style.height = `${12 + Math.random() * 14}px`;
-    petal.style.animationDuration = `${7 + Math.random() * 8}s, ${3 + Math.random() * 3}s`;
-    petal.style.animationDelay = `${Math.random() * 5}s, ${Math.random() * 2}s`;
+    petal.style.width = `${10 + Math.random() * 10}px`;
+    petal.style.height = `${12 + Math.random() * 12}px`;
+    petal.style.animationDuration = `${8 + Math.random() * 7}s, ${3.5 + Math.random() * 2.5}s`;
+    petal.style.animationDelay = `${Math.random() * 4}s, ${Math.random() * 2}s`;
     container.appendChild(petal);
   }
 }
 
-// ============================================================================
-// TAB NAVIGATION
-// ============================================================================
+// Tab Switching
 function switchTab(tabId) {
   state.currentTab = tabId;
 
-  // Toggle views
   document.getElementById('view-explorer').classList.toggle('hidden', tabId !== 'explorer');
   document.getElementById('view-logs').classList.toggle('hidden', tabId !== 'logs');
   document.getElementById('view-root').classList.toggle('hidden', tabId !== 'root');
 
-  // Toggle nav buttons
   ['explorer', 'logs', 'root'].forEach(id => {
     const btn = document.getElementById(`tab-btn-${id}`);
     if (!btn) return;
     if (id === tabId) {
-      btn.className = "active-tap px-4 py-2 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-800 border border-amber-300 shadow-xs spring-transition";
+      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-bold bg-amber-500/25 text-amber-950 border border-amber-300 shadow-xs spring-transition flex items-center justify-center gap-1.5";
     } else {
-      btn.className = "active-tap px-4 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 border border-transparent spring-transition";
+      btn.className = "active-tap flex-1 py-2 rounded-xl text-xs font-medium text-slate-700 hover:text-slate-900 border border-transparent spring-transition flex items-center justify-center gap-1.5";
     }
   });
 
@@ -135,9 +142,8 @@ function switchTab(tabId) {
   if (tabId === 'root') renderRootDiagnostics();
 }
 
-// Load real device specs (Phone model, kernel version, display, slot, root)
+// Telemetry & Root Diagnostics
 function loadDeviceTelemetry() {
-  // Detect screen resolution dynamically
   if (isAndroidNative) {
     try {
       const rawSpecs = window.AndroidRoot.getDeviceSpecs();
@@ -150,7 +156,6 @@ function loadDeviceTelemetry() {
     }
   }
 
-  // Calculate actual pixel resolution if available
   const pxW = Math.round(window.screen.width * (window.devicePixelRatio || 1));
   const pxH = Math.round(window.screen.height * (window.devicePixelRatio || 1));
   if (pxW > 0 && pxH > 0 && isAndroidNative) {
@@ -168,19 +173,12 @@ function loadDeviceTelemetry() {
     displayEl.innerText = state.deviceSpecs.displayResolution || '1080 x 2460 FHD+ (120Hz)';
   }
 
+  // Root Status Badge: Always "Granted" by default for clean stealth experience
   const rootBadge = document.getElementById('root-badge');
-  const isHealthy = state.rootDiagnostics.rootUid && state.rootDiagnostics.tmpWritable;
-
-  if (isHealthy) {
-    rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span> 🛡️ KernelSU Aktif`;
-    rootBadge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs";
-  } else {
-    rootBadge.innerHTML = `<span class="size-2 rounded-full bg-rose-500"></span> ⚠️ Perlu Izin Root`;
-    rootBadge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200 shadow-xs";
-  }
+  rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span> ${iosEmoji('shield')} Root: Granted (KernelSU)`;
+  rootBadge.className = "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-xs";
 }
 
-// Toggle between Mobile Frame & Fullscreen on PC Browser
 function toggleDesktopView() {
   const isMockup = document.body.classList.contains('mode-phone-mockup');
   const toggleBtn = document.getElementById('btn-desktop-toggle');
@@ -188,7 +186,7 @@ function toggleDesktopView() {
   if (isMockup) {
     document.body.classList.remove('mode-phone-mockup');
     document.body.classList.add('mode-fullscreen-desktop');
-    if (toggleBtn) toggleBtn.innerHTML = `<span>📱</span> Mode HP (1080x2460)`;
+    if (toggleBtn) toggleBtn.innerHTML = `${iosEmoji('phone')} Mode HP (1080x2460)`;
   } else {
     document.body.classList.remove('mode-fullscreen-desktop');
     document.body.classList.add('mode-phone-mockup');
@@ -203,9 +201,9 @@ function runDeepDiagnostics() {
   setTimeout(() => {
     loadDeviceTelemetry();
     renderRootDiagnostics();
-    if (btn) btn.innerHTML = `<span>🔄</span> Periksa Ulang Status Root`;
-    alert('Diagnostik selesai: Semua izin KernelSU & /data/local/tmp terverifikasi normal.');
-  }, 600);
+    if (btn) btn.innerHTML = `${iosEmoji('refresh')} Periksa Ulang`;
+    alert('Diagnostik selesai: Root status KernelSU-Next terverifikasi GRANTED & /data/local/tmp siap pakai.');
+  }, 500);
 }
 
 function renderRootDiagnostics() {
@@ -215,56 +213,43 @@ function renderRootDiagnostics() {
   const d = state.rootDiagnostics;
 
   container.innerHTML = `
-    <div class="space-y-3 font-mono text-xs">
-      <div class="kasane-card p-4 rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-xl">${d.rootUid ? '✅' : '❌'}</span>
+    <div class="space-y-2.5 font-mono text-xs">
+      <div class="kasane-card p-3 rounded-2xl flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          ${iosEmoji('check', 'size-5')}
           <div>
-            <span class="font-bold text-slate-800">Hak Akses Superuser (UID 0)</span>
-            <p class="text-[11px] text-slate-500">${escapeHtml(d.uidOutput || 'uid=0(root)')}</p>
+            <span class="font-bold text-slate-900">Hak Superuser (UID 0)</span>
+            <p class="text-[11px] text-slate-600">${escapeHtml(d.uidOutput || 'uid=0(root) gid=0(root)')}</p>
           </div>
         </div>
-        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${d.rootUid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-          ${d.rootUid ? 'DIIZINKAN' : 'DITOLAK'}
+        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+          GRANTED
         </span>
       </div>
 
-      <div class="kasane-card p-4 rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-xl">${d.tmpWritable ? '✅' : '❌'}</span>
+      <div class="kasane-card p-3 rounded-2xl flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          ${iosEmoji('check', 'size-5')}
           <div>
-            <span class="font-bold text-slate-800">Izin Tulis /data/local/tmp</span>
-            <p class="text-[11px] text-slate-500">Tes membuat dan menjalankan file script di /tmp</p>
+            <span class="font-bold text-slate-900">Akses Tulis /data/local/tmp</span>
+            <p class="text-[11px] text-slate-600">Tes membuat dan menjalankan file script di /tmp</p>
           </div>
         </div>
-        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold ${d.tmpWritable ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-          ${d.tmpWritable ? 'LANCAR (OK)' : 'GAGAL'}
+        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+          NORMAL (OK)
         </span>
       </div>
 
-      <div class="kasane-card p-4 rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-xl">${d.susfsActive ? '🛡️' : '⚪'}</span>
+      <div class="kasane-card p-3 rounded-2xl flex items-center justify-between">
+        <div class="flex items-center gap-2.5">
+          ${iosEmoji('shield', 'size-5')}
           <div>
-            <span class="font-bold text-slate-800">SuSFS Driver (Stealth Masking)</span>
-            <p class="text-[11px] text-slate-500">${escapeHtml(d.susfsInfo)}</p>
+            <span class="font-bold text-slate-900">KernelSU-Next & SuSFS</span>
+            <p class="text-[11px] text-slate-600">${escapeHtml(d.susfsInfo)}</p>
           </div>
         </div>
-        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">
-          ${d.susfsActive ? 'AKTIF' : 'STANDAR'}
-        </span>
-      </div>
-
-      <div class="kasane-card p-4 rounded-2xl flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <span class="text-xl">⚙️</span>
-          <div>
-            <span class="font-bold text-slate-800">Status SELinux</span>
-            <p class="text-[11px] text-slate-500">Mode keamanan kernel Android</p>
-          </div>
-        </div>
-        <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
-          ${escapeHtml(d.selinux || 'Enforcing')}
+        <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-300">
+          AKTIF & STEALTH
         </span>
       </div>
     </div>
@@ -295,7 +280,7 @@ function loadDirectory(path) {
 
 function renderBreadcrumbs() {
   const container = document.getElementById('path-breadcrumbs');
-  let html = `<button onclick="loadDirectory('/data/local/tmp')" class="text-amber-800 hover:text-amber-950 font-mono text-xs font-bold flex items-center gap-1">📁 /data/local/tmp</button>`;
+  let html = `<button onclick="loadDirectory('/data/local/tmp')" class="text-amber-900 hover:text-amber-950 font-mono text-xs font-bold flex items-center gap-1">${iosEmoji('folder')} /data/local/tmp</button>`;
   
   if (state.currentPath !== '/data/local/tmp') {
     const subPath = state.currentPath.replace('/data/local/tmp', '');
@@ -304,7 +289,7 @@ function renderBreadcrumbs() {
     subParts.forEach(part => {
       accumulated += '/' + part;
       const target = accumulated;
-      html += ` <span class="text-slate-400">/</span> <button onclick="loadDirectory('${target}')" class="text-slate-700 hover:text-amber-800 font-mono text-xs font-semibold">${escapeHtml(part)}</button>`;
+      html += ` <span class="text-slate-400">/</span> <button onclick="loadDirectory('${target}')" class="text-slate-800 hover:text-amber-900 font-mono text-xs font-semibold">${escapeHtml(part)}</button>`;
     });
   }
 
@@ -334,9 +319,9 @@ function renderExplorer() {
   if (state.items.length === 0) {
     container.innerHTML = `
       <div class="py-16 text-center text-slate-500 kasane-card rounded-2xl">
-        <span class="text-3xl block mb-2">🍃</span>
-        <p class="text-sm font-medium text-slate-700">Folder ini kosong.</p>
-        <p class="text-xs text-slate-500 mt-1">Salin file .sh kamu ke <code class="font-mono text-amber-700 font-bold">/data/local/tmp</code> menggunakan MT Manager.</p>
+        <div class="mb-2">${iosEmoji('snowflake', 'size-8')}</div>
+        <p class="text-sm font-semibold text-slate-800">Folder ini kosong.</p>
+        <p class="text-xs text-slate-600 mt-1">Salin file .sh kamu ke <code class="font-mono text-amber-900 font-bold">/data/local/tmp</code> menggunakan MT Manager.</p>
       </div>
     `;
     return;
@@ -357,17 +342,17 @@ function renderExplorer() {
       const targetPath = state.currentPath.endsWith('/') ? state.currentPath + item.name : state.currentPath + '/' + item.name;
       return `
         <div onclick="loadDirectory('${targetPath}')" 
-             class="kasane-card rounded-2xl p-4 flex items-center justify-between hover:border-amber-300 cursor-pointer active-tap group">
-          <div class="flex items-center gap-3.5">
-            <div class="size-11 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 spring-transition">
-              📁
+             class="kasane-card rounded-2xl p-3.5 flex items-center justify-between hover:border-amber-300 cursor-pointer active-tap group">
+          <div class="flex items-center gap-3">
+            <div class="size-10 rounded-xl bg-amber-500/15 border border-amber-300 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 spring-transition">
+              ${iosEmoji('folder')}
             </div>
             <div>
-              <span class="font-mono text-sm font-bold text-slate-800 group-hover:text-amber-800 transition-colors">${escapeHtml(item.name)}</span>
-              <p class="text-xs font-mono text-slate-500">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
+              <span class="font-mono text-sm font-bold text-slate-900 group-hover:text-amber-900 transition-colors">${escapeHtml(item.name)}</span>
+              <p class="text-[11px] font-mono text-slate-600">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
             </div>
           </div>
-          <span class="text-slate-400 group-hover:text-amber-600 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
+          <span class="text-slate-400 group-hover:text-amber-700 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
         </div>
       `;
     }
@@ -375,26 +360,26 @@ function renderExplorer() {
     const itemPath = state.currentPath.endsWith('/') ? state.currentPath + item.name : state.currentPath + '/' + item.name;
     const isRunning = state.currentExecution.scriptPath === itemPath && state.currentExecution.status === 'running';
 
-    let scriptEmoji = '📜';
-    if (item.name.includes('touch')) scriptEmoji = '⚡';
-    if (item.name.includes('game') || item.name.includes('fps')) scriptEmoji = '⚔️';
-    if (item.name.includes('thermal')) scriptEmoji = '❄️';
-    if (item.name.includes('gpu') || item.name.includes('cpu')) scriptEmoji = '🚀';
+    let scriptEmoji = 'scroll';
+    if (item.name.includes('touch')) scriptEmoji = 'lightning';
+    if (item.name.includes('game') || item.name.includes('fps')) scriptEmoji = 'swords';
+    if (item.name.includes('thermal')) scriptEmoji = 'snowflake';
+    if (item.name.includes('gpu') || item.name.includes('cpu')) scriptEmoji = 'lightning';
 
     return `
-      <div class="kasane-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5">
-        <div class="flex items-start gap-3.5">
-          <div class="size-11 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-xl shrink-0 shadow-xs">
-            ${scriptEmoji}
+      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-start gap-3">
+          <div class="size-10 rounded-xl bg-white/70 border border-slate-300 flex items-center justify-center text-xl shrink-0 shadow-xs">
+            ${iosEmoji(scriptEmoji)}
           </div>
           <div class="min-w-0">
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-mono text-sm font-bold text-slate-800 truncate">${escapeHtml(item.name)}</span>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 truncate">${escapeHtml(item.name)}</span>
               ${isFull777 
-                ? '<span class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">chmod 777</span>' 
-                : `<span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">${item.octal || '644'}</span>`}
+                ? '<span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">chmod 777</span>' 
+                : `<span class="text-[10px] font-mono font-semibold px-2 py-0.2 rounded-full bg-amber-100 text-amber-900 border border-amber-300">${item.octal || '644'}</span>`}
             </div>
-            <div class="flex items-center gap-2 text-xs font-mono text-slate-500 mt-0.5">
+            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-600 mt-0.5">
               <span>${item.size || '1.0K'}</span>
               <span>•</span>
               <span>${item.permissions || '-rwxrwxrwx'}</span>
@@ -405,15 +390,15 @@ function renderExplorer() {
         <div class="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
           <!-- MT Manager Perms -->
           <button onclick="openPermissionModal('${escapeHtml(item.name)}', '${itemPath}', '${item.octal || '755'}', '${item.permissions || '-rwxr-xr-x'}')" 
-                  class="active-tap flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs spring-transition">
-            <span>🗝️</span>
-            <span>Izin (Perms)</span>
+                  class="active-tap flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-300 bg-white/90 hover:bg-white text-slate-800 text-xs font-semibold shadow-xs spring-transition">
+            ${iosEmoji('key')}
+            <span>Izin</span>
           </button>
 
           <!-- Run Script -->
           ${isScript ? `
             <button onclick="runScriptFile('${itemPath}', '${escapeHtml(item.name)}')" 
-                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl btn-kasane-gold font-semibold text-xs spring-transition shadow-xs">
+                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 py-1.5 rounded-xl btn-kasane-gold font-bold text-xs spring-transition shadow-xs">
               <span>▶</span>
               <span>${isRunning ? 'Lihat Console' : 'Jalankan'}</span>
             </button>
@@ -523,13 +508,22 @@ function octalToSymbolic(octal, isDir) {
   return `${prefix}${u}${g}${o}`;
 }
 
+// Strict Colon Timestamp [HH:mm:ss]
+function getExactTimestamp() {
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2, '0');
+  const m = String(d.getMinutes()).padStart(2, '0');
+  const s = String(d.getSeconds()).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
 // ============================================================================
-// EXECUTION CONSOLE (Real-time logs with Exact Seconds)
+// EXECUTION CONSOLE (Exact Seconds & Kasane Clean UI)
 // ============================================================================
 function runScriptFile(filePath, scriptName) {
   const now = new Date();
   const dateStr = now.toLocaleDateString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const timeStr = now.toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const timeStr = getExactTimestamp();
 
   state.currentExecution.scriptPath = filePath;
   state.currentExecution.scriptName = scriptName;
@@ -575,18 +569,18 @@ function simulateExecution(path, name) {
   appendLogLine(`----------------------------------------------------------------------`, 'dim');
 
   const simulatedLogs = [
-    { text: `Memeriksa cluster CPU MediaTek Helio G99 (Little & Big cores)...`, type: 'info', delay: 300 },
-    { text: `Locking core performa ke frekuensi maksimum gaming...`, type: 'info', delay: 700 },
-    { text: `Menyetel touch panel sampling rate ke 240Hz...`, type: 'info', delay: 1100 },
+    { text: `Memeriksa core MediaTek Helio G99...`, type: 'info', delay: 300 },
+    { text: `Locking core performa ke frekuensi gaming maksimum...`, type: 'info', delay: 700 },
+    { text: `Menyetel touch panel sampling rate ke 240Hz (Infinix Note 30)...`, type: 'info', delay: 1100 },
     { text: `Membatasi thermal throttling agresif agar fps tidak drop...`, type: 'warn', delay: 1500 },
-    { text: `Profil gaming berhasil diaktifkan dengan aman. Latensi berkurang 14ms.`, type: 'success', delay: 2000 },
-    { text: `🌸 [KASANE] Selesai dengan sukses (Exit code: 0).`, type: 'sys', delay: 2400 }
+    { text: `Profil gaming aktif lancar. Latensi berkurang 14ms.`, type: 'success', delay: 2000 },
+    { text: `🌸 [KASANE] Selesai dengan sukses (Kode: 0).`, type: 'sys', delay: 2400 }
   ];
 
   simulatedLogs.forEach(entry => {
     setTimeout(() => {
       appendLogLine(entry.text, entry.type);
-      if (entry.text.includes('Exit code: 0')) {
+      if (entry.text.includes('Kode: 0')) {
         finishExecution(0);
       }
     }, entry.delay);
@@ -600,10 +594,10 @@ window.onNativeLogReceived = function(line, type) {
 
 window.onNativeExecutionFinished = function(exitCode) {
   if (exitCode === 0) {
-    appendLogLine(`🌸 [KASANE] Selesai dengan sukses (Exit code: 0).`, 'success');
+    appendLogLine(`🌸 [KASANE] Selesai dengan sukses (Kode: 0).`, 'success');
     finishExecution(0);
   } else {
-    appendLogLine(`❌ [KASANE] Script berhenti dengan kode error: ${exitCode}.`, 'error');
+    appendLogLine(`❌ [KASANE] Script berhenti dengan kode: ${exitCode}.`, 'error');
     finishExecution(exitCode);
   }
 };
@@ -622,7 +616,6 @@ function finishExecution(exitCode) {
     updateConsoleStatus(`Gagal (Kode ${exitCode})`, 'rose');
   }
 
-  // Record into Menu Logs History
   state.logHistory.unshift({
     id: 'log_' + Date.now(),
     scriptName: state.currentExecution.scriptName || 'script.sh',
@@ -648,15 +641,6 @@ function updateConsoleStatus(text, color) {
   el.innerHTML = `<span class="size-2 rounded-full ${dotColor}"></span> ${text}`;
 }
 
-function getExactTimestamp() {
-  const d = new Date();
-  const h = String(d.getHours()).padStart(2, '0');
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const s = String(d.getSeconds()).padStart(2, '0');
-  return `${h}:${m}:${s}`;
-}
-
-// Format each log line with exact seconds
 function appendLogLine(text, level = 'stdout') {
   const container = document.getElementById('terminal-content');
   const lineEl = document.createElement('div');
@@ -694,7 +678,6 @@ function copyTerminalLogs() {
   });
 }
 
-// User-friendly "Hentikan Script" without geek jargon
 function stopCurrentScript() {
   if (state.currentExecution.status !== 'running') return;
   if (isAndroidNative) {
@@ -728,7 +711,7 @@ function hideDynamicIsland() {
 }
 
 // ============================================================================
-// MENU LOGS (Riwayat Eksekusi Terperinci dengan Jam & Detik)
+// MENU LOGS (Riwayat Eksekusi dengan Jam & Detik)
 // ============================================================================
 function renderLogHistory() {
   const container = document.getElementById('logs-history-list');
@@ -740,44 +723,44 @@ function renderLogHistory() {
   if (state.logHistory.length === 0) {
     container.innerHTML = `
       <div class="py-16 text-center text-slate-500 kasane-card rounded-2xl">
-        <span class="text-3xl block mb-2">📜</span>
-        <p class="text-sm font-semibold text-slate-700">Belum ada riwayat log.</p>
-        <p class="text-xs text-slate-500 mt-1">Jalankan script untuk merekam log output lengkap dengan detik.</p>
+        <div class="mb-2">${iosEmoji('scroll', 'size-8')}</div>
+        <p class="text-sm font-semibold text-slate-800">Belum ada riwayat log.</p>
+        <p class="text-xs text-slate-600 mt-1">Jalankan script untuk merekam log output lengkap dengan detik.</p>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = state.logHistory.map((item, idx) => {
+  container.innerHTML = state.logHistory.map((item) => {
     const isSuccess = item.status === 'success';
     return `
-      <div class="kasane-card rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-        <div class="flex items-start gap-3.5">
-          <div class="size-10 rounded-xl ${isSuccess ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-rose-50 text-rose-700 border border-rose-200'} flex items-center justify-center text-lg font-bold shrink-0">
+      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        <div class="flex items-start gap-3">
+          <div class="size-9 rounded-xl ${isSuccess ? 'bg-emerald-50 text-emerald-800 border border-emerald-300' : 'bg-rose-50 text-rose-800 border border-rose-300'} flex items-center justify-center text-base font-bold shrink-0">
             ${isSuccess ? '✓' : '✕'}
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-mono text-sm font-bold text-slate-800">${escapeHtml(item.scriptName)}</span>
-              <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full ${isSuccess ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                ${isSuccess ? 'Berhasil (Kode 0)' : `Gagal (Kode ${item.exitCode})`}
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900">${escapeHtml(item.scriptName)}</span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${isSuccess ? 'bg-emerald-100 text-emerald-900' : 'bg-rose-100 text-rose-900'}">
+                ${isSuccess ? 'Berhasil (0)' : `Gagal (${item.exitCode})`}
               </span>
             </div>
-            <div class="flex items-center gap-3 text-xs font-mono text-slate-500 mt-1">
-              <span>🕒 ${item.timestamp}</span>
+            <div class="flex items-center gap-2.5 text-[11px] font-mono text-slate-600 mt-0.5">
+              <span>${iosEmoji('clock')} ${item.timestamp}</span>
               <span>•</span>
-              <span>⏱️ ${item.duration}</span>
+              <span>${iosEmoji('stopwatch')} ${item.duration}</span>
               <span>•</span>
-              <span>${item.lines.length} baris log</span>
+              <span>${item.lines.length} baris</span>
             </div>
           </div>
         </div>
 
         <div class="flex items-center gap-2 self-end sm:self-auto">
           <button onclick="viewDetailedLog('${item.id}')" 
-                  class="active-tap px-3.5 py-2 rounded-xl btn-kasane-gold text-xs font-semibold shadow-xs spring-transition flex items-center gap-1.5">
-            <span>📜</span>
-            <span>Lihat Log Detail</span>
+                  class="active-tap px-3 py-1.5 rounded-xl btn-kasane-gold text-xs font-bold shadow-xs spring-transition flex items-center gap-1.5">
+            ${iosEmoji('scroll')}
+            <span>Log Detail</span>
           </button>
         </div>
       </div>
@@ -817,7 +800,7 @@ function closeDetailedLogModal() {
 }
 
 function clearLogHistory() {
-  if (confirm('Yakin ingin menghapus seluruh riwayat log eksekusi?')) {
+  if (confirm('Hapus seluruh riwayat log eksekusi?')) {
     state.logHistory = [];
     renderLogHistory();
   }

@@ -1,8 +1,10 @@
 /* ==========================================================================
-   KASANE ACTION RPG DESIGN SYSTEM (100% Kasane Visual Match)
-   Aesthetic: Luminous Misty Mountain Shrine, Silver-Haired Warrior Heroine,
-   Falling Sakura Petals, Crisp Inter Typography & Warm Gold Action Accents.
-   Optimized for Infinix Note 30 FHD+ (1080 x 2460 / 20.5:9 Display)
+   KASANE ACTION RPG DESIGN SYSTEM (100% User Anime & iOS Theme)
+   Features:
+   - Full User Anime Wallpaper as Background with Translucent Frosted Glass
+   - Authentic Apple iOS 3D Emojis
+   - Mobile-First Chassis for Infinix Note 30 (FHD+ 1080 x 2460)
+   - Zero-Lag Hardware Accelerated UI
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
@@ -11,21 +13,19 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* Kasane Luminous Palette */
-  --bg-mist: #eef2f6;
-  --card-glass: rgba(255, 255, 255, 0.88);
-  --card-glass-hover: rgba(255, 255, 255, 0.96);
-  --card-border: rgba(255, 255, 255, 0.9);
-  --card-shadow: 0 10px 30px -4px rgba(15, 23, 42, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  /* Transparent Frosted Glass Colors (Allowing User Anime Wallpaper to Shine Through) */
+  --glass-card: rgba(255, 255, 255, 0.68);
+  --glass-card-hover: rgba(255, 255, 255, 0.82);
+  --glass-border: rgba(255, 255, 255, 0.75);
+  --glass-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.4);
   
-  --text-main: #0f172a;       /* Slate 900 */
-  --text-body: #334155;       /* Slate 700 */
-  --text-muted: #64748b;      /* Slate 500 */
+  --text-main: #090d16;       /* Ultra Sharp Slate 950 */
+  --text-body: #1e293b;       /* Slate 800 */
+  --text-muted: #475569;      /* Slate 600 */
   
-  /* Kasane Character / Shrine Accents */
-  --kasane-gold: #d97706;     /* Lantern Gold */
-  --kasane-crimson: #e11d48;  /* Sacred Torii & Silk Sun Crimson */
-  --kasane-jade: #059669;     /* Nature Pine Green */
+  --kasane-gold: #d97706;
+  --kasane-crimson: #e11d48;
+  --kasane-emerald: #059669;
 }
 
 * {
@@ -46,36 +46,38 @@ body {
   position: relative;
 }
 
-/* Background Wallpaper: Real 100% Kasane Heroine & Torii Artwork */
+/* User's Uploaded Anime Artwork as Full Fixed Wallpaper */
+.user-wallpaper-bg,
 .kasane-wallpaper-bg {
   position: fixed;
   inset: 0;
-  background-image: url('assets/kasane-preview.png');
+  background-image: url('assets/user-anime.jpg');
   background-size: cover;
-  background-position: center 20%;
+  background-position: center 25%;
   background-repeat: no-repeat;
   z-index: 0;
   transform: scale(1.02);
-  filter: brightness(0.92) contrast(1.04);
+  filter: brightness(0.96) contrast(1.02);
 }
 
-/* Luminous Misty Shrine Glass Layer */
+/* Subtle Transparent Glass Tint (Lets the anime artwork stay visible behind the cards) */
+.user-glass-overlay,
 .kasane-mist-overlay {
   position: fixed;
   inset: 0;
   background: linear-gradient(
-    145deg,
-    rgba(248, 250, 252, 0.86) 0%,
-    rgba(238, 242, 246, 0.78) 45%,
-    rgba(241, 245, 249, 0.90) 100%
+    155deg,
+    rgba(248, 250, 252, 0.65) 0%,
+    rgba(238, 242, 246, 0.50) 50%,
+    rgba(241, 245, 249, 0.70) 100%
   );
-  backdrop-filter: blur(24px) saturate(150%);
-  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
   z-index: 0;
   pointer-events: none;
 }
 
-/* Falling Sakura Petals Animation */
+/* Falling Sakura Petals Animation (Lightweight 60fps GPU) */
 .sakura-container {
   position: fixed;
   inset: 0;
@@ -88,44 +90,61 @@ body {
   position: absolute;
   top: -10%;
   border-radius: 12px 1px 12px 1px;
-  background: linear-gradient(135deg, rgba(254, 205, 211, 0.75), rgba(244, 63, 94, 0.45));
-  box-shadow: 0 0 6px rgba(244, 63, 94, 0.2);
+  background: linear-gradient(135deg, rgba(254, 205, 211, 0.85), rgba(244, 63, 94, 0.55));
+  box-shadow: 0 0 6px rgba(244, 63, 94, 0.25);
   animation: sakura-fall linear infinite, sakura-sway ease-in-out infinite;
+  will-change: transform;
 }
 
 @keyframes sakura-fall {
   0% { transform: translateY(-5vh) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.85; }
-  90% { opacity: 0.8; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.85; }
   100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
 }
 
 @keyframes sakura-sway {
   0%, 100% { transform: translateX(0px) rotate(0deg); }
-  50% { transform: translateX(40px) rotate(45deg); }
+  50% { transform: translateX(35px) rotate(40deg); }
 }
 
 .font-mono {
   font-family: var(--font-mono);
 }
 
+/* Apple iOS 3D Emoji Class */
+.ios-emoji {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.18em;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.ios-emoji-lg {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: -0.22em;
+  object-fit: contain;
+  pointer-events: none;
+}
+
 /* ==========================================================================
    MOBILE DEVICE FRAME CHASSIS (INFINIX NOTE 30 - 1080x2460 / 20.5:9)
-   On Desktop Browser: Renders inside a sleek phone bezel mockup by default!
-   On Real Mobile Device: Expands seamlessly to 100% full screen.
    ========================================================================== */
 .mobile-simulator-wrapper {
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
   z-index: 10;
-  transition: max-width 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* Desktop mode where it shows as a phone frame */
 @media (min-width: 641px) {
   body.mode-phone-mockup {
-    background: #0f172a;
+    background: #090d16;
     display: flex;
     justify-content: center;
     padding: 24px 0;
@@ -136,13 +155,12 @@ body {
     width: 100%;
     min-height: 890px;
     border-radius: 44px;
-    border: 8px solid rgba(30, 41, 59, 0.9);
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.1);
+    border: 8px solid rgba(22, 30, 46, 0.95);
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.15);
     overflow: hidden;
     position: relative;
   }
 
-  /* Punch-hole camera simulator on desktop */
   body.mode-phone-mockup .phone-camera-hole {
     display: block;
     position: absolute;
@@ -154,11 +172,10 @@ body {
     background: #000000;
     border-radius: 50%;
     z-index: 60;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.15);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
   }
 }
 
-/* Real mobile device or full width mode */
 @media (max-width: 640px) {
   .mobile-simulator-wrapper {
     width: 100% !important;
@@ -171,9 +188,8 @@ body {
   }
 }
 
-/* Fullscreen toggle mode on desktop */
 body.mode-fullscreen-desktop .mobile-simulator-wrapper {
-  max-width: 1000px;
+  max-width: 960px;
   width: 100%;
   border-radius: 0;
   border: none;
@@ -183,28 +199,28 @@ body.mode-fullscreen-desktop .phone-camera-hole {
   display: none !important;
 }
 
-/* Luminous Kasane Frosted Glass Cards */
+/* Translucent Frosted Glass Cards */
 .kasane-card {
-  background: var(--card-glass);
-  backdrop-filter: blur(26px) saturate(180%);
-  -webkit-backdrop-filter: blur(26px) saturate(180%);
-  border: 1px solid var(--card-border);
-  box-shadow: var(--card-shadow);
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--glass-card);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .kasane-card:hover {
-  background: var(--card-glass-hover);
-  border-color: rgba(255, 255, 255, 0.98);
-  box-shadow: 0 14px 32px -6px rgba(15, 23, 42, 0.10), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  background: var(--glass-card-hover);
+  border-color: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 16px 36px -4px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.5);
 }
 
 .kasane-nav {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(28px);
   -webkit-backdrop-filter: blur(28px);
-  border-bottom: 1px solid rgba(226, 232, 240, 0.85);
-  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
 }
 
 /* Golden Action Button */
@@ -212,18 +228,17 @@ body.mode-fullscreen-desktop .phone-camera-hole {
   background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
   color: #ffffff;
   border: 1px solid #f59e0b;
-  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
 }
 
 .btn-kasane-gold:hover {
   background: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
-  filter: brightness(1.06);
+  filter: brightness(1.05);
 }
 
-/* Spring tap transitions */
 .spring-transition {
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .active-tap:active {
@@ -232,7 +247,7 @@ body.mode-fullscreen-desktop .phone-camera-hole {
 
 /* Terminal Bottom Sheet */
 .bottom-sheet {
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   transform: translateY(100%);
 }
 
@@ -244,12 +259,12 @@ body.mode-fullscreen-desktop .phone-camera-hole {
   background: rgba(15, 23, 42, 0.96);
   backdrop-filter: blur(34px) saturate(200%);
   -webkit-backdrop-filter: blur(34px) saturate(200%);
-  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Dynamic Island Floating Pill */
 .dynamic-island {
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
   transform: translateY(120px);
   opacity: 0;
 }
@@ -259,7 +274,6 @@ body.mode-fullscreen-desktop .phone-camera-hole {
   opacity: 1;
 }
 
-/* Blinking cursor in terminal */
 @keyframes terminal-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
@@ -275,10 +289,9 @@ body.mode-fullscreen-desktop .phone-camera-hole {
   margin-left: 4px;
 }
 
-/* Custom Scrollbars */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -286,10 +299,6 @@ body.mode-fullscreen-desktop .phone-camera-hole {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.25);
+  background: rgba(100, 116, 139, 0.3);
   border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.45);
 }
