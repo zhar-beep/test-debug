@@ -205,9 +205,18 @@ function loadDeviceTelemetry() {
     displayEl.innerText = state.deviceSpecs.displayResolution || '1080 x 2460 FHD+ (120Hz)';
   }
 
-  // Root Status Badge: Clean Apple Pill (No Shield Emoji)
+  // Root Status Badge: Plain Text Only - No Icon, No Emoji, No Dot (Root: YES / Root: NO)
   const rootBadge = document.getElementById('root-badge');
-  rootBadge.innerHTML = `<span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span> <span>Root: Granted</span>`;
+  if (rootBadge) {
+    const isRoot = true;
+    if (isRoot) {
+      rootBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-500/40 shadow-xs tracking-wider';
+      rootBadge.innerText = 'Root: YES';
+    } else {
+      rootBadge.className = 'px-3 py-1 rounded-full text-xs font-mono font-bold bg-rose-500/20 text-rose-800 dark:text-rose-400 border border-rose-500/40 shadow-xs tracking-wider';
+      rootBadge.innerText = 'Root: NO';
+    }
+  }
 }
 
 function toggleDesktopView() {
@@ -363,11 +372,11 @@ function renderExplorer() {
               ${iosEmoji('folder')}
             </div>
             <div>
-              <span class="font-mono text-sm font-bold text-white group-hover:text-amber-300 transition-colors">${escapeHtml(item.name)}</span>
-              <p class="text-[11px] font-mono text-slate-400">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
+              <span class="font-mono text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors">${escapeHtml(item.name)}</span>
+              <p class="text-[11px] font-mono text-slate-500 dark:text-slate-400">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
             </div>
           </div>
-          <span class="text-slate-400 group-hover:text-amber-300 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
+          <span class="text-slate-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
         </div>
       `;
     }
@@ -386,7 +395,7 @@ function renderExplorer() {
           </div>
           <div class="min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-white truncate">${escapeHtml(item.name)}</span>
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(item.name)}</span>
               ${isFull777 
                 ? '<span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">chmod 777</span>' 
                 : `<span class="text-[10px] font-mono font-semibold px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">${item.octal || '644'}</span>`}
@@ -853,12 +862,12 @@ function renderLogHistory() {
           </div>
           <div>
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-white">${escapeHtml(item.scriptName)}</span>
-              <span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${isSuccess ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'}">
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(item.scriptName)}</span>
+              <span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${isSuccess ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30'}">
                 ${isSuccess ? 'Berhasil (0)' : `Berhenti (${item.exitCode})`}
               </span>
             </div>
-            <div class="flex items-center gap-2.5 text-[11px] font-mono text-slate-400 mt-0.5">
+            <div class="flex items-center gap-2.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 mt-0.5">
               <span>${iosEmoji('clock')} ${item.timestamp}</span>
               <span>•</span>
               <span>${iosEmoji('stopwatch')} ${item.duration}</span>

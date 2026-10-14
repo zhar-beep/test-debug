@@ -65,10 +65,9 @@
         </div>
         <div>
           <div class="flex items-center gap-1.5">
-            <span class="font-extrabold text-sm tracking-tight text-white dark:text-white uppercase">KASANE</span>
-            <span class="text-[10px] font-mono tracking-wider text-amber-300 font-bold uppercase px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/30">GAME SETUP</span>
+            <span class="font-extrabold text-sm tracking-tight text-slate-900 dark:text-white uppercase">KASANE</span>
           </div>
-          <p class="text-[10px] text-slate-300 font-mono">Infinix Note 30 • FHD+ (1080x2460)</p>
+          <p class="text-[10px] text-slate-600 dark:text-slate-300 font-mono">Infinix Note 30 • FHD+ (1080x2460)</p>
         </div>
       </div>
 
@@ -79,11 +78,8 @@
           <span id="theme-icon">🌙</span>
         </button>
 
-        <!-- Root Granted Live Badge (Clean Apple Pill - No Shield Emoji) -->
-        <div id="root-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-xs">
-          <span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          <span>Root: Granted</span>
-        </div>
+        <!-- Root Granted Live Badge (Clean Apple Pill - Plain Text Only) -->
+        <div id="root-badge" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-emerald-500/20 text-emerald-800 dark:text-emerald-400 border border-emerald-500/40 shadow-xs tracking-wider">Root: YES</div>
       </div>
     </header>
 
@@ -97,7 +93,7 @@
         <div class="flex items-center justify-between border-b border-white/10 pb-2.5">
           <div class="flex items-center gap-2">
             <span class="size-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-            <h2 class="font-bold text-xs uppercase tracking-wide text-white dark:text-white">Status Root & Spesifikasi HP</h2>
+            <h2 class="font-bold text-xs uppercase tracking-wide text-slate-900 dark:text-white">Status Root & Spesifikasi HP</h2>
           </div>
           <button id="btn-recheck-root" onclick="runDeepDiagnostics()" 
                   class="active-tap px-3 py-1 rounded-xl btn-kasane-gold text-[10px] font-bold shadow-xs spring-transition flex items-center gap-1">
@@ -111,56 +107,56 @@
           
           <!-- Phone Model -->
           <div class="tile-surface p-2.5 rounded-2xl shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-300 text-[10px]">
+            <div class="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-[10px]">
               <img src="assets/emojis/phone.png" class="ios-emoji" alt="phone">
               <span class="uppercase tracking-wider font-semibold">Perangkat HP</span>
             </div>
-            <p id="hud-device-name" class="font-bold text-white truncate">Infinix Note 30 (X6833B)</p>
+            <p id="hud-device-name" class="font-bold text-slate-900 dark:text-white truncate">Infinix Note 30 (X6833B)</p>
           </div>
 
           <!-- Display Resolution -->
           <div class="tile-surface p-2.5 rounded-2xl shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-300 text-[10px]">
+            <div class="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-[10px]">
               <img src="assets/emojis/display.png" class="ios-emoji" alt="display">
               <span class="uppercase tracking-wider font-semibold">Layar FHD+</span>
             </div>
-            <p id="hud-display-resolution" class="font-bold text-amber-300 truncate">1080 x 2460 (120Hz)</p>
+            <p id="hud-display-resolution" class="font-bold text-amber-700 dark:text-amber-300 truncate">1080 x 2460 (120Hz)</p>
           </div>
 
           <!-- Kernel Version -->
           <div class="tile-surface p-2.5 rounded-2xl shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-300 text-[10px]">
+            <div class="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-[10px]">
               <img src="assets/emojis/gear.png" class="ios-emoji" alt="gear">
               <span class="uppercase tracking-wider font-semibold">Kernel</span>
             </div>
-            <p id="hud-kernel-version" class="font-bold text-amber-300 truncate">5.10.269-SuiKernel</p>
+            <p id="hud-kernel-version" class="font-bold text-amber-700 dark:text-amber-300 truncate">5.10.269-SuiKernel</p>
           </div>
 
           <!-- OS / ROM -->
           <div class="tile-surface p-2.5 rounded-2xl shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-300 text-[10px]">
+            <div class="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-[10px]">
               <img src="assets/emojis/label.png" class="ios-emoji" alt="label">
               <span class="uppercase tracking-wider font-semibold">OS / ROM</span>
             </div>
-            <p id="hud-android-version" class="font-bold text-white truncate">AxionOS 2.7 • Android 16</p>
+            <p id="hud-android-version" class="font-bold text-slate-900 dark:text-white truncate">AxionOS 2.7 • Android 16</p>
           </div>
 
           <!-- Active Slot -->
           <div class="tile-surface p-2.5 rounded-2xl shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-300 text-[10px]">
+            <div class="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-[10px]">
               <img src="assets/emojis/slot.png" class="ios-emoji" alt="slot">
               <span class="uppercase tracking-wider font-semibold">Slot Aktif</span>
             </div>
-            <p id="hud-active-slot" class="font-bold text-emerald-400 truncate">Slot _b (/dev/block/sdc55)</p>
+            <p id="hud-active-slot" class="font-bold text-emerald-700 dark:text-emerald-400 truncate">Slot _b (/dev/block/sdc55)</p>
           </div>
 
           <!-- Target Folder -->
           <div class="tile-surface p-2.5 rounded-2xl shadow-xs space-y-0.5">
-            <div class="flex items-center gap-1 text-slate-300 text-[10px]">
+            <div class="flex items-center gap-1 text-slate-600 dark:text-slate-300 text-[10px]">
               <img src="assets/emojis/folder.png" class="ios-emoji" alt="folder">
               <span class="uppercase tracking-wider font-semibold">Workspace</span>
             </div>
-            <p class="font-bold text-amber-300 truncate">/data/local/tmp</p>
+            <p class="font-bold text-amber-700 dark:text-amber-300 truncate">/data/local/tmp</p>
           </div>
 
         </div>

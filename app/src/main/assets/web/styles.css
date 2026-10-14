@@ -1,12 +1,12 @@
 /* ==========================================================================
-   KASANE ACTION RPG DESIGN SYSTEM (APPLE SF PRO & VIVID ANIME GLASS)
+   KASANE ACTION RPG DESIGN SYSTEM (APPLE SF PRO & VIVID MOBILE ANIME GLASS)
    Features:
-   - 100% Crystal-Clear Vivid User Anime Wallpaper (No Blur on Wallpaper)
-   - Real Apple iOS Frosted Glass on Menus & Cards (backdrop-filter on cards only)
-   - Genuine Apple SF Pro Display & SF Pro Text Typography
-   - Zero Punch-Hole Glitch on Desktop
-   - Dark Mode & Light Mode Theme Support
-   - Authentic Apple iOS 3D Emojis with Custom Script Icon Picker
+   - Wallpaper is strictly bounded inside Mobile Phone Chassis (NO desktop stretch)
+   - High-Contrast Light Mode (Zero washed-out text) & Deep Smoky Dark Mode
+   - Root Status: Pure "Root: YES" / "Root: NO" (No icons)
+   - Apple SF Pro Display & SF Pro Text Typography
+   - Zero Punch-Hole Glitch
+   - Real Apple iOS Frosted Glass on Cards & Menus
    - Mobile-First Chassis for Infinix Note 30 (FHD+ 1080 x 2460)
    ========================================================================== */
 
@@ -19,12 +19,12 @@
 
   /* Default Dark Mode (Vivid Anime Wallpaper + Dark Translucent Glass Cards) */
   --bg-color: #05070c;
-  --glass-card: rgba(13, 17, 28, 0.65);
-  --glass-card-hover: rgba(20, 26, 42, 0.78);
+  --glass-card: rgba(13, 17, 28, 0.72);
+  --glass-card-hover: rgba(20, 26, 42, 0.85);
   --glass-border: rgba(255, 255, 255, 0.18);
   --glass-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.12);
   
-  --nav-bg: rgba(9, 13, 22, 0.75);
+  --nav-bg: rgba(9, 13, 22, 0.82);
   --nav-border: rgba(255, 255, 255, 0.15);
   
   --text-main: #ffffff;
@@ -38,33 +38,120 @@
   --kasane-crimson: #f43f5e;
   --kasane-emerald: #10b981;
 
-  --wallpaper-brightness: 1.0;
-  --wallpaper-contrast: 1.04;
-  --wallpaper-overlay: rgba(0, 0, 0, 0.15);
+  --chassis-backdrop: rgba(0, 0, 0, 0.18);
 }
 
-/* Light Theme Overrides (Vivid Anime Wallpaper + Light Translucent Glass Cards) */
+/* Light Theme Overrides (High-Contrast, Ultra-Sharp & Perfectly Readable) */
 html.light,
 body.light {
-  --bg-color: #f8fafc;
-  --glass-card: rgba(255, 255, 255, 0.70);
-  --glass-card-hover: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.85);
-  --glass-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(255, 255, 255, 0.5);
+  --bg-color: #f1f5f9;
+  --glass-card: rgba(255, 255, 255, 0.88);
+  --glass-card-hover: rgba(255, 255, 255, 0.96);
+  --glass-border: rgba(15, 23, 42, 0.16);
+  --glass-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08);
   
-  --nav-bg: rgba(255, 255, 255, 0.82);
-  --nav-border: rgba(255, 255, 255, 0.80);
+  --nav-bg: rgba(255, 255, 255, 0.92);
+  --nav-border: rgba(15, 23, 42, 0.15);
   
   --text-main: #090d16;
   --text-body: #1e293b;
   --text-muted: #475569;
   
-  --tile-bg: rgba(255, 255, 255, 0.75);
-  --tile-border: rgba(255, 255, 255, 0.90);
+  --tile-bg: rgba(241, 245, 249, 0.95);
+  --tile-border: rgba(15, 23, 42, 0.12);
 
-  --wallpaper-brightness: 1.0;
-  --wallpaper-contrast: 1.02;
-  --wallpaper-overlay: rgba(255, 255, 255, 0.10);
+  --chassis-backdrop: rgba(255, 255, 255, 0.10);
+}
+
+/* Light Mode High-Contrast Rules (100% Readable, Zero Washed-Out Text) */
+html.light .kasane-card,
+body.light .kasane-card {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(15, 23, 42, 0.16);
+  box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.08);
+}
+
+html.light .kasane-card:hover,
+body.light .kasane-card:hover {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+html.light .kasane-nav,
+body.light .kasane-nav {
+  color: #0f172a;
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.14);
+}
+
+html.light .tile-surface,
+body.light .tile-surface {
+  background: rgba(241, 245, 249, 0.95);
+  border-color: rgba(15, 23, 42, 0.15);
+  color: #0f172a;
+}
+
+html.light .text-white,
+body.light .text-white {
+  color: #090d16 !important;
+}
+
+html.light .text-slate-200,
+body.light .text-slate-200,
+html.light .text-slate-300,
+body.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400,
+body.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .text-amber-300,
+body.light .text-amber-300 {
+  color: #b45309 !important;
+}
+
+html.light .text-emerald-300,
+body.light .text-emerald-300,
+html.light .text-emerald-400,
+body.light .text-emerald-400 {
+  color: #047857 !important;
+}
+
+html.light .text-rose-300,
+body.light .text-rose-300,
+html.light .text-rose-400,
+body.light .text-rose-400 {
+  color: #be123c !important;
+}
+
+/* Full Viewport Wallpaper Layer (Mobile Edge-to-Edge, Bounded on Desktop) */
+.user-wallpaper-bg {
+  position: fixed;
+  inset: 0;
+  background-image: url('assets/user-anime.jpg');
+  background-size: cover;
+  background-position: center 18%;
+  background-repeat: no-repeat;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.user-glass-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.15);
+  z-index: 1;
+  pointer-events: none;
+}
+
+@media (min-width: 641px) {
+  body.mode-phone-mockup .user-wallpaper-bg,
+  body.mode-phone-mockup .user-glass-overlay {
+    display: none; /* Hide full-screen wallpaper on PC so it never stretches across widescreen monitors */
+  }
 }
 
 * {
@@ -79,46 +166,20 @@ body {
   font-family: var(--font-sans);
   letter-spacing: -0.012em;
   color: var(--text-main);
-  background-color: var(--bg-color);
+  background-color: #06080e;
   min-height: 100vh;
   overflow-x: hidden;
   position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* 100% VIVID, CRYSTAL-CLEAR FULL WALLPAPER (NO BLUR ON WALLPAPER ITSELF!) */
-.user-wallpaper-bg,
-.kasane-wallpaper-bg {
-  position: fixed;
-  inset: 0;
-  background-image: url('assets/user-anime.jpg');
-  background-size: cover;
-  background-position: center 25%;
-  background-repeat: no-repeat;
-  z-index: 0;
-  transform: scale(1.01);
-  filter: brightness(var(--wallpaper-brightness)) contrast(var(--wallpaper-contrast));
-  pointer-events: none;
-}
-
-/* Very subtle ambient tint (Leaves the anime artwork completely visible) */
-.user-glass-overlay,
-.kasane-mist-overlay {
-  position: fixed;
-  inset: 0;
-  background: var(--wallpaper-overlay);
-  z-index: 0;
-  pointer-events: none;
-}
-
-/* Falling Sakura Petals Animation (Lightweight 60fps GPU) */
+/* Falling Sakura Petals Animation */
 .sakura-container {
-  position: fixed;
+  position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 1;
+  z-index: 2;
   overflow: hidden;
 }
 
@@ -142,11 +203,6 @@ body {
 @keyframes sakura-sway {
   0%, 100% { transform: translateX(0px) rotate(0deg); }
   50% { transform: translateX(35px) rotate(40deg); }
-}
-
-/* Font Classes */
-.font-sf {
-  font-family: var(--font-sans);
 }
 
 .font-mono {
@@ -173,19 +229,36 @@ body {
 }
 
 /* ==========================================================================
-   MOBILE DEVICE FRAME CHASSIS (INFINIX NOTE 30 - 1080x2460 / 20.5:9)
+   MOBILE CHASSIS (INFINIX NOTE 30 - 1080x2460 / 20.5:9 FHD+)
+   WALLPAPER IS STRICTLY BOUNDED INSIDE THIS MOBILE CHASSIS!
    ========================================================================== */
 .mobile-simulator-wrapper {
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
   z-index: 10;
+  overflow-x: hidden;
+  background-image: url('assets/user-anime.jpg');
+  background-size: cover;
+  background-position: center 18%;
+  background-repeat: no-repeat;
   transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Subtle backdrop tint inside chassis */
+.mobile-simulator-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--chassis-backdrop);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Desktop Presentation Mode: Clean Studio Desk with Mobile Phone in Center */
 @media (min-width: 641px) {
   body.mode-phone-mockup {
-    background: #020408;
+    background: #04060b;
     display: flex;
     justify-content: center;
     padding: 24px 0;
@@ -196,17 +269,18 @@ body {
     width: 100%;
     min-height: 890px;
     border-radius: 40px;
-    border: 7px solid rgba(22, 30, 46, 0.90);
-    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.15);
+    border: 7px solid rgba(24, 32, 48, 0.95);
+    box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
     overflow: hidden;
-    position: relative;
   }
 }
 
+/* Mobile Devices: Edge-to-Edge Screen Fill */
 @media (max-width: 640px) {
   .mobile-simulator-wrapper {
     width: 100% !important;
     max-width: 100% !important;
+    min-height: 100vh !important;
     border-radius: 0 !important;
     border: none !important;
   }
@@ -220,8 +294,10 @@ body.mode-fullscreen-desktop .mobile-simulator-wrapper {
   box-shadow: none;
 }
 
-/* REAL FROSTED GLASS ON MENU CARDS (Backdrop Blur Applied to Cards Only) */
+/* REAL APPLE FROSTED GLASS ON MENU CARDS */
 .kasane-card {
+  position: relative;
+  z-index: 3;
   background: var(--glass-card);
   backdrop-filter: blur(28px) saturate(190%);
   -webkit-backdrop-filter: blur(28px) saturate(190%);
@@ -232,15 +308,17 @@ body.mode-fullscreen-desktop .mobile-simulator-wrapper {
 
 .kasane-card:hover {
   background: var(--glass-card-hover);
-  border-color: rgba(255, 255, 255, 0.30);
 }
 
 .kasane-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
   background: var(--nav-bg);
   backdrop-filter: blur(32px) saturate(190%);
   -webkit-backdrop-filter: blur(32px) saturate(190%);
   border-bottom: 1px solid var(--nav-border);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
 }
 
 .tile-surface {
