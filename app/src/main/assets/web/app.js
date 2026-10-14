@@ -186,17 +186,17 @@ function toggleDesktopView() {
   if (isMockup) {
     document.body.classList.remove('mode-phone-mockup');
     document.body.classList.add('mode-fullscreen-desktop');
-    if (toggleBtn) toggleBtn.innerHTML = `${iosEmoji('phone')} Mode HP (1080x2460)`;
+    if (toggleBtn) toggleBtn.innerHTML = `${iosEmoji('phone')} <span>Mode HP (1080x2460)</span>`;
   } else {
     document.body.classList.remove('mode-fullscreen-desktop');
     document.body.classList.add('mode-phone-mockup');
-    if (toggleBtn) toggleBtn.innerHTML = `<span>💻</span> Mode Layar Lebar`;
+    if (toggleBtn) toggleBtn.innerHTML = `${iosEmoji('display')} <span>Mode Layar Lebar</span>`;
   }
 }
 
 function runDeepDiagnostics() {
   const btn = document.getElementById('btn-recheck-root');
-  if (btn) btn.innerHTML = `<span>⏳</span> Memeriksa...`;
+  if (btn) btn.innerHTML = `${iosEmoji('clock')} <span>Memeriksa...</span>`;
 
   setTimeout(() => {
     loadDeviceTelemetry();

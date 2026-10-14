@@ -286,9 +286,9 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
         try {
             currentProcess?.destroyForcibly()
             currentProcess = null
-            sendLogLine("⚠️ [SIGKILL] Process killed by user.", "warn")
+            sendLogLine("⚠️ [HENTIKAN] Script dihentikan oleh pengguna.", "warn")
         } catch (e: Exception) {
-            sendLogLine("❌ [ERROR] Failed to kill process: ${e.message}", "error")
+            sendLogLine("❌ [ERROR] Gagal menghentikan script: ${e.message}", "error")
         }
     }
 
