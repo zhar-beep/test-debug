@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Game Setup — Root Script Explorer</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            kasane: {
+              bg: '#07070a',
+              card: 'rgba(18, 17, 24, 0.72)',
+              border: 'rgba(255, 255, 255, 0.08)',
+              glow: '#a855f7',
+              nature: '#10b981',
+              rose: '#f43f5e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-[#07070a] text-zinc-100 antialiased selection:bg-purple-500 selection:text-white pb-28">
+
+  <!-- Ambient Bioluminescent Glows -->
+  <div class="ambient-glow-violet"></div>
+  <div class="ambient-glow-emerald"></div>
+
+  <!-- Decorative Qronos-style Grid Lines -->
+  <div class="pointer-events-none fixed inset-0 z-0 flex justify-center">
+    <div class="w-full max-w-5xl h-full border-x border-white/[0.03] flex justify-between px-6 sm:px-12">
+      <div class="w-px h-full bg-white/[0.02]"></div>
+      <div class="w-px h-full bg-white/[0.02]"></div>
+    </div>
+  </div>
+
+  <!-- Top Navigation Bar -->
+  <header class="sticky top-0 z-40 glass-nav px-4 sm:px-8 py-3.5 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="relative flex items-center justify-center size-9 rounded-xl bg-gradient-to-br from-purple-600/30 to-indigo-600/10 border border-purple-500/30 shadow-lg shadow-purple-600/10">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" y1="19" x2="20" y2="19"></line>
+        </svg>
+        <span class="absolute -top-1 -right-1 size-2 rounded-full bg-emerald-400"></span>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-extrabold text-sm tracking-wider uppercase bg-gradient-to-r from-zinc-100 via-zinc-200 to-zinc-400 bg-clip-text text-transparent">Game Setup</span>
+          <span class="text-[10px] font-mono tracking-widest text-purple-400 font-semibold uppercase px-1.5 py-0.5 rounded border border-purple-500/30 bg-purple-500/10">ROOT</span>
+        </div>
+        <p class="text-[10px] text-zinc-500 font-mono">KernelSU-Next • /data/local/tmp</p>
+      </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="flex items-center gap-2">
+      <div id="root-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-purple-500/30 bg-purple-500/10 text-purple-300">
+        <span class="size-2 rounded-full bg-purple-400 animate-pulse"></span>
+        KernelSU Connecting...
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-8 pt-6 space-y-6">
+
+    <!-- Hero Banner (Kasane Anime & Nature RPG Aesthetics) -->
+    <section class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#13111c] via-[#0d0c14] to-[#07070a] p-5 sm:p-7 shadow-2xl">
+      <div class="absolute -right-20 -top-20 size-80 rounded-full bg-purple-600/15 blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-20 -bottom-20 size-80 rounded-full bg-emerald-600/10 blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-3 max-w-xl text-center md:text-left">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300 text-xs font-medium">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="m10 15 5-3-5-3v6Z"></path></svg>
+            Infinix Note 30 • AxionOS 2.7 (Android 16)
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white leading-tight">
+            Script & File Manager
+            <span class="block bg-gradient-to-r from-purple-400 via-pink-400 to-emerald-400 bg-clip-text text-transparent">
+              Dedicated to /data/local/tmp
+            </span>
+          </h1>
+
+          <p class="text-xs text-zinc-400 leading-relaxed">
+            Browse folders, set executable permissions (<code class="font-mono text-purple-300">chmod 777</code> / MT Manager style), and run game scripts with live terminal logs directly via KernelSU.
+          </p>
+        </div>
+
+        <!-- Anime Character Illustration -->
+        <div class="relative shrink-0 flex items-center justify-center">
+          <div class="relative size-36 sm:size-44 rounded-2xl overflow-hidden border border-purple-500/30 shadow-xl shadow-purple-900/20 group">
+            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=800&auto=format&fit=crop" 
+                 alt="Kasane Anime Heroine" 
+                 class="size-full object-cover object-top opacity-85 group-hover:scale-105 spring-transition">
+            <div class="absolute inset-0 bg-gradient-to-t from-[#09090c] via-transparent to-transparent"></div>
+            <div class="absolute bottom-2 inset-x-2 text-center">
+              <span class="text-[9px] font-mono tracking-widest text-purple-300 uppercase px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/10">
+                KASANE // NATURE
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MT Manager Style Path Bar & Controls -->
+    <div class="glass-panel rounded-2xl p-3 sm:p-4 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 min-w-0">
+        <!-- Go Up Button -->
+        <button id="btn-folder-up" onclick="navigateUp()" title="Go to Parent Folder"
+                class="active-tap p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300 spring-transition shrink-0">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+
+        <!-- Breadcrumbs Navigation -->
+        <div id="path-breadcrumbs" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar font-mono text-xs">
+          <!-- Injected via app.js -->
+        </div>
+      </div>
+
+      <!-- Items Count / Refresh Button -->
+      <div class="flex items-center gap-2 shrink-0">
+        <span id="items-count" class="text-[11px] font-mono text-zinc-500">0 items</span>
+        <button onclick="loadDirectory(state.currentPath)" title="Refresh" class="active-tap p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300 spring-transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Explorer File List (Folders & Scripts) -->
+    <div id="file-list" class="space-y-2.5">
+      <!-- Injected dynamically via app.js -->
+    </div>
+
+  </main>
+
+  <!-- =========================================================================
+       MT MANAGER STYLE PERMISSIONS MODAL (chmod 777 / 755 / Octal Picker)
+       ========================================================================= -->
+  <div id="permission-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-md hidden">
+    <div class="w-full max-w-md glass-sheet rounded-3xl p-6 border border-white/10 space-y-5 shadow-2xl">
+      <div class="flex items-start justify-between">
+        <div>
+          <h3 class="font-bold text-base text-white">File Permissions</h3>
+          <p id="perm-filename" class="font-mono text-xs text-purple-300 truncate max-w-[280px]">touch_boost.sh</p>
+          <p id="perm-filepath" class="font-mono text-[10px] text-zinc-500 truncate max-w-[280px]">/data/local/tmp/touch_boost.sh</p>
+        </div>
+        <button onclick="closePermissionModal()" class="text-zinc-400 hover:text-white text-lg">&times;</button>
+      </div>
+
+      <!-- Permission Matrix (MT Manager Style) -->
+      <div class="glass-panel p-4 rounded-2xl space-y-3 font-mono text-xs">
+        <div class="grid grid-cols-4 gap-2 text-center text-[11px] text-zinc-400 pb-2 border-b border-white/10 uppercase">
+          <span class="text-left text-zinc-500">Role</span>
+          <span>Read (4)</span>
+          <span>Write (2)</span>
+          <span>Exec (1)</span>
+        </div>
+
+        <!-- Owner Row -->
+        <div class="grid grid-cols-4 gap-2 items-center text-center">
+          <span class="text-left text-purple-300 font-semibold">Owner (u)</span>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-u-r" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-u-w" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-u-x" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+        </div>
+
+        <!-- Group Row -->
+        <div class="grid grid-cols-4 gap-2 items-center text-center">
+          <span class="text-left text-indigo-300 font-semibold">Group (g)</span>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-g-r" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-g-w" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-g-x" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+        </div>
+
+        <!-- Other Row -->
+        <div class="grid grid-cols-4 gap-2 items-center text-center">
+          <span class="text-left text-zinc-400 font-semibold">Other (o)</span>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-o-r" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-o-w" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-o-x" class="perm-checkbox accent-purple-600 size-4 rounded"></label>
+        </div>
+      </div>
+
+      <!-- Octal Display & Quick Preset Buttons -->
+      <div class="space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-mono text-zinc-400">Octal Mode:</span>
+          <input type="text" id="perm-octal-input" readonly class="w-20 text-center font-mono font-bold text-sm py-1 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300">
+        </div>
+
+        <div class="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
+          <button onclick="applyOctalPreset('777')" class="active-tap py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold hover:bg-emerald-500/20 spring-transition">
+            Set 777 (Full)
+          </button>
+          <button onclick="applyOctalPreset('755')" class="active-tap py-2 rounded-xl bg-purple-500/10 border border-purple-500/30 text-purple-300 font-semibold hover:bg-purple-500/20 spring-transition">
+            Set 755 (Exe)
+          </button>
+          <button onclick="applyOctalPreset('644')" class="active-tap py-2 rounded-xl bg-white/5 border border-white/10 text-zinc-400 hover:bg-white/10 spring-transition">
+            Set 644 (Read)
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closePermissionModal()" class="px-4 py-2 rounded-xl border border-white/10 text-zinc-400 text-xs">Cancel</button>
+        <button onclick="savePermissions()" class="active-tap px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium text-xs shadow-lg shadow-purple-600/25 spring-transition">
+          Apply Permissions
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       EXECUTION CONSOLE: iOS Bottom Sheet Terminal
+       ========================================================================= -->
+  <div id="sheet-backdrop" onclick="closeTerminalSheet()" 
+       class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm pointer-events-none opacity-0 spring-transition"></div>
+
+  <div id="terminal-sheet" 
+       class="fixed inset-x-0 bottom-0 z-50 max-w-4xl mx-auto h-[85vh] sm:h-[75vh] glass-sheet rounded-t-[32px] bottom-sheet flex flex-col overflow-hidden shadow-2xl">
+    
+    <!-- iOS Grabber Handle -->
+    <div class="flex justify-center pt-3 pb-1 cursor-pointer" onclick="closeTerminalSheet()">
+      <div class="w-12 h-1.5 rounded-full bg-white/20 hover:bg-white/40 spring-transition"></div>
+    </div>
+
+    <!-- Header & Telemetry Bar -->
+    <div class="px-5 py-3 border-b border-white/10 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div id="console-status-badge" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono border border-amber-500/30 bg-amber-500/10 text-amber-400">
+          <span class="size-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+          RUNNING
+        </div>
+        <div>
+          <h2 id="console-title" class="font-mono text-sm font-bold text-white truncate max-w-[180px] sm:max-w-md">script_name.sh</h2>
+          <div class="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
+            <span id="console-pid">PID: 4892</span>
+            <span>•</span>
+            <span id="console-timer" class="text-purple-300">00:00.00s</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Console Controls -->
+      <div class="flex items-center gap-1.5">
+        <button id="btn-autoscroll" title="Toggle Auto-Scroll" class="p-2 rounded-xl border border-white/10 bg-white/5 text-purple-300 border-purple-500/40 text-xs">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+        </button>
+        <button onclick="copyTerminalLogs()" title="Copy Logs" class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300 text-xs spring-transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+        </button>
+        <button onclick="clearTerminal()" title="Clear Console" class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-300 text-xs spring-transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/></svg>
+        </button>
+        <button onclick="killCurrentProcess()" title="Kill Process" class="active-tap px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-300 text-xs font-semibold hover:bg-rose-500/30 spring-transition">
+          Kill SIGKILL
+        </button>
+        <button onclick="closeTerminalSheet()" title="Minimize" class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-zinc-400 spring-transition">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Terminal Content Area -->
+    <div id="terminal-content" class="flex-1 p-4 font-mono text-xs overflow-y-auto bg-[#050508] text-zinc-200 space-y-1">
+      <!-- Stream lines injected via app.js -->
+    </div>
+
+    <!-- Bottom Status -->
+    <div class="px-4 py-2 border-t border-white/10 bg-black/60 flex items-center justify-between text-[11px] font-mono text-zinc-500">
+      <span>KernelSU Execution Daemon</span>
+      <span>Streaming stdout / stderr <span class="cursor-blink"></span></span>
+    </div>
+  </div>
+
+  <!-- Dynamic Island Mini-HUD -->
+  <div id="dynamic-island" onclick="openTerminalSheet()"
+       class="fixed bottom-6 inset-x-0 mx-auto w-max z-30 dynamic-island cursor-pointer active-tap">
+    <div class="px-4 py-2 rounded-full glass-sheet border border-purple-500/30 bg-black/80 shadow-2xl flex items-center gap-3">
+      <span class="size-2 rounded-full bg-purple-400 animate-pulse"></span>
+      <span id="island-name" class="font-mono text-xs font-semibold text-zinc-200 max-w-[150px] truncate">touch_boost.sh</span>
+      <span class="text-zinc-600">•</span>
+      <span id="island-status" class="text-[11px] font-mono text-purple-300">Running</span>
+      <span id="island-timer" class="text-[11px] font-mono text-zinc-400">00:03s</span>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
