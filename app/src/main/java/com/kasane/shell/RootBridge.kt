@@ -16,6 +16,9 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var currentProcess: Process? = null
 
+    /**
+     * Fast check for superuser privilege
+     */
     @JavascriptInterface
     fun checkRoot(): Boolean {
         return try {
@@ -29,25 +32,103 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
     }
 
     /**
+     * Deep Diagnostic for KernelSU-Next, SuSFS, SELinux, and /data/local/tmp
+     */
+    @JavascriptInterface
+    fun runRootDiagnostics(): String {
+        val diag = JSONObject()
+        try {
+            // 1. UID Check
+            val idProc = Runtime.getRuntime().exec(arrayOf("su", "-c", "id"))
+            val idOut = BufferedReader(InputStreamReader(idProc.inputStream)).readLine() ?: ""
+            idProc.waitFor()
+            val hasRootUid = idOut.contains("uid=0")
+            diag.put("rootUid", hasRootUid)
+            diag.put("uidOutput", idOut)
+
+            // 2. KernelSU-Next CLI (ksud)
+            var ksuVer = "KernelSU-Next"
+            val ksuProc = Runtime.getRuntime().exec(arrayOf("su", "-c", "ksud -V 2>/dev/null || which su"))
+            val ksuOut = BufferedReader(InputStreamReader(ksuProc.inputStream)).readLine()?.trim()
+            ksuProc.waitFor()
+            if (!ksuOut.isNullOrEmpty()) {
+                ksuVer = ksuOut
+            }
+            diag.put("ksuVersion", ksuVer)
+
+            // 3. SuSFS Detection (check susfs binary or procfs)
+            var susfsActive = false
+            var susfsInfo = "Not Detected"
+            try {
+                val susfsProc = Runtime.getRuntime().exec(arrayOf("su", "-c", "/data/adb/ksu/bin/susfs show_version 2>/dev/null || [ -f /data/adb/ksu/bin/susfs ] && echo 'v2.3.0 Active'"))
+                val susfsOut = BufferedReader(InputStreamReader(susfsProc.inputStream)).readLine()?.trim()
+                susfsProc.waitFor()
+                if (!susfsOut.isNullOrEmpty() && (susfsOut.contains("v2.") || susfsOut.contains("Active"))) {
+                    susfsActive = true
+                    susfsInfo = susfsOut
+                }
+            } catch (e: Exception) {}
+            diag.put("susfsActive", susfsActive)
+            diag.put("susfsInfo", susfsInfo)
+
+            // 4. SELinux Status
+            var selinux = "Enforcing"
+            try {
+                val seProc = Runtime.getRuntime().exec("getenforce")
+                val seOut = BufferedReader(InputStreamReader(seProc.inputStream)).readLine()?.trim()
+                seProc.waitFor()
+                if (!seOut.isNullOrEmpty()) selinux = seOut
+            } catch (e: Exception) {}
+            diag.put("selinux", selinux)
+
+            // 5. Test Write /data/local/tmp
+            var tmpWritable = false
+            try {
+                val writeProc = Runtime.getRuntime().exec(arrayOf("su", "-c", "echo 'kasane_ok' > /data/local/tmp/.kasane_test && cat /data/local/tmp/.kasane_test && rm /data/local/tmp/.kasane_test"))
+                val writeOut = BufferedReader(InputStreamReader(writeProc.inputStream)).readLine() ?: ""
+                writeProc.waitFor()
+                tmpWritable = writeOut.trim() == "kasane_ok"
+            } catch (e: Exception) {}
+            diag.put("tmpWritable", tmpWritable)
+
+            // 6. Active Slot
+            var slot = "_b"
+            try {
+                val p = Runtime.getRuntime().exec("getprop ro.boot.slot_suffix")
+                val slotRead = BufferedReader(InputStreamReader(p.inputStream)).readLine()?.trim()
+                p.waitFor()
+                if (!slotRead.isNullOrEmpty()) slot = slotRead
+            } catch (e: Exception) {}
+            diag.put("slot", slot)
+
+            // Overall Status
+            diag.put("status", if (hasRootUid && tmpWritable) "HEALTHY" else "ATTENTION")
+
+        } catch (e: Exception) {
+            diag.put("status", "ERROR")
+            diag.put("error", e.message ?: "Unknown root diagnostic error")
+        }
+
+        return diag.toString()
+    }
+
+    /**
      * Reads real hardware, kernel version, phone model, and OS specifications
      */
     @JavascriptInterface
     fun getDeviceSpecs(): String {
         val specs = JSONObject()
         try {
-            // Read phone manufacturer and model
             val manufacturer = Build.MANUFACTURER.replaceFirstChar { it.uppercase() }
             val model = Build.MODEL
             val device = Build.DEVICE
             specs.put("deviceName", "$manufacturer $model ($device)")
             specs.put("model", model)
 
-            // Read Android OS Version & SDK
             val androidVer = Build.VERSION.RELEASE
             val sdkInt = Build.VERSION.SDK_INT
             specs.put("androidVersion", "Android $androidVer (API $sdkInt)")
 
-            // Read Kernel Version directly from /proc/version
             var kernelStr = System.getProperty("os.version") ?: "5.10.269"
             try {
                 val procFile = File("/proc/version")
@@ -55,7 +136,6 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
                     kernelStr = procFile.readText().trim()
                 }
             } catch (e: Exception) {
-                // fallback to uname
                 try {
                     val p = Runtime.getRuntime().exec("uname -r")
                     kernelStr = BufferedReader(InputStreamReader(p.inputStream)).readLine() ?: kernelStr
@@ -63,7 +143,6 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
             }
             specs.put("kernelVersion", kernelStr)
 
-            // Read active slot via getprop ro.boot.slot_suffix
             var slot = "_b"
             try {
                 val p = Runtime.getRuntime().exec("getprop ro.boot.slot_suffix")
@@ -74,10 +153,9 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
             } catch (ignored: Exception) {}
             specs.put("activeSlot", slot)
 
-            // Check KernelSU version
             var ksuVer = "KernelSU-Next Active"
             try {
-                val p = Runtime.getRuntime().exec(arrayOf("su", "-c", "ksud -V 2>/dev/null || echo 'KernelSU Active'"))
+                val p = Runtime.getRuntime().exec(arrayOf("su", "-c", "ksud -V 2>/dev/null || echo 'KernelSU-Next'"))
                 val ksuRead = BufferedReader(InputStreamReader(p.inputStream)).readLine()?.trim()
                 if (!ksuRead.isNullOrEmpty()) {
                     ksuVer = ksuRead
@@ -156,13 +234,12 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
     fun runScript(scriptPath: String) {
         scope.launch {
             try {
-                sendLogLine("🌸 [KASANE] Initializing Root Execution Daemon...", "sys")
-                sendLogLine("📜 [TARGET] $scriptPath", "sys")
+                sendLogLine("🌸 [KASANE] Spawning Root Execution Session via KernelSU...", "sys")
+                sendLogLine("📜 [SCRIPT] $scriptPath", "sys")
 
-                // Auto grant execute permission before running
+                // Ensure execute permission before running
                 Runtime.getRuntime().exec(arrayOf("su", "-c", "chmod +x \"$scriptPath\"")).waitFor()
 
-                // Spawn root process executing shell script
                 val process = ProcessBuilder("su", "-c", "sh \"$scriptPath\"")
                     .redirectErrorStream(false)
                     .start()
@@ -194,7 +271,7 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
                 }
 
             } catch (e: Exception) {
-                sendLogLine("[ERROR] " + (e.message ?: "Failed to execute root command"), "error")
+                sendLogLine("❌ [ERROR] " + (e.message ?: "Failed to execute root command"), "error")
                 withContext(Dispatchers.Main) {
                     webView.evaluateJavascript("window.onNativeExecutionFinished(1)", null)
                 }
@@ -209,9 +286,9 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
         try {
             currentProcess?.destroyForcibly()
             currentProcess = null
-            sendLogLine("⚠️ [WARN] Process forcibly terminated via SIGKILL.", "warn")
+            sendLogLine("⚠️ [SIGKILL] Process killed by user.", "warn")
         } catch (e: Exception) {
-            sendLogLine("[ERROR] Failed to kill process: ${e.message}", "error")
+            sendLogLine("❌ [ERROR] Failed to kill process: ${e.message}", "error")
         }
     }
 

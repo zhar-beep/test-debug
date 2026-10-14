@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Kasane Shell // Game Setup — KernelSU Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Kasane Shell // Game Setup — Infinix Note 30 (FHD+ 1080x2460)</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -15,7 +15,7 @@
             kasane: {
               gold: '#d97706',
               jade: '#059669',
-              sakura: '#e11d48',
+              crimson: '#e11d48',
               slate: '#0f172a'
             }
           }
@@ -26,322 +26,401 @@
   
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="text-slate-800 antialiased pb-28">
+<body class="text-slate-800 antialiased mode-phone-mockup">
 
-  <!-- Background Wallpaper & Misty Nature Overlay -->
+  <!-- Background Wallpaper: 100% Real Kasane Anime Torii Artwork -->
   <div class="kasane-wallpaper-bg"></div>
   <div class="kasane-mist-overlay"></div>
 
-  <!-- Top Navigation Bar -->
-  <header class="sticky top-0 z-40 kasane-nav px-4 sm:px-8 py-3.5 flex items-center justify-between">
-    <!-- Brand / Logo -->
-    <div class="flex items-center gap-3">
-      <div class="relative flex items-center justify-center size-10 rounded-2xl bg-amber-500/10 border border-amber-300 shadow-sm text-xl">
-        🌸
-      </div>
-      <div>
-        <div class="flex items-center gap-2">
-          <span class="font-extrabold text-sm tracking-tight uppercase text-slate-900">KASANE</span>
-          <span class="text-[10px] font-mono tracking-wider text-amber-800 font-bold uppercase px-2 py-0.5 rounded-full bg-amber-100 border border-amber-300">GAME SETUP</span>
+  <!-- Falling Sakura Petals Drift -->
+  <div id="sakura-container" class="sakura-container"></div>
+
+  <!-- Floating Desktop View Switcher (Visible on PC Browser) -->
+  <div class="hidden sm:flex fixed top-3 right-4 z-50 items-center gap-2">
+    <button id="btn-desktop-toggle" onclick="toggleDesktopView()" 
+            class="active-tap px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white/90 hover:bg-white text-slate-800 border border-slate-300 shadow-md spring-transition flex items-center gap-1.5">
+      <span>💻</span>
+      <span>Mode Layar Lebar</span>
+    </button>
+  </div>
+
+  <!-- =======================================================================
+       MOBILE VIEW CONTAINER (INFINIX NOTE 30 CHASSIS)
+       ======================================================================= -->
+  <div class="mobile-simulator-wrapper flex flex-col bg-slate-50/90 shadow-2xl relative">
+    
+    <!-- Phone Punch-Hole Camera (Infinix Note 30 Simulator on Desktop) -->
+    <div class="phone-camera-hole"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="sticky top-0 z-40 kasane-nav px-4 sm:px-5 py-3.5 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="relative flex items-center justify-center size-9 rounded-2xl bg-amber-500/10 border border-amber-300 shadow-xs text-lg">
+          🌸
         </div>
-        <p class="text-[11px] text-slate-500 font-mono">重音 // Nature Action Shell • /data/local/tmp</p>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="font-extrabold text-xs tracking-tight uppercase text-slate-900">KASANE</span>
+            <span class="text-[9px] font-mono tracking-wider text-amber-800 font-bold uppercase px-1.5 py-0.2 rounded-full bg-amber-100 border border-amber-300">GAME SETUP</span>
+          </div>
+          <p class="text-[10px] text-slate-500 font-mono">重音 // Action Shell • FHD+ (1080x2460)</p>
+        </div>
       </div>
-    </div>
 
-    <!-- Root Engine Badge -->
-    <div id="root-badge" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm">
-      <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
-      🛡️ KernelSU Active
-    </div>
-  </header>
+      <!-- Live Root Status Badge -->
+      <div id="root-badge" class="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-xs">
+        <span class="size-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        🛡️ KernelSU Aktif
+      </div>
+    </header>
 
-  <!-- Main Content Container -->
-  <main class="relative z-10 max-w-5xl mx-auto px-4 sm:px-8 pt-6 space-y-6">
+    <!-- Main Container inside Mobile View -->
+    <main class="flex-1 px-4 py-4 space-y-4 pb-28">
 
-    <!-- Hero Card: Kasane Anime & Nature Banner -->
-    <section class="kasane-card rounded-3xl p-6 sm:p-7 relative overflow-hidden shadow-xl">
-      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-        
-        <!-- Left: Introduction -->
-        <div class="space-y-3 max-w-xl text-center md:text-left">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100/80 border border-amber-300/80 text-amber-900 text-xs font-semibold">
-            <span>🌸</span>
-            <span>Kasane Action RPG Nature Theme</span>
+      <!-- Hero Card: 100% Kasane Heroine & Torii Artwork Banner -->
+      <section class="kasane-card rounded-2xl p-4 sm:p-5 relative overflow-hidden shadow-md">
+        <div class="relative z-10 flex flex-col sm:flex-row items-center justify-between gap-4">
+          
+          <!-- Left: Summary -->
+          <div class="space-y-2 text-center sm:text-left flex-1">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-amber-100/90 border border-amber-300/80 text-amber-900 text-[11px] font-semibold">
+              <span>🌸</span>
+              <span>Kasane Action RPG • FHD+ 120Hz</span>
+            </div>
+
+            <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 leading-tight">
+              Game Script Runner
+              <span class="block bg-gradient-to-r from-amber-700 via-rose-700 to-emerald-700 bg-clip-text text-transparent">
+                /data/local/tmp
+              </span>
+            </h1>
+
+            <p class="text-xs text-slate-600 leading-relaxed">
+              Jalankan script game, atur izin <strong class="text-slate-900">chmod 777</strong>, dan pantau log dengan detik di Infinix Note 30.
+            </p>
           </div>
 
-          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
-            Game Script & Kernel Orchestrator
-            <span class="block bg-gradient-to-r from-amber-700 via-rose-700 to-emerald-700 bg-clip-text text-transparent">
-              Dedicated to /data/local/tmp
-            </span>
-          </h1>
-
-          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-            Kelola subfolder script game, ubah izin file dengan format <strong class="text-slate-900">MT Manager (chmod 777)</strong>, dan jalankan script dengan streaming log langsung dari KernelSU.
-          </p>
-        </div>
-
-        <!-- Right: Kasane Character Hero Card -->
-        <div class="relative shrink-0">
-          <div class="relative w-44 sm:w-52 h-40 sm:h-44 rounded-2xl overflow-hidden border border-amber-200/80 shadow-md group">
-            <img src="assets/character-hero.jpg" 
-                 alt="Kasane Anime Heroine" 
-                 class="size-full object-cover object-top group-hover:scale-105 spring-transition">
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent"></div>
-            <div class="absolute bottom-2 inset-x-2 text-center">
-              <span class="text-[10px] font-mono tracking-widest text-amber-200 uppercase px-2 py-0.5 rounded-full bg-black/60 backdrop-blur-md border border-white/20">
-                🌸 KASANE // 重音
-              </span>
+          <!-- Right: Official Kasane Character Illustration -->
+          <div class="relative shrink-0">
+            <div class="relative w-40 h-32 rounded-xl overflow-hidden border-2 border-amber-300/90 shadow-md group">
+              <img src="assets/kasane-preview.png" 
+                   alt="Kasane Anime Heroine" 
+                   class="size-full object-cover object-right group-hover:scale-105 spring-transition">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+              <div class="absolute bottom-1.5 inset-x-1.5 text-center">
+                <span class="text-[9px] font-mono tracking-widest text-amber-200 uppercase px-2 py-0.2 rounded-full bg-black/60 backdrop-blur-md border border-white/20">
+                  🌸 KASANE HEROINE
+                </span>
+              </div>
             </div>
           </div>
+
         </div>
+      </section>
 
+      <!-- Main Navigation Tabs (3 Core Tabs) -->
+      <div class="kasane-card rounded-2xl p-1 flex items-center justify-between gap-1 shadow-xs">
+        <button id="tab-btn-explorer" onclick="switchTab('explorer')" 
+                class="active-tap flex-1 py-2 rounded-xl text-xs font-bold bg-amber-500/15 text-amber-800 border border-amber-300 shadow-xs spring-transition flex items-center justify-center gap-1">
+          <span>📁</span>
+          <span>Explorer</span>
+        </button>
+        <button id="tab-btn-logs" onclick="switchTab('logs')" 
+                class="active-tap flex-1 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 border border-transparent spring-transition flex items-center justify-center gap-1">
+          <span>📜</span>
+          <span>Menu Logs</span>
+        </button>
+        <button id="tab-btn-root" onclick="switchTab('root')" 
+                class="active-tap flex-1 py-2 rounded-xl text-xs font-medium text-slate-600 hover:text-slate-900 border border-transparent spring-transition flex items-center justify-center gap-1">
+          <span>🛡️</span>
+          <span>Status Root</span>
+        </button>
       </div>
-    </section>
 
-    <!-- Detailed Hardware & Kernel Specs Telemetry Card -->
-    <section class="kasane-card rounded-3xl p-5 sm:p-6 shadow-md space-y-3">
-      <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
-        <div class="flex items-center gap-2">
-          <span class="text-lg">📊</span>
-          <h2 class="font-bold text-sm text-slate-900 tracking-tight">System & Hardware Telemetry</h2>
-        </div>
-        <span class="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200">
-          LIVE HARDWARE
-        </span>
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 font-mono text-xs">
+      <!-- =======================================================================
+           VIEW 1: FILE EXPLORER TAB
+           ======================================================================= -->
+      <div id="view-explorer" class="space-y-3">
         
-        <!-- Phone Model / Name -->
-        <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/70 shadow-xs space-y-1">
-          <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
-            <span>📱</span>
-            <span class="uppercase tracking-wider">Device Model</span>
+        <!-- Path Bar & Controls (MT Manager Style) -->
+        <div class="kasane-card rounded-2xl p-3 flex items-center justify-between gap-2 shadow-xs">
+          <div class="flex items-center gap-2 min-w-0">
+            <button id="btn-folder-up" onclick="navigateUp()" title="Kembali ke Folder Atas"
+                    class="active-tap size-8 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold flex items-center justify-center spring-transition shrink-0 shadow-xs text-xs">
+              ▲
+            </button>
+            <div id="path-breadcrumbs" class="flex items-center gap-1 overflow-x-auto no-scrollbar font-mono text-xs">
+              <!-- Injected via app.js -->
+            </div>
           </div>
-          <p id="hud-device-name" class="font-bold text-slate-800 truncate text-xs">Infinix Note 30 (X6833B)</p>
+
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span id="items-count" class="text-[11px] font-mono font-semibold text-slate-500">0 item</span>
+            <button onclick="loadDirectory(state.currentPath)" title="Segarkan" 
+                    class="active-tap size-8 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center spring-transition shadow-xs text-xs">
+              🔄
+            </button>
+          </div>
         </div>
 
-        <!-- Kernel Version -->
-        <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/70 shadow-xs space-y-1">
-          <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
-            <span>⚙️</span>
-            <span class="uppercase tracking-wider">Kernel Version</span>
-          </div>
-          <p id="hud-kernel-version" class="font-bold text-amber-800 truncate text-xs" title="5.10.269-SuiKernel-Stable-KernelSU-Next">5.10.269-SuiKernel</p>
-        </div>
-
-        <!-- Android OS & ROM -->
-        <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/70 shadow-xs space-y-1">
-          <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
-            <span>🏷️</span>
-            <span class="uppercase tracking-wider">OS / ROM</span>
-          </div>
-          <p id="hud-android-version" class="font-bold text-slate-800 truncate text-xs">AxionOS 2.7 • Android 16</p>
-        </div>
-
-        <!-- Active Slot -->
-        <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/70 shadow-xs space-y-1">
-          <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
-            <span>💽</span>
-            <span class="uppercase tracking-wider">Active Boot Slot</span>
-          </div>
-          <p id="hud-active-slot" class="font-bold text-emerald-700 truncate text-xs">Slot _b (/dev/block/sdc55)</p>
-        </div>
-
-        <!-- Root Engine -->
-        <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/70 shadow-xs space-y-1">
-          <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
-            <span>🛡️</span>
-            <span class="uppercase tracking-wider">Root Subsystem</span>
-          </div>
-          <p id="hud-root-engine" class="font-bold text-slate-800 truncate text-xs">KernelSU-Next v3.4.0</p>
-        </div>
-
-        <!-- Target Dir -->
-        <div class="bg-white/70 p-3 rounded-2xl border border-slate-200/70 shadow-xs space-y-1">
-          <div class="flex items-center gap-1.5 text-slate-500 text-[11px]">
-            <span>📂</span>
-            <span class="uppercase tracking-wider">Script Workspace</span>
-          </div>
-          <p class="font-bold text-amber-800 truncate text-xs">/data/local/tmp</p>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- Path Bar & Folder Controls (MT Manager Style) -->
-    <div class="kasane-card rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-sm">
-      <div class="flex items-center gap-2 min-w-0">
-        <!-- Go Up Button -->
-        <button id="btn-folder-up" onclick="navigateUp()" title="Go to Parent Folder"
-                class="active-tap size-9 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold flex items-center justify-center spring-transition shrink-0 shadow-sm">
-          ▲
-        </button>
-
-        <!-- Breadcrumbs Navigation -->
-        <div id="path-breadcrumbs" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar font-mono text-xs">
-          <!-- Injected via app.js -->
+        <!-- File & Folder List -->
+        <div id="file-list" class="space-y-2.5">
+          <!-- Injected dynamically via app.js -->
         </div>
       </div>
 
-      <!-- Items Count / Refresh Button -->
-      <div class="flex items-center gap-2 shrink-0">
-        <span id="items-count" class="text-xs font-mono font-semibold text-slate-500">0 items</span>
-        <button onclick="loadDirectory(state.currentPath)" title="Refresh" 
-                class="active-tap size-9 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 flex items-center justify-center spring-transition shadow-sm">
-          🔄
-        </button>
+      <!-- =======================================================================
+           VIEW 2: MENU LOGS TAB (Riwayat Eksekusi dengan Jam & Detik)
+           ======================================================================= -->
+      <div id="view-logs" class="space-y-3 hidden">
+        <div class="kasane-card rounded-2xl p-3.5 flex items-center justify-between gap-2 shadow-xs">
+          <div>
+            <h2 class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+              <span>📜</span> Riwayat Eksekusi & Logs
+            </h2>
+            <p class="text-[11px] text-slate-500 mt-0.5">Mencatat output script dengan jam dan detik detail.</p>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <span id="logs-total-count" class="text-[11px] font-mono font-semibold text-slate-500">0 Riwayat</span>
+            <button onclick="clearLogHistory()" class="active-tap px-2.5 py-1 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 text-[11px] font-semibold hover:bg-rose-100 spring-transition">
+              Hapus
+            </button>
+          </div>
+        </div>
+
+        <!-- Log History Cards -->
+        <div id="logs-history-list" class="space-y-2.5">
+          <!-- Injected dynamically via app.js -->
+        </div>
       </div>
-    </div>
 
-    <!-- Explorer File List (Folders & Scripts) -->
-    <div id="file-list" class="space-y-3">
-      <!-- Injected dynamically via app.js -->
-    </div>
+      <!-- =======================================================================
+           VIEW 3: ROOT & KERNEL STATUS TAB (Includes 1080x2460 Display Telemetry)
+           ======================================================================= -->
+      <div id="view-root" class="space-y-3 hidden">
+        
+        <div class="kasane-card rounded-2xl p-4 shadow-sm space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-200/80 pb-2.5">
+            <div>
+              <h2 class="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                <span>🛡️</span> Spesifikasi HP & Layar FHD+
+              </h2>
+              <p class="text-[11px] text-slate-500 mt-0.5">Status KernelSU, SuSFS stealth, dan resolusi Infinix Note 30.</p>
+            </div>
+            <button id="btn-recheck-root" onclick="runDeepDiagnostics()" 
+                    class="active-tap px-3 py-1.5 rounded-xl btn-kasane-gold text-[11px] font-semibold shadow-xs spring-transition flex items-center gap-1">
+              <span>🔄</span>
+              <span>Periksa Ulang</span>
+            </button>
+          </div>
 
-  </main>
+          <!-- Hardware & Display Specs Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 font-mono text-xs">
+            
+            <!-- Phone Model -->
+            <div class="bg-white/80 p-2.5 rounded-xl border border-slate-200 shadow-xs space-y-0.5">
+              <div class="flex items-center gap-1 text-slate-500 text-[10px]">
+                <span>📱</span>
+                <span class="uppercase tracking-wider">Perangkat HP</span>
+              </div>
+              <p id="hud-device-name" class="font-bold text-slate-900 truncate text-xs">Infinix Note 30 (X6833B)</p>
+            </div>
+
+            <!-- Display Resolution (FHD+ 1080x2460) -->
+            <div class="bg-white/80 p-2.5 rounded-xl border border-slate-200 shadow-xs space-y-0.5">
+              <div class="flex items-center gap-1 text-slate-500 text-[10px]">
+                <span>📺</span>
+                <span class="uppercase tracking-wider">Resolusi Layar HP</span>
+              </div>
+              <p id="hud-display-resolution" class="font-bold text-amber-800 truncate text-xs">1080 x 2460 FHD+ (20.5:9, 120Hz)</p>
+            </div>
+
+            <!-- Kernel Version -->
+            <div class="bg-white/80 p-2.5 rounded-xl border border-slate-200 shadow-xs space-y-0.5">
+              <div class="flex items-center gap-1 text-slate-500 text-[10px]">
+                <span>⚙️</span>
+                <span class="uppercase tracking-wider">Kernel Version</span>
+              </div>
+              <p id="hud-kernel-version" class="font-bold text-amber-800 truncate text-xs">5.10.269-SuiKernel</p>
+            </div>
+
+            <!-- Android OS & ROM -->
+            <div class="bg-white/80 p-2.5 rounded-xl border border-slate-200 shadow-xs space-y-0.5">
+              <div class="flex items-center gap-1 text-slate-500 text-[10px]">
+                <span>🏷️</span>
+                <span class="uppercase tracking-wider">OS & Android</span>
+              </div>
+              <p id="hud-android-version" class="font-bold text-slate-900 truncate text-xs">AxionOS 2.7 • Android 16</p>
+            </div>
+
+            <!-- Active Slot -->
+            <div class="bg-white/80 p-2.5 rounded-xl border border-slate-200 shadow-xs space-y-0.5">
+              <div class="flex items-center gap-1 text-slate-500 text-[10px]">
+                <span>💽</span>
+                <span class="uppercase tracking-wider">Active Boot Slot</span>
+              </div>
+              <p id="hud-active-slot" class="font-bold text-emerald-700 truncate text-xs">Slot _b (/dev/block/sdc55)</p>
+            </div>
+
+            <!-- Target Folder -->
+            <div class="bg-white/80 p-2.5 rounded-xl border border-slate-200 shadow-xs space-y-0.5">
+              <div class="flex items-center gap-1 text-slate-500 text-[10px]">
+                <span>📂</span>
+                <span class="uppercase tracking-wider">Folder Target</span>
+              </div>
+              <p class="font-bold text-amber-800 truncate text-xs">/data/local/tmp</p>
+            </div>
+          </div>
+
+          <!-- Deep Diagnostics Results List -->
+          <div id="root-diagnostics-content" class="pt-1">
+            <!-- Injected via app.js -->
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+
+  </div>
 
   <!-- =========================================================================
        MT MANAGER PERMISSIONS MODAL (chmod 777 / 755 / Octal Picker)
        ========================================================================= -->
   <div id="permission-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
-    <div class="w-full max-w-md bg-white/95 rounded-3xl p-6 border border-slate-200 space-y-5 shadow-2xl">
+    <div class="w-full max-w-sm bg-white rounded-3xl p-5 border border-slate-200 space-y-4 shadow-2xl">
       <div class="flex items-start justify-between">
         <div>
-          <div class="flex items-center gap-2">
-            <span class="text-xl">🗝️</span>
-            <h3 class="font-bold text-base text-slate-900">File Permissions</h3>
+          <div class="flex items-center gap-1.5">
+            <span class="text-lg">🗝️</span>
+            <h3 class="font-bold text-sm text-slate-900">Izin File (MT Manager)</h3>
           </div>
-          <p id="perm-filename" class="font-mono text-xs font-semibold text-amber-800 truncate max-w-[280px]">touch_boost.sh</p>
-          <p id="perm-filepath" class="font-mono text-[11px] text-slate-500 truncate max-w-[280px]">/data/local/tmp/touch_boost.sh</p>
+          <p id="perm-filename" class="font-mono text-xs font-semibold text-amber-800 truncate max-w-[240px]">touch_boost.sh</p>
+          <p id="perm-filepath" class="font-mono text-[10px] text-slate-500 truncate max-w-[240px]">/data/local/tmp/touch_boost.sh</p>
         </div>
-        <button onclick="closePermissionModal()" class="text-slate-400 hover:text-slate-700 text-xl font-bold">&times;</button>
+        <button onclick="closePermissionModal()" class="text-slate-400 hover:text-slate-700 text-lg font-bold">&times;</button>
       </div>
 
-      <!-- Permission Matrix -->
-      <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 space-y-3 font-mono text-xs">
-        <div class="grid grid-cols-4 gap-2 text-center text-[11px] text-slate-500 pb-2 border-b border-slate-200 uppercase font-semibold">
-          <span class="text-left text-slate-600">Role</span>
-          <span>Read (4)</span>
-          <span>Write (2)</span>
-          <span>Exec (1)</span>
+      <!-- 9-Checkbox Matrix -->
+      <div class="bg-slate-50 p-3 rounded-2xl border border-slate-200 space-y-2.5 font-mono text-xs">
+        <div class="grid grid-cols-4 gap-2 text-center text-[10px] text-slate-500 pb-1.5 border-b border-slate-200 uppercase font-semibold">
+          <span class="text-left text-slate-600">Peran</span>
+          <span>Baca (4)</span>
+          <span>Tulis (2)</span>
+          <span>Eksekusi (1)</span>
         </div>
 
-        <!-- Owner Row -->
         <div class="grid grid-cols-4 gap-2 items-center text-center">
-          <span class="text-left text-amber-800 font-bold">Owner (u)</span>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-u-r" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-u-w" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-u-x" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
+          <span class="text-left text-amber-800 font-bold text-[11px]">Owner (u)</span>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-u-r" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-u-w" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-u-x" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
         </div>
 
-        <!-- Group Row -->
         <div class="grid grid-cols-4 gap-2 items-center text-center">
-          <span class="text-left text-slate-700 font-bold">Group (g)</span>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-g-r" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-g-w" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-g-x" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
+          <span class="text-left text-slate-700 font-bold text-[11px]">Group (g)</span>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-g-r" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-g-w" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-g-x" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
         </div>
 
-        <!-- Other Row -->
         <div class="grid grid-cols-4 gap-2 items-center text-center">
-          <span class="text-left text-slate-700 font-bold">Other (o)</span>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-o-r" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-o-w" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
-          <label class="cursor-pointer"><input type="checkbox" id="perm-o-x" class="perm-checkbox accent-amber-600 size-4.5 rounded"></label>
+          <span class="text-left text-slate-700 font-bold text-[11px]">Other (o)</span>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-o-r" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-o-w" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
+          <label class="cursor-pointer"><input type="checkbox" id="perm-o-x" class="perm-checkbox accent-amber-600 size-4 rounded"></label>
         </div>
       </div>
 
-      <!-- Octal Display & Quick Presets -->
-      <div class="space-y-2">
+      <!-- Octal Display & Quick 1-Click Presets -->
+      <div class="space-y-1.5">
         <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-bold text-slate-600">Octal Mode:</span>
-          <input type="text" id="perm-octal-input" readonly class="w-24 text-center font-mono font-bold text-base py-1 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 shadow-inner">
+          <span class="text-xs font-mono font-bold text-slate-600">Kode Octal:</span>
+          <input type="text" id="perm-octal-input" readonly class="w-20 text-center font-mono font-bold text-sm py-1 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 shadow-inner">
         </div>
 
-        <div class="grid grid-cols-3 gap-2 pt-1 font-mono text-[11px]">
-          <button onclick="applyOctalPreset('777')" class="active-tap py-2 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold hover:bg-emerald-200 spring-transition shadow-xs">
+        <div class="grid grid-cols-3 gap-1.5 pt-1 font-mono text-[10px]">
+          <button onclick="applyOctalPreset('777')" class="active-tap py-1.5 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-900 font-bold hover:bg-emerald-200 spring-transition">
             Set 777 (Full)
           </button>
-          <button onclick="applyOctalPreset('755')" class="active-tap py-2 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 font-bold hover:bg-amber-200 spring-transition shadow-xs">
+          <button onclick="applyOctalPreset('755')" class="active-tap py-1.5 rounded-xl bg-amber-100 border border-amber-300 text-amber-900 font-bold hover:bg-amber-200 spring-transition">
             Set 755 (Exe)
           </button>
-          <button onclick="applyOctalPreset('644')" class="active-tap py-2 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 font-semibold hover:bg-slate-200 spring-transition shadow-xs">
+          <button onclick="applyOctalPreset('644')" class="active-tap py-1.5 rounded-xl bg-slate-100 border border-slate-300 text-slate-700 font-semibold hover:bg-slate-200 spring-transition">
             Set 644 (Read)
           </button>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center justify-end gap-2.5 pt-2">
-        <button onclick="closePermissionModal()" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-600 font-medium text-xs hover:bg-slate-50">Cancel</button>
-        <button onclick="savePermissions()" class="active-tap px-5 py-2 rounded-xl btn-kasane-gold font-semibold text-xs shadow-md spring-transition">
-          Apply Permissions
+      <div class="flex items-center justify-end gap-2 pt-1">
+        <button onclick="closePermissionModal()" class="px-3.5 py-1.5 rounded-xl border border-slate-300 text-slate-600 font-medium text-xs hover:bg-slate-50">Batal</button>
+        <button onclick="savePermissions()" class="active-tap px-4 py-1.5 rounded-xl btn-kasane-gold font-semibold text-xs shadow-md spring-transition">
+          Terapkan
         </button>
       </div>
     </div>
   </div>
 
   <!-- =========================================================================
-       EXECUTION CONSOLE: iOS Bottom Sheet Terminal
+       EXECUTION CONSOLE: iOS Bottom Sheet Terminal (Kasane Style)
        ========================================================================= -->
   <div id="sheet-backdrop" onclick="closeTerminalSheet()" 
        class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm pointer-events-none opacity-0 spring-transition"></div>
 
   <div id="terminal-sheet" 
-       class="fixed inset-x-0 bottom-0 z-50 max-w-4xl mx-auto h-[85vh] sm:h-[75vh] sheet-terminal-surface rounded-t-[32px] bottom-sheet flex flex-col overflow-hidden shadow-2xl">
+       class="fixed inset-x-0 bottom-0 z-50 max-w-lg mx-auto h-[85vh] sm:h-[75vh] sheet-terminal-surface rounded-t-[32px] bottom-sheet flex flex-col overflow-hidden shadow-2xl">
     
-    <!-- iOS Grabber Handle -->
-    <div class="flex justify-center pt-3 pb-1 cursor-pointer" onclick="closeTerminalSheet()">
+    <!-- Grabber Handle -->
+    <div class="flex justify-center pt-2.5 pb-1 cursor-pointer" onclick="closeTerminalSheet()">
       <div class="w-12 h-1.5 rounded-full bg-white/20 hover:bg-white/40 spring-transition"></div>
     </div>
 
-    <!-- Header & Telemetry Bar -->
-    <div class="px-5 py-3 border-b border-white/10 flex items-center justify-between gap-3">
-      <div class="flex items-center gap-3">
-        <div id="console-status-badge" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono border border-amber-500/30 bg-amber-500/10 text-amber-400">
+    <!-- Header Bar -->
+    <div class="px-4 py-2.5 border-b border-white/10 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2 min-w-0">
+        <div id="console-status-badge" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-mono font-semibold border border-amber-500/40 bg-amber-500/15 text-amber-300 shrink-0">
           <span class="size-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-          RUNNING
+          Berjalan...
         </div>
-        <div>
-          <h2 id="console-title" class="font-mono text-sm font-bold text-white truncate max-w-[180px] sm:max-w-md">script_name.sh</h2>
-          <div class="flex items-center gap-2 text-[10px] font-mono text-slate-400">
-            <span id="console-pid">PID: 4892</span>
+        <div class="min-w-0">
+          <h2 id="console-title" class="font-mono text-xs font-bold text-white truncate max-w-[130px] sm:max-w-xs">script_name.sh</h2>
+          <div class="flex items-center gap-1.5 text-[9px] font-mono text-slate-400">
+            <span id="console-start-time">Mulai: --:--:--</span>
             <span>•</span>
-            <span id="console-timer" class="text-amber-300">00:00.00s</span>
+            <span id="console-timer" class="text-amber-300">0.0s</span>
           </div>
         </div>
       </div>
 
-      <!-- Console Controls -->
-      <div class="flex items-center gap-1.5">
-        <button id="btn-autoscroll" title="Toggle Auto-Scroll" class="p-2 rounded-xl border border-white/10 bg-white/5 text-amber-300 border-amber-400/40 text-xs">
+      <!-- Simplified Actions -->
+      <div class="flex items-center gap-1.5 shrink-0">
+        <button id="btn-autoscroll" title="Toggle Auto-Scroll" class="p-1.5 rounded-xl border border-white/10 bg-white/5 text-amber-300 border-amber-400/40 text-[10px] font-mono">
           📜 Scroll
         </button>
-        <button onclick="copyTerminalLogs()" title="Copy Logs" class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-xs spring-transition">
+        <button onclick="copyTerminalLogs()" title="Salin Log" class="p-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-xs spring-transition">
           📋
         </button>
-        <button onclick="clearTerminal()" title="Clear Console" class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-xs spring-transition">
+        <button onclick="clearTerminal()" title="Bersihkan Layar" class="p-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-200 text-xs spring-transition">
           🧹
         </button>
-        <button onclick="killCurrentProcess()" title="Kill Process" class="active-tap px-3 py-1.5 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-300 text-xs font-semibold hover:bg-rose-500/30 spring-transition">
-          Kill SIGKILL
+        <button onclick="stopCurrentScript()" title="Hentikan Script" class="active-tap px-2.5 py-1 rounded-xl border border-rose-500/40 bg-rose-500/20 text-rose-300 text-xs font-semibold hover:bg-rose-500/30 spring-transition flex items-center gap-1">
+          <span>⏹️</span>
+          <span>Hentikan</span>
         </button>
-        <button onclick="closeTerminalSheet()" title="Minimize" class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-400 spring-transition">
+        <button onclick="closeTerminalSheet()" title="Tutup" class="p-1.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-400 spring-transition text-xs">
           ✕
         </button>
       </div>
     </div>
 
     <!-- Terminal Content Area -->
-    <div id="terminal-content" class="flex-1 p-4 font-mono text-xs overflow-y-auto bg-[#090d16] text-slate-200 space-y-1">
-      <!-- Stream lines injected via app.js -->
+    <div id="terminal-content" class="flex-1 p-3.5 font-mono text-xs overflow-y-auto bg-[#090d16] text-slate-200 space-y-1">
+      <!-- Stream lines injected via app.js with exact seconds -->
     </div>
 
     <!-- Bottom Status -->
-    <div class="px-4 py-2 border-t border-white/10 bg-black/60 flex items-center justify-between text-[11px] font-mono text-slate-400">
-      <span>🌸 Kasane Execution Daemon • KernelSU</span>
+    <div class="px-4 py-2 border-t border-white/10 bg-black/60 flex items-center justify-between text-[10px] font-mono text-slate-400">
+      <span>🌸 Kasane Execution • KernelSU</span>
       <span>Live stdout / stderr <span class="cursor-blink"></span></span>
     </div>
   </div>
@@ -349,12 +428,36 @@
   <!-- Dynamic Island Mini-HUD -->
   <div id="dynamic-island" onclick="openTerminalSheet()"
        class="fixed bottom-6 inset-x-0 mx-auto w-max z-30 dynamic-island cursor-pointer active-tap">
-    <div class="px-4 py-2 rounded-full sheet-terminal-surface border border-amber-400/30 bg-slate-900/90 shadow-2xl flex items-center gap-3">
+    <div class="px-3.5 py-1.5 rounded-full sheet-terminal-surface border border-amber-400/30 bg-slate-900/90 shadow-2xl flex items-center gap-2">
       <span class="size-2 rounded-full bg-amber-400 animate-pulse"></span>
-      <span id="island-name" class="font-mono text-xs font-semibold text-slate-100 max-w-[150px] truncate">touch_boost.sh</span>
+      <span id="island-name" class="font-mono text-xs font-semibold text-slate-100 max-w-[130px] truncate">touch_boost.sh</span>
       <span class="text-slate-500">•</span>
-      <span id="island-status" class="text-[11px] font-mono text-amber-300">Running</span>
-      <span id="island-timer" class="text-[11px] font-mono text-slate-400">00:03s</span>
+      <span id="island-status" class="text-[10px] font-mono text-amber-300">Berjalan</span>
+      <span id="island-timer" class="text-[10px] font-mono text-slate-400">0.0s</span>
+    </div>
+  </div>
+
+  <!-- Modal: Detail Log History -->
+  <div id="detailed-log-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden">
+    <div class="w-full max-w-lg bg-slate-900 text-slate-100 rounded-3xl p-5 border border-white/15 space-y-3.5 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex items-start justify-between border-b border-white/10 pb-2.5">
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-lg">📜</span>
+            <h3 id="modal-log-title" class="font-bold text-sm text-white">script_name.sh</h3>
+          </div>
+          <p id="modal-log-meta" class="font-mono text-[10px] text-slate-400 mt-0.5">Dijalankan: -- • Durasi: --</p>
+        </div>
+        <button onclick="closeDetailedLogModal()" class="text-slate-400 hover:text-white text-lg font-bold">&times;</button>
+      </div>
+
+      <div id="modal-log-content" class="flex-1 p-3 bg-black/60 rounded-2xl border border-white/5 font-mono text-xs overflow-y-auto space-y-1">
+        <!-- Lines injected dynamically -->
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-1 border-t border-white/10">
+        <button onclick="closeDetailedLogModal()" class="px-3.5 py-1.5 rounded-xl border border-white/15 text-slate-300 text-xs hover:bg-white/5">Tutup</button>
+      </div>
     </div>
   </div>
 
