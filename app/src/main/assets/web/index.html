@@ -97,7 +97,9 @@
           </div>
           <button id="btn-recheck-root" onclick="runDeepDiagnostics()" 
                   class="active-tap px-3 py-1 rounded-xl btn-kasane-gold text-[10px] font-bold shadow-xs spring-transition flex items-center gap-1">
-            <img src="assets/emojis/refresh.png" class="ios-emoji" alt="refresh">
+            <svg class="size-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
             <span>Periksa Ulang</span>
           </button>
         </div>
@@ -196,8 +198,10 @@
           <div class="flex items-center gap-1.5 shrink-0">
             <span id="items-count" class="text-[11px] font-mono font-bold text-slate-300">0 item</span>
             <button onclick="loadDirectory(state.currentPath)" title="Segarkan" 
-                    class="active-tap size-8 rounded-xl tile-surface flex items-center justify-center spring-transition shadow-xs">
-              <img src="assets/emojis/refresh.png" class="ios-emoji" alt="refresh">
+                    class="active-tap size-8 rounded-xl tile-surface flex items-center justify-center spring-transition shadow-xs text-amber-500 dark:text-amber-300 hover:border-amber-400/50">
+              <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+              </svg>
             </button>
           </div>
         </div>

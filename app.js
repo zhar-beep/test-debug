@@ -366,17 +366,17 @@ function renderExplorer() {
       const targetPath = state.currentPath.endsWith('/') ? state.currentPath + item.name : state.currentPath + '/' + item.name;
       return `
         <div onclick="loadDirectory('${targetPath}')" 
-             class="kasane-card rounded-2xl p-3.5 flex items-center justify-between hover:border-amber-400/50 cursor-pointer active-tap group">
-          <div class="flex items-center gap-3">
-            <div class="size-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-xl shadow-xs group-hover:scale-105 spring-transition">
+             class="kasane-card rounded-2xl px-3.5 py-2.5 flex items-center justify-between gap-3 hover:border-amber-400/50 cursor-pointer active-tap group shadow-md">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="size-10 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 spring-transition">
               ${iosEmoji('folder')}
             </div>
-            <div>
-              <span class="font-mono text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors">${escapeHtml(item.name)}</span>
-              <p class="text-[11px] font-mono text-slate-500 dark:text-slate-400">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
+            <div class="min-w-0">
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 dark:text-white group-hover:text-amber-500 dark:group-hover:text-amber-300 transition-colors truncate block leading-tight">${escapeHtml(item.name)}</span>
+              <p class="text-[10px] font-mono text-slate-500 dark:text-slate-400 mt-0.5 leading-none">Folder • ${item.permissions || 'drwxr-xr-x'}</p>
             </div>
           </div>
-          <span class="text-slate-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 font-bold text-lg group-hover:translate-x-1 spring-transition">›</span>
+          <span class="text-slate-400 group-hover:text-amber-500 dark:group-hover:text-amber-300 font-bold text-lg group-hover:translate-x-1 spring-transition shrink-0 pr-1">›</span>
         </div>
       `;
     }
@@ -386,32 +386,35 @@ function renderExplorer() {
     const scriptEmoji = getScriptEmoji(item.name);
 
     return `
-      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
-        <div class="flex items-start gap-3">
+      <div class="kasane-card rounded-2xl px-3.5 py-2.5 flex items-center justify-between gap-2.5 shadow-md">
+        
+        <!-- Icon & File Info (Neatly Aligned Left & Middle) -->
+        <div class="flex items-center gap-2.5 min-w-0 flex-1">
           <!-- Clickable Emoji Icon to customize script icon -->
           <div onclick="openEmojiPicker('${escapeHtml(item.name)}')" title="Klik untuk mengganti emoji"
-               class="size-10 rounded-xl tile-surface flex items-center justify-center text-xl shrink-0 shadow-xs cursor-pointer active-tap hover:border-amber-400/60 spring-transition group">
+               class="size-10 rounded-xl tile-surface flex items-center justify-center shrink-0 shadow-xs cursor-pointer active-tap hover:border-amber-400/60 spring-transition">
             ${iosEmoji(scriptEmoji)}
           </div>
-          <div class="min-w-0">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(item.name)}</span>
+          
+          <div class="min-w-0 flex-1">
+            <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate block leading-tight">${escapeHtml(item.name)}</span>
+            <div class="flex items-center gap-1.5 mt-0.5 text-[10px] font-mono text-slate-500 dark:text-slate-400 leading-none">
               ${isFull777 
-                ? '<span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">chmod 777</span>' 
-                : `<span class="text-[10px] font-mono font-semibold px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/30">${item.octal || '644'}</span>`}
-            </div>
-            <div class="flex items-center gap-2 text-[11px] font-mono text-slate-400 mt-0.5">
+                ? '<span class="px-1.5 py-0.2 rounded font-bold bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30">chmod 777</span>' 
+                : `<span class="px-1.5 py-0.2 rounded font-semibold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-400/30">${item.octal || '644'}</span>`}
+              <span>•</span>
               <span>${item.size || '1.0K'}</span>
               <span>•</span>
-              <span>${item.permissions || '-rwxrwxrwx'}</span>
+              <span class="truncate">${item.permissions || '-rwxr-xr-x'}</span>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
+        <!-- Action Buttons: Izin & Run (Strictly Aligned Side-by-Side in Same Row) -->
+        <div class="flex items-center gap-1.5 shrink-0">
           <!-- Izin Button (MT Manager chmod - strictly "Izin") -->
           <button onclick="openPermissionModal('${escapeHtml(item.name)}', '${itemPath}', '${item.octal || '755'}', '${item.permissions || '-rwxr-xr-x'}')" 
-                  class="active-tap flex items-center gap-1.5 px-3 py-1.5 rounded-xl tile-surface text-slate-200 text-xs font-semibold shadow-xs spring-transition hover:border-amber-400/40">
+                  class="active-tap h-8 px-2.5 rounded-xl tile-surface text-slate-800 dark:text-slate-200 text-xs font-bold shadow-xs spring-transition flex items-center gap-1 border border-white/15 hover:border-amber-400/40">
             <img src="assets/emojis/key.png" class="ios-emoji" alt="key">
             <span>Izin</span>
           </button>
@@ -419,12 +422,13 @@ function renderExplorer() {
           <!-- Run Button (With 2x Confirmation) -->
           ${isScript ? `
             <button onclick="requestRunScript('${itemPath}', '${escapeHtml(item.name)}')" 
-                    class="active-tap flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-4 py-1.5 rounded-xl btn-kasane-gold font-bold text-xs spring-transition shadow-md">
+                    class="active-tap h-8 px-3 rounded-xl btn-kasane-gold text-white text-xs font-bold spring-transition shadow-md flex items-center gap-1">
               <img src="assets/emojis/lightning.png" class="ios-emoji" alt="run">
-              <span>${isRunning ? 'Lihat Console' : 'Run'}</span>
+              <span>${isRunning ? 'Lihat' : 'Run'}</span>
             </button>
           ` : ''}
         </div>
+
       </div>
     `;
   }).join('');
@@ -718,7 +722,7 @@ function appendLogLine(text, level = 'stdout') {
   let colorClass = 'text-slate-200';
   if (level === 'sys') colorClass = 'text-amber-300 font-semibold';
   if (level === 'dim') colorClass = 'text-slate-500';
-  if (level === 'info') colorClass = 'text-sky-300';
+  if (level === 'info') colorClass = 'text-amber-200';
   if (level === 'warn') colorClass = 'text-amber-300';
   if (level === 'success') colorClass = 'text-emerald-300 font-semibold';
   if (level === 'error') colorClass = 'text-rose-400 font-semibold';
@@ -855,39 +859,39 @@ function renderLogHistory() {
   container.innerHTML = state.logHistory.map((item) => {
     const isSuccess = item.status === 'success';
     return `
-      <div class="kasane-card rounded-2xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-md">
-        <div class="flex items-start gap-3">
+      <div class="kasane-card rounded-2xl px-3.5 py-2.5 flex items-center justify-between gap-2.5 shadow-md">
+        <div class="flex items-center gap-2.5 min-w-0 flex-1">
           <div class="size-9 rounded-xl ${isSuccess ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40' : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'} flex items-center justify-center text-base font-bold shrink-0">
             ${isSuccess ? '✓' : '✕'}
           </div>
-          <div>
-            <div class="flex items-center gap-2 flex-wrap">
-              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 dark:text-white">${escapeHtml(item.scriptName)}</span>
-              <span class="text-[10px] font-mono font-bold px-2 py-0.2 rounded-full ${isSuccess ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30'}">
-                ${isSuccess ? 'Berhasil (0)' : `Berhenti (${item.exitCode})`}
+          <div class="min-w-0 flex-1">
+            <div class="flex items-center gap-1.5 leading-tight">
+              <span class="font-mono text-xs sm:text-sm font-bold text-slate-900 dark:text-white truncate">${escapeHtml(item.scriptName)}</span>
+              <span class="text-[9px] font-mono font-bold px-1.5 py-0.2 rounded ${isSuccess ? 'bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30' : 'bg-rose-500/20 text-rose-700 dark:text-rose-300 border border-rose-500/30'} shrink-0">
+                ${isSuccess ? '0' : item.exitCode}
               </span>
             </div>
-            <div class="flex items-center gap-2.5 text-[11px] font-mono text-slate-600 dark:text-slate-400 mt-0.5">
-              <span>${iosEmoji('clock')} ${item.timestamp}</span>
+            <div class="flex items-center gap-2 text-[10px] font-mono text-slate-600 dark:text-slate-400 mt-0.5 leading-none">
+              <span>${item.timestamp.split(', ')[1] || item.timestamp}</span>
               <span>•</span>
-              <span>${iosEmoji('stopwatch')} ${item.duration}</span>
+              <span>${item.duration}</span>
               <span>•</span>
               <span>${item.lines.length} baris</span>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-2 self-end sm:self-auto">
+        <div class="flex items-center gap-1.5 shrink-0">
           <!-- Copy Log Button -->
           <button onclick="copyLogById('${item.id}')" title="Salin Log ini" 
-                  class="active-tap px-3 py-1.5 rounded-xl tile-surface text-xs font-semibold text-slate-200 shadow-xs spring-transition flex items-center gap-1.5 hover:border-amber-400/40">
+                  class="active-tap h-8 px-2.5 rounded-xl tile-surface text-xs font-semibold text-slate-800 dark:text-slate-200 shadow-xs spring-transition flex items-center gap-1 border border-white/15 hover:border-amber-400/40">
             <img src="assets/emojis/clipboard.png" class="ios-emoji" alt="copy">
-            <span>Salin Log</span>
+            <span>Salin</span>
           </button>
 
           <!-- Detail Log Button -->
           <button onclick="viewDetailedLog('${item.id}')" 
-                  class="active-tap px-3 py-1.5 rounded-xl btn-kasane-gold text-xs font-bold shadow-xs spring-transition flex items-center gap-1.5">
+                  class="active-tap h-8 px-3 rounded-xl btn-kasane-gold text-xs font-bold shadow-xs spring-transition flex items-center gap-1">
             <img src="assets/emojis/scroll.png" class="ios-emoji" alt="scroll">
             <span>Detail</span>
           </button>
@@ -909,7 +913,7 @@ function viewDetailedLog(logId) {
   contentEl.innerHTML = item.lines.map(line => {
     let colorClass = 'text-slate-200';
     if (line.type === 'sys') colorClass = 'text-amber-300 font-semibold';
-    if (line.type === 'info') colorClass = 'text-sky-300';
+    if (line.type === 'info') colorClass = 'text-amber-200';
     if (line.type === 'warn') colorClass = 'text-amber-300';
     if (line.type === 'success') colorClass = 'text-emerald-300 font-semibold';
     if (line.type === 'error') colorClass = 'text-rose-400 font-semibold';

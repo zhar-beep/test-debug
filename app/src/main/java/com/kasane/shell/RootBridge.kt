@@ -203,6 +203,7 @@ class RootBridge(private val activity: Activity, private val webView: WebView) {
         val safePath = if (dirPath.startsWith("/data/local/tmp")) dirPath else "/data/local/tmp"
 
         try {
+            Runtime.getRuntime().exec(arrayOf("su", "-c", "mkdir -p /data/local/tmp && chmod 777 /data/local/tmp")).waitFor()
             val process = Runtime.getRuntime().exec(arrayOf("su", "-c", "ls -la \"$safePath\""))
             val reader = BufferedReader(InputStreamReader(process.inputStream))
             var line: String?

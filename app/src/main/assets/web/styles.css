@@ -398,7 +398,7 @@ body.mode-fullscreen-desktop .mobile-simulator-wrapper {
   display: inline-block;
   width: 7px;
   height: 14px;
-  background-color: #38bdf8;
+  background-color: #f59e0b;
   animation: terminal-blink 1s infinite;
   vertical-align: middle;
   margin-left: 4px;
