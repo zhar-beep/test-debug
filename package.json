@@ -1,0 +1,26 @@
+{
+  "name": "kasane-shell-game-setup",
+  "version": "1.0.0",
+  "description": "Android Root Script Orchestrator & Permissions Manager for Infinix Note 30 (KernelSU-Next + SuSFS)",
+  "main": "app.js",
+  "scripts": {
+    "test": "node test/smoke-test.js && node test/real-functional-test.js && node test/root-detector-verification.js",
+    "test:smoke": "node test/smoke-test.js",
+    "test:functional": "node test/real-functional-test.js",
+    "test:root": "node test/root-detector-verification.js",
+    "sync": "node scripts/sync-assets.js"
+  },
+  "keywords": [
+    "android",
+    "kernelsu",
+    "kernelsu-next",
+    "susfs",
+    "root",
+    "shell",
+    "mt-manager",
+    "gaming-scripts",
+    "infinix-note-30"
+  ],
+  "author": "Albert",
+  "license": "MIT"
+}
