@@ -1,0 +1,216 @@
+================================================================================
+KASANE SHELL // GAME SETUP — COMPREHENSIVE SYSTEM ARCHITECTURE, PRD & DEBUG SPEC
+TARGET MODEL FOR AUDIT: DeepSeek v4.1 Flash
+TARGET RUNTIME: Android 16 (API 36) | KernelSU-Next v3.4.0 + SuSFS v2.3.0
+================================================================================
+
+[DIRECTIVE FOR DEEPSEEK v4.1 FLASH]
+You are acting as a Principal Android Kernel Systems Architect, Mobile Security Auditor, and Senior Front-End Engineer.
+Analyze this entire document with strict first-principles engineering logic:
+1. ANTI-SLOP MANDATE: Do NOT generate boilerplate greetings ("Certainly! Here is...", "As an AI..."), superficial praise, vague generic advice, or hallucinated APIs.
+2. TECHNICAL ACCURACY: Respect Android 16 (API 36) SELinux domain restrictions, MediaTek Helio G99 hardware constraints, KernelSU-Next Hybrid hook behavior, and SuSFS syscall redirection mechanics.
+3. CONCRETE OUTPUT: Any suggested optimizations, code refactorings, or architecture tweaks must be provided as complete, copy-paste ready, syntactically valid code blocks with exact explanations of the underlying OS and hardware interactions.
+
+--------------------------------------------------------------------------------
+1. TARGET HARDWARE & OS ENVIRONMENT CONTEXT
+--------------------------------------------------------------------------------
+- Primary User / Owner: Albert (WIB / UTC+7).
+- Target Device: Infinix Note 30 (Model: X6833B), Sunset Gold (Vegan Leather Edition).
+- SoC / Hardware:
+  * MediaTek Helio G99 (MT6789 - 6nm TSMC).
+  * CPU: Octa-core (2x Cortex-A76 @ 2.2 GHz + 6x Cortex-A55 @ 2.0 GHz).
+  * GPU: Mali-G57 MC2 (Valhall architecture).
+  * RAM: 8GB LPDDR4X physical (+ 8GB MemFusion virtual RAM).
+  * Storage: 256GB UFS 2.2.
+- Display Panel:
+  * Resolution: FHD+ 1080 x 2460 pixels (20.5:9 aspect ratio).
+  * Refresh Rate: Dynamic 120Hz (60Hz / 90Hz / 120Hz).
+  * Touch Sampling Rate: 240Hz ultra-responsive input polling.
+- Operating System & Firmware:
+  * ROM: AxionOS 2.7 (Android 16 Vanilla Ice Cream, API level 36, arm64-v8a).
+  * Active Boot Slot: Slot `_b` (`/dev/block/sdc55`).
+  * Kernel: SuiKernel 5.10.269-SuiKernel-Stable-KernelSU-Next (HSKY14 release by KanagawaYamada / LoggingNewMemory).
+- Root & Stealth Subsystem:
+  * Root Engine: KernelSU-Next v3.4.0 (Hybrid hook mode, GKI2 built-in).
+  * Stealth Driver: SuSFS v2.3.0 (GKI full-feature kernel syscall interception).
+  * Installed Modules:
+    - BRENE v0.0.69 (SuSFS manager & uname spoofer).
+    - HMA-OSS (Hide My Applist Open Source).
+    - Tricky Store (Hardware Keystore & Play Integrity keybox attestation).
+    - Vector (Gaming & MediaTek performance booster).
+    - Zygisk Next (Standalone Zygote injection).
+- Kernel Syscall vs Procfs Divergence (Critical Knowledge):
+  * `/proc/version`: Hardcoded compile-time string inside kernel image binary (`5.10.269-SuiKernel-Stable-KernelSU-Next`).
+  * `uname()` / `sys_newuname()` syscall: Intercepted in-kernel by SuSFS driver to return spoofed GKI values:
+    Release: `5.10.269-android12-9-g40451463`
+    Version: `#1 SMP PREEMPT Tue Jul 14 14:27:37 UTC 2026`
+  * Detection Immunity: Native Detector / Momo checks `uname -r` against blacklists. If unmasked, it flags "Detected Custom Kernel containing KernelSU". SuSFS masking MUST remain active.
+  * Android 16 Safety Constraint: Do NOT aggressively spoof System Properties, Fingerprint, or OS Patch level inside BRENE to arbitrary Pixel values on Android 16. Doing so breaks Google Play Services, KeyStore attestation, and app login. Tricky Store manages Keybox attestation independently.
+
+--------------------------------------------------------------------------------
+2. PROJECT IDENTITY & PRODUCT REQUIREMENTS DOCUMENT (PRD v2.0)
+--------------------------------------------------------------------------------
+- Project Name: Kasane Shell // Game Setup (Package: `com.kasane.shell`).
+- Core Purpose: A lightweight, high-performance root script orchestrator designed specifically to manage, inspect, set chmod permissions, and execute custom shell scripts (`.sh`) located in `/data/local/tmp` for gaming performance tuning, touch sampling overclocking, and thermal bypass.
+- Architecture: Hybrid Native Android WebView (`MainActivity.kt`) + Kotlin Coroutine Background Bridge (`RootBridge.kt`) + Vanilla HTML5/Tailwind/CSS3 Glassmorphism SPA (`index.html`, `styles.css`, `app.js`).
+- Build & CI/CD Pipeline: Zero local toolchain required. Fully automated cloud compilation via GitHub Actions (`.github/workflows/build-apk.yml`) running Ubuntu runner with JDK 17, Android SDK 34, compiling directly to `app-debug.apk` with automatic GitHub Releases.
+
+CORE FEATURE SPECIFICATIONS:
+1. Header & System HUD Telemetry:
+   - Device branding: Clean `KASANE` logo (yellow `GAME SETUP` badge removed as requested).
+   - Root status badge: Plain binary text only — `Root: YES` (emerald green) or `Root: NO` (rose red). Zero shield emojis, zero icons, zero pulsing dots.
+   - Hardware HUD: Real-time telemetry displaying Infinix Note 30 (X6833B), FHD+ (1080x2460 @ 120Hz), Kernel 5.10.269-SuiKernel, AxionOS 2.7 (Android 16), Slot _b (/dev/block/sdc55), and Workspace `/data/local/tmp`.
+   - "Periksa Ulang" Deep Diagnostics button with SVG rotation animation.
+2. File Explorer & Directory Management:
+   - Dedicated Workspace: Strictly defaults to `/data/local/tmp`.
+   - Auto-Init Root Logic: Automatically ensures `/data/local/tmp` exists with full `chmod 777` permissions on startup via `su -c "mkdir -p /data/local/tmp && chmod 777 /data/local/tmp"`.
+   - Breadcrumb navigation: Displays path hierarchy with folder up navigation (disabled at `/data/local/tmp` root to prevent accidental directory escaping).
+   - Single-Row Aligned Script & Folder Cards:
+     * Icon: 40x40px rounded box vertically centered with customizable Apple iOS 3D emoji.
+     * Middle Metadata: File/folder name (truncated single line, never wraps awkwardly) + sub-line with octal badge (`777` or `755` or `644`), file size, and permissions string.
+     * Action Buttons: `Izin` button (frosted glass) and `Run` button (Kasane gold gradient) side-by-side with uniform 32px height (`h-8`), identical border radius (`rounded-xl`), and vertical center alignment.
+   - Folder vs Script visual parity: Both card types share identical padding, font sizing, and row height for a clean, straight, non-crooked visual layout.
+3. MT Manager Permissions Modal ("Izin" Tool):
+   - Visual 9-checkbox matrix (Owner `u`, Group `g`, Other `o` with Read `4`, Write `2`, Execute `1`).
+   - Dynamic real-time octal calculation display (e.g. `777`, `755`, `644`).
+   - 1-Tap Quick Presets:
+     * `Set 777 (Full)`: `rwxrwxrwx`
+     * `Set 755 (Exe)`: `rwxr-xr-x`
+     * `Set 644 (Read)`: `rw-r--r--`
+   - Executes `su -c "chmod <octal> <filePath>"` via native bridge.
+4. Two-Step Run Confirmation Modal:
+   - Step 1: Script identity confirmation, displaying target file path and execution confirmation.
+   - Step 2: Superuser security warning emphasizing UID 0 execution inside `/data/local/tmp`.
+   - Auto-Execution Prep: Automatically applies `chmod +x` before running to prevent `Permission Denied` faults.
+5. Custom Script Emoji Manager:
+   - Dedicated modal allowing the user to assign unique Apple iOS 3D emoji icons (`lightning`, `swords`, `snowflake`, `gear`, `phone`, `key`, `scroll`, `sakura`) to each individual `.sh` script. Persisted via `localStorage`.
+6. Live Execution Console (Bottom Sheet Terminal):
+   - iOS sliding sheet with backdrop blur and swipe-down grabber handle.
+   - Process Telemetry: Script name, elapsed execution timer with millisecond precision, and status badge.
+   - Live stdout & stderr stream with exact-second timestamps `[HH:mm:ss]`.
+   - Action controls: Toggle Auto-Scroll, Copy Full Logs to Clipboard, Clear Screen, and Force Stop (Ctrl+C).
+   - Force Stop (Ctrl+C): Invokes native `currentProcess?.destroyForcibly()` to safely terminate running root processes without app crashes or zombie PID leaks.
+   - Dynamic Island Mini-HUD: If user closes the terminal sheet while a script is running, a floating pill appears at the bottom screen with script name, elapsed timer, and pulsing indicator. Tapping it re-opens the console.
+7. Menu Logs (Audit & History Tab):
+   - Full history of all script runs with duration, start timestamp, exit code, and line count.
+   - "Salin Log" instant clipboard export.
+   - Detailed modal viewing full execution lines with color-coded syntax (system, success, warning, error, info).
+8. Kasane Aesthetic & Visual Design System:
+   - Design reference: `https://kasane.aura.build/`.
+   - Typography: Apple SF Pro Display and JetBrains Mono.
+   - Mobile Chassis Bounding: Wallpaper (`user-anime.jpg`) is bounded inside `.mobile-simulator-wrapper` (`max-width: 420px; min-height: 890px` on desktop, 100vw x 100vh on mobile), eliminating widescreen monitor stretching.
+   - High-Contrast Light Mode: Cards use `rgba(255, 255, 255, 0.94)`, text uses deep dark `#090d16` and `#334155`, avoiding washed-out white text.
+   - Dark Mode: Deep smoky frosted glass `rgba(13, 17, 28, 0.72)` with subtle 60fps GPU sakura petal drift.
+   - Zero AI Slop: No shield emojis, no generic purple gradients, no sky blue accents (all accents use Kasane Gold `#f59e0b` and vector SVGs).
+
+--------------------------------------------------------------------------------
+3. TECHNICAL IMPLEMENTATION & CODEBASE AUDIT
+--------------------------------------------------------------------------------
+
+[A] RootBridge.kt (`app/src/main/java/com/kasane/shell/RootBridge.kt`):
+--------------------------------------------------------------------------------
+- Language: Kotlin
+- Concurrency: `CoroutineScope(Dispatchers.IO + SupervisorJob())`
+- Security Libraries:
+  * `com.topjohnwu.superuser:core:5.2.2` (libsu)
+  * `com.scottyab:rootbeer-lib:0.1.0` (RootBeer)
+- Key Exposed Javascript Methods:
+  1. `checkRoot(): Boolean`:
+     Checks `Shell.isAppGrantedRoot()` followed by fallback `su -c "id"` UID 0 check.
+  2. `runRootDiagnostics(): String`:
+     Returns JSON containing RootBeer heuristic checks, libsu grant status, UID 0 verification, `ksud -V` detection, SuSFS kernel status, SELinux enforcement, and `/data/local/tmp` read/write capability test (`.kasane_test`).
+  3. `getDeviceSpecs(): String`:
+     Extracts hardware model via `Build.MODEL`, Android OS version via `Build.VERSION.RELEASE`, active slot via `getprop ro.boot.slot_suffix`, and kernel version via `/proc/version` file reading (falling back to `uname -r`).
+  4. `listDirectory(dirPath: String): String`:
+     Sanitizes target path to `/data/local/tmp`. Executes `su -c "mkdir -p /data/local/tmp && chmod 777 /data/local/tmp"` to guarantee folder availability, then executes `su -c "ls -la \"$safePath\""`, parses rows into JSON array with name, path, isDirectory, permissions, octal, size, and isScript.
+  5. `changePermissions(filePath: String, octal: String): Boolean`:
+     Executes `su -c "chmod $octal \"$filePath\""` and returns boolean success.
+  6. `runScript(scriptPath: String)`:
+     Launches background coroutine on `Dispatchers.IO`. Runs `su -c "chmod +x \"$scriptPath\""`. Spawns `ProcessBuilder("su", "-c", "sh \"$scriptPath\"")`. Starts concurrent coroutines reading `process.inputStream` and `process.errorStream` line-by-line, formatting via `categorizeLine()`, and sending to WebView via `webView.evaluateJavascript("window.onNativeLogReceived(...)")`. Upon completion, triggers `window.onNativeExecutionFinished(exitCode)`.
+  7. `killProcess(): Boolean`:
+     Calls `currentProcess?.destroyForcibly()` to immediately terminate active process (Ctrl+C equivalent).
+
+[B] MainActivity.kt (`app/src/main/java/com/kasane/shell/MainActivity.kt`):
+--------------------------------------------------------------------------------
+- Handles WebView lifecycle. Enables hardware acceleration (`android:hardwareAccelerated="true"`).
+- Settings: `javaScriptEnabled = true`, `domStorageEnabled = true`, `allowFileAccess = true`.
+- Registers `@JavascriptInterface`: `webView.addJavascriptInterface(rootBridge, "AndroidRoot")`.
+- URL Loaded: `file:///android_asset/web/index.html`.
+- Immersive UI: Fullscreen immersive sticky flags hiding navigation bars for maximum 20.5:9 screen real estate.
+- Back Button Intercept: Checks if terminal sheet or modals are open via `evaluateJavascript` before closing the application.
+
+[C] Front-End Architecture (`index.html`, `styles.css`, `app.js`):
+--------------------------------------------------------------------------------
+- Structure:
+  * Header with logo, theme switcher (Dark/Light), and text-only `Root: YES` badge.
+  * System HUD telemetry card with 6 hardware tiles.
+  * 2-Tab Navigation: Explorer Tab & Menu Logs Tab.
+  * Modals: MT Manager Izin Chmod modal, 2-Step Run confirmation modal, Custom Emoji picker modal, and Log Detail modal.
+  * Bottom Sheet Terminal with Dynamic Island fallback.
+- CSS Tokens:
+  * Dark Mode: `--bg-color: #05070c; --glass-card: rgba(13, 17, 28, 0.72); --text-main: #ffffff;`
+  * Light Mode: `--bg-color: #f1f5f9; --glass-card: rgba(255, 255, 255, 0.94); --text-main: #090d16;`
+  * Kasane Palette: `--kasane-gold: #f59e0b; --kasane-crimson: #f43f5e; --kasane-emerald: #10b981;`
+  * Wallpaper Container: `.mobile-simulator-wrapper` with `background-image: url('assets/user-anime.jpg')` contained within 420px desktop width and 100vw mobile width.
+
+[D] Automated Test Suite Status (24 of 24 Passing):
+--------------------------------------------------------------------------------
+1. `test/smoke-test.js` (9/9 PASS):
+   - Asset existence (`user-anime.jpg`, Apple iOS 3D emoji pack).
+   - DOM structure and zero punch-hole glitch.
+   - Zero "SIGKILL" geek jargon.
+   - Stylesheet rules & SF Pro font import.
+   - 2-step confirmation and MT Manager Izin logic.
+   - Exact-second timestamp formatting `[HH:mm:ss]`.
+   - Android Kotlin bridge signature verification.
+   - GitHub Actions CI/CD configuration.
+2. `test/real-functional-test.js` (8/8 PASS):
+   - AndroidManifest.xml package and hardware acceleration flags.
+   - Gradle Kotlin coroutines dependency.
+   - RootBridge non-blocking I/O and process termination.
+   - All 21 offline iOS 3D emoji assets.
+   - Top-level root status card hierarchy.
+   - app.js syntax and modal workflows.
+   - Infinix Note 30 FHD+ 1080x2460 display telemetry.
+   - GitHub Actions zero-config APK compilation steps.
+3. `test/root-detector-verification.js` (7/7 PASS):
+   - RootBeer SU binary paths scanning.
+   - libsu root shell session & UID 0 verification.
+   - KernelSU-Next CLI `ksud` check.
+   - SuSFS kernel driver & uname spoofing verification.
+   - Filesystem `/data/local/tmp` read-write-execute capability.
+   - Process lifecycle coroutine streaming and Ctrl+C force stop.
+   - Gradle build dependencies verification.
+
+--------------------------------------------------------------------------------
+4. QUESTIONS & DIRECTIVES FOR DEEPSEEK v4.1 FLASH AUDIT
+--------------------------------------------------------------------------------
+Please conduct an exhaustive, rigorous engineering critique on the following 6 core areas and provide concrete, production-grade recommendations:
+
+AREA 1: ANDROID 16 (API 36) SELinux & PROCESS ISOLATION HARDENING
+- In Android 16, Google further tightened SELinux domain transitions from `untrusted_app` to `su`.
+- Question: Does our `ProcessBuilder("su", "-c", ...)` pattern in `RootBridge.kt` present any vulnerability to SELinux denial or zombie process leaks when running complex shell scripts that spawn background child processes (e.g., thermal daemons or continuous loop monitors)?
+- Propose: A bulletproof process tree management pattern in Kotlin that ensures child processes spawned by shell scripts are cleanly terminated when `killProcess()` (Ctrl+C) is invoked.
+
+AREA 2: NON-BLOCKING STREAMING & MEMORY FOOTPRINT
+- When scripts output high-frequency stdout (e.g. 500 lines per second during CPU stress testing), sending each line individually via `webView.evaluateJavascript("window.onNativeLogReceived(...)")` could overwhelm the main Android UI thread.
+- Propose: An optimal buffer/batching mechanism (e.g. Kotlin Flow with `chunked` or `debounce` of 50-100ms) to stream output smoothly to the WebView without lag, frame drops, or memory spikes.
+
+AREA 3: MEDIATEK HELIO G99 (MT6789) GAMING SCRIPT TUNING
+- Target device has 2x Cortex-A76 performance cores and 6x Cortex-A55 efficiency cores with Mali-G57 MC2.
+- Question: What are the safest and most effective sysfs / procfs nodes under Linux 5.10 GKI for Helio G99 to tune via `/data/local/tmp` scripts without triggering thermal shutdowns or kernel panics?
+  (e.g., `/sys/devices/system/cpu/cpufreq/`, `/sys/class/kgsl/`, `/proc/perfmgr/`, `/sys/module/ged/`).
+
+AREA 4: SuSFS & KERNELSU STEALTH INTEGRITY
+- Under SuiKernel 5.10.269 with SuSFS v2.3.0 and BRENE module, verify our telemetry reading logic. Does reading `/proc/version` directly from Android WebView / Java expose any risk of tripping banking app heuristics, or should our app rely solely on the in-memory `uname()` syscall spoofed by SuSFS?
+
+AREA 5: WEBVIEW RENDERING PERFORMANCE (120Hz JANK-FREE GPU ACCELERATION)
+- The Infinix Note 30 panel operates at 120Hz with a 240Hz touch sampling rate.
+- Audit our CSS and JavaScript in `styles.css` and `app.js` to ensure zero layout thrashing, 60/120fps smooth transitions, and proper GPU layering (`will-change: transform`, `transform: translateZ(0)`).
+
+AREA 6: SPECIFIC TWEAKS WITHOUT GENERATING AI SLOP
+- Provide exact code improvements for `RootBridge.kt`, `app.js`, and `styles.css` that elevate the app from a prototype to an enterprise-grade root orchestrator, adhering strictly to the Kasane RPG glassmorphism design language.
+
+================================================================================
+END OF SPECIFICATION FILE — COPY DIRECTLY INTO DEEPSEEK v4.1 FLASH
+================================================================================

@@ -1,32 +1,39 @@
-# Product Requirements Document (PRD)
-## Project: Kasane Shell (KuroScript) — Android Root Game Script Orchestrator
-
-**Version:** 1.0.0  
-**Target Device Environment:** Android 16 (API 36, arm64)  
-**Root Framework:** KernelSU-Next (v3.4.0+) / SuSFS  
-**Build Target Architecture:** Hybrid Native WebView + KernelSU Root Bridge  
-**Compilation Strategy:** GitHub Actions Cloud CI/CD (Zero Local Toolchain / Potato-PC Friendly)
-
----
-
-## 1. Executive Summary & Goals
-Kasane Shell is a modern, high-performance Android utility application designed for power users and mobile gamers who run custom shell scripts (`.sh`) located in `/data/local/tmp`. 
-
-### Key Objectives:
-1. **Root-Level Script Execution:** Secure, asynchronous execution of shell scripts via `su` under KernelSU-Next with real-time streaming logs (`stdout` & `stderr`).
-2. **Design Language Synergy:** Seamlessly fusion of:
-   * **21st.dev (Qronos):** Jet black AMOLED foundation (`#08080a`), micro-borders, glowing pill badges, and clean technical aesthetics.
-   * **Kasane (Aura):** Anime & nature RPG ambiance with bioluminescent ambient glows, character hero integration, and status HUD telemetry.
-   * **iOS UX:** SF Pro typography, frosted glass bottom sheets (`backdrop-blur-2xl`), smooth haptic-like animations, and floating dynamic island status indicators.
-3. **No-Heavy-IDE Requirement:** Zero local compilation required. The entire pipeline builds on GitHub Actions cloud runners and outputs a ready-to-install `.apk` directly to the user's phone.
+# Product Requirements Document (PRD v2.0)
+## Project: Kasane Shell — Android Root Game Script Orchestrator
+**Package:** `com.kasane.shell`  
+**Target Device Environment:** Infinix Note 30 (`X6833B`), Android 16 (AxionOS 2.7, API 36, arm64-v8a)  
+**Kernel Subsystem:** SuiKernel 5.10.269-SuiKernel-Stable-KernelSU-Next (HSKY14 by KanagawaYamada)  
+**Root Framework:** KernelSU-Next v3.4.0 (Hybrid Hook) + SuSFS v2.3.0 (GKI Full Feature Stealth)  
+**Build & CI/CD Strategy:** GitHub Actions Cloud Automation (`.github/workflows/build-apk.yml`)  
 
 ---
 
-## 2. Target User Persona & Hardware
-* **Primary User:** Albert (Infinix Note 30 / X6833B).
-* **System Environment:** AxionOS 2.7 (Android 16, API 36, Kernel 5.10.269-SuiKernel, Slot `_b`).
-* **Root Subsystem:** KernelSU-Next in Hybrid mode with SuSFS stealth.
-* **Constraints:** Development workstation is a resource-constrained laptop ("laptop kentang"); local Android Studio or heavy Gradle daemons are strictly avoided.
+## 1. Executive Summary & Core Mission
+Kasane Shell is a modern, high-performance Android root utility application engineered specifically to orchestrate, inspect, set chmod permissions on, and execute custom shell scripts (`.sh`) located in `/data/local/tmp`. It provides mobile gamers and power users with an intuitive, aesthetic interface to run touch latency overclocks, Helio G99 gaming profiles, and thermal bypass scripts without touching a desktop terminal or MT Manager.
+
+### Core Objectives:
+1. **Root-Level Execution & Sandbox Enforcement:** Secure, non-blocking execution of shell scripts via KernelSU-Next `su` on `Dispatchers.IO` with real-time streaming stdout/stderr.
+2. **Dedicated `/data/local/tmp` Workspace:** Automatically ensures directory existence and `chmod 777` permissions on startup, locking the explorer to this safe root sandbox.
+3. **Kasane Glassmorphism UI:** Aesthetic inspired by `https://kasane.aura.build/` using Apple SF Pro typography, authentic Apple iOS 3D emojis, translucent frosted glass cards, and zero horizontal wallpaper stretching on desktop view.
+4. **MT Manager Visual Permissions:** 9-checkbox chmod matrix (Owner, Group, Other) with instant presets (`777 Full`, `755 Exe`, `644 Read`).
+5. **Two-Step Safety Run:** Strict 2-step verification modal before any root script execution, auto-applying `chmod +x` before launch.
+6. **Zero-Config Cloud Build:** Full compilation on GitHub Actions Ubuntu runners outputting signed/installable APKs with zero local SDK setup.
+
+---
+
+## 2. Target Device Hardware & Kernel Environment
+- **Device Model:** Infinix Note 30 (`X6833B`), Sunset Gold Vegan Leather Edition.
+- **SoC:** MediaTek Helio G99 (`MT6789`, 6nm TSMC) — 2x Cortex-A76 @ 2.2 GHz, 6x Cortex-A55 @ 2.0 GHz, Mali-G57 MC2.
+- **Display:** FHD+ 1080 x 2460 pixels (20.5:9 aspect ratio, 120Hz refresh rate, 240Hz touch sampling rate).
+- **RAM & Storage:** 8GB LPDDR4X (+ 8GB MemFusion virtual RAM) / 256GB UFS 2.2.
+- **Operating System:** AxionOS 2.7 (Android 16 Vanilla Ice Cream, API 36, arm64-v8a).
+- **Active Boot Slot:** Slot `_b` (`/dev/block/sdc55`).
+- **Kernel:** SuiKernel 5.10.269-SuiKernel-Stable-KernelSU-Next (HSKY14).
+- **Root & Stealth Subsystem:**
+  * KernelSU-Next v3.4.0 (Hybrid hook mode, GKI2).
+  * SuSFS v2.3.0 (GKI full-feature syscall interception).
+  * Modules: BRENE v0.0.69 (SuSFS manager & uname spoofer), HMA-OSS, Tricky Store, Vector, Zygisk Next.
+  * Syscall vs Procfs Divergence: `/proc/version` reads `5.10.269-SuiKernel-Stable-KernelSU-Next`, while `uname()` is intercepted by SuSFS to return `5.10.269-android12-9-g40451463` to bypass Native Detector and Momo detection.
 
 ---
 
@@ -39,114 +46,86 @@ Kasane Shell is a modern, high-performance Android utility application designed 
 |  +-------------------------------------------------------+  |
 |  |           WebView Frontend (HTML5 / Tailwind)         |  |
 |  |  - Dashboard: Script Catalog & System HUD             |  |
-|  |  - Execution Console: iOS Bottom Sheet & Mini-HUD     |  |
-|  |  - Script Editor: Built-in Code Editor                |  |
+|  |  - Single-Row Cards: Icon | File Info | Izin | Run    |  |
+|  |  - Modals: MT Manager Chmod, 2-Step Run, Emoji Picker |  |
+|  |  - Console: iOS Sliding Bottom Sheet & Dynamic Island |  |
 |  +-------------------------------------------------------+  |
 |                            |                                |
 |                 @JavascriptInterface Bridge                 |
 |                            v                                |
 |  +-------------------------------------------------------+  |
 |  |         Native Android Host (MainActivity.kt)         |  |
-|  |  - Process Management (Coroutine Dispatchers.IO)     |  |
-|  |  - Root Shell Worker: `su -c sh /data/local/tmp/...`   |  |
-|  |  - Real-time Output Streaming Buffer                  |  |
+|  |  - RootBridge.kt on CoroutineScope(Dispatchers.IO)    |  |
+|  |  - topjohnwu libsu (v5.2.2) + scottyab RootBeer       |  |
+|  |  - Process Streaming Buffer & destroyForcibly()       |  |
 |  +-------------------------------------------------------+  |
 |                            |                                |
 |                      KernelSU su                            |
 |                            v                                |
 |  +-------------------------------------------------------+  |
 |  |           Filesystem: /data/local/tmp/                |  |
-|  |  - touch_optimizer.sh                                 |  |
-|  |  - game_governor.sh                                   |  |
-|  |  - thermal_drop.sh                                    |  |
+|  |  - touch_boost_120hz.sh                               |  |
+|  |  - gpu_governor_lock.sh                               |  |
+|  |  - thermal_bypass_drop.sh                             |  |
+|  |  - mlbb_extreme_fps.sh                                |  |
 |  +-------------------------------------------------------+  |
 +-------------------------------------------------------------+
 ```
-
-### Components:
-* **Frontend Layer:** Single-page application packaged inside `app/src/main/assets/web/`. Runs offline with zero external network dependencies for core functions.
-* **Bridge Layer (`RootBridge.kt`):** Exposes two-way asynchronous communication between JavaScript and Android root shell via `@JavascriptInterface`.
-* **Execution Engine:** Uses Kotlin Coroutines with buffered `BufferedReader` to stream lines directly to the web view without freezing UI threads.
 
 ---
 
 ## 4. Feature Specifications
 
-### 4.1. System HUD & Telemetry
-Displays real-time hardware and kernel status at the top of the interface:
-* **Root Engine:** `KernelSU-Next Active`
-* **Default Directory:** `/data/local/tmp`
-* **Device / OS:** `Infinix Note 30 | Android 16`
-* **Kernel:** `5.10.269 SuiKernel`
+### 4.1. Header & Live Telemetry
+- Clean `KASANE` branding (yellow `GAME SETUP` badge removed).
+- Root Status: Binary text-only `Root: YES` (emerald green) or `Root: NO` (rose red). Zero shield emojis, zero icons.
+- System HUD: 6 telemetry tiles displaying Device Name, FHD+ 1080x2460 (120Hz) resolution, 5.10.269-SuiKernel, AxionOS 2.7, Slot _b, and Workspace `/data/local/tmp`.
+- Diagnostics Trigger: "Periksa Ulang" button with vector SVG animation.
 
-### 4.2. Script Catalog Management
-* **Auto-Discovery:** Scans `/data/local/tmp` for `*.sh` files.
-* **Categorization Tags:**
-  * `Performance` (Touch boost, GPU clock lock, CPU governor)
-  * `Thermal` (Bypass throttling, battery thermal throttle adjust)
-  * `Game-Specific` (MLBB, Genshin, PUBG, emulator setups)
-  * `Custom` (User-written scripts)
-* **Script Action Controls:**
-  * **Execute Button:** One-tap trigger with immediate log opening.
-  * **Edit / View:** In-app inspection and editing.
-  * **Delete:** Safe removal with confirmation modal.
-  * **Add New Script:** Built-in template creator.
+### 4.2. File Explorer & Management
+- Locked Workspace: Defaults permanently to `/data/local/tmp`.
+- Directory Auto-Init: Executes `su -c "mkdir -p /data/local/tmp && chmod 777 /data/local/tmp"` on startup.
+- Single-Row Aligned Card Layout:
+  * Icon (40x40px rounded box, vertically centered).
+  * Middle Info (truncated file name + sub-line with permissions badge, file size, and permissions string).
+  * Action Buttons (`Izin` and `Run` side-by-side with uniform 32px height `h-8` and matching corner radius).
+- Folder vs Script visual parity: Both card types share identical padding, font sizing, and row height.
 
-### 4.3. Execution Console (The Terminal Engine)
-* **Presentation Form:** iOS-style sliding bottom sheet with smooth gestures.
-* **Telemetry Banner:**
-  * Script Name (`filename.sh`)
-  * Process Status Badge (`IDLE`, `RUNNING` with pulse animation, `SUCCESS 0`, `ERROR [code]`)
-  * Execution Elapsed Time counter (`00:00.00`)
-  * Process ID (`PID`)
-* **Terminal Stream Area:**
-  * Monospace font formatting with dark OLED black contrast.
-  * ANSI color parsing:
-    * White/Slate: Standard stdout
-    * Rose/Red: Stderr and errors
-    * Amber/Gold: Warnings
-    * Emerald: Success completion tokens
-* **Console Controls:**
-  * **Kill Process:** Sends `SIGTERM` / `SIGKILL` to running process.
-  * **Clear Logs:** Resets console buffer.
-  * **Copy Output:** Copies full session logs to clipboard.
-  * **Auto-Scroll Lock:** Allows scrolling up without being forced to bottom upon new output.
-  * **Dynamic Island / Minimize:** Shrinks console into an iOS-style floating pill at screen bottom, allowing background navigation while observing progress.
+### 4.3. MT Manager Permissions Modal ("Izin")
+- 9-Checkbox chmod matrix (Owner, Group, Other for r, w, x).
+- Live octal calculation input.
+- Instant 1-tap presets: `Set 777 (Full)`, `Set 755 (Exe)`, `Set 644 (Read)`.
+- Backend invocation: `su -c "chmod <octal> <path>"`.
 
-### 4.4. Security & Permissions
-* Standard Android permissions: `INTERNET` (for Web assets/fonts), `RECEIVE_BOOT_COMPLETED` (optional auto-run on boot).
-* Root privilege: Explicitly granted via KernelSU superuser prompt on first run.
-* Whitelist safety: All executions are strictly scoped to user confirmation; no hidden background telemetry.
+### 4.4. Two-Step Run Confirmation
+- Step 1: Script target confirmation.
+- Step 2: Superuser security warning emphasizing UID 0 execution in `/data/local/tmp`.
+- Auto-prep: Executes `su -c "chmod +x <path>"` before running.
 
----
+### 4.5. Custom Script Emoji Manager
+- Modal allowing users to assign Apple iOS 3D emoji icons (`lightning`, `swords`, `snowflake`, `gear`, `phone`, `key`, `scroll`, `sakura`) to each individual script. Persisted via `localStorage`.
 
-## 5. UI/UX Design System Specification
+### 4.6. Live Execution Console (Bottom Sheet Terminal)
+- Sliding bottom sheet with drag handle and backdrop blur.
+- Exact-second timestamps `[HH:mm:ss]` on all output lines.
+- Controls: Toggle Auto-Scroll, Copy Full Logs to Clipboard, Clear Screen, and Force Stop (Ctrl+C).
+- Force Stop (Ctrl+C): Calls `currentProcess?.destroyForcibly()` to safely terminate running root processes.
+- Dynamic Island Mini-HUD: If user dismisses sheet while script runs, a floating pill appears at bottom screen with script name and timer.
 
-### 5.1. Color Palette
-| Token | Hex Value | Application |
-|---|---|---|
-| Background Canvas | `#08080a` | Ultra-deep AMOLED base |
-| Surface Card | `rgba(18, 17, 24, 0.72)` | Translucent glass card background |
-| Surface Border | `rgba(255, 255, 255, 0.08)` | Subtle 1px crisp micro-border |
-| Accent Violet (Kasane) | `#a855f7` / `#9333ea` | Primary glowing accents, running indicators |
-| Accent Emerald (Nature) | `#10b981` / `#059669` | Success states, active root status |
-| Accent Rose (Flame) | `#f43f5e` | Kill actions, error badges |
-| Text Primary | `#f8fafc` | Headings, active states |
-| Text Muted | `#94a3b8` / `#64748b` | Descriptions, timestamps, metadata |
+### 4.7. Menu Logs (History & Audit)
+- Persistent execution history with start timestamp, execution duration, exit code, and line count.
+- Copy log to clipboard and detail inspection modal.
 
-### 5.2. Glassmorphism & Micro-Interactions
-* `backdrop-filter: blur(24px) saturate(180%)`
-* Card hover/tap scale transform (`scale(0.98)` on active tap for haptic sensation)
-* Delicate radial gradient auras behind character illustration and active script cards.
+### 4.8. UI/UX Design System
+- Apple SF Pro Display typography and JetBrains Mono code font.
+- Mobile chassis bounding: Wallpaper contained inside 420px container on desktop, 100vw on mobile.
+- High-contrast Light Mode (`rgba(255, 255, 255, 0.94)` cards, `#090d16` text) and Smoky Glass Dark Mode.
+- Zero AI Slop: No blue accents (amber/gold SVG icons used), no generic purple gradients, no punch-hole camera glitch, no "SIGKILL" geek jargon.
 
 ---
 
-## 6. Cloud CI/CD Pipeline (GitHub Actions)
-* **Trigger:** Push to branch `main` or manual `workflow_dispatch`.
-* **Runner:** `ubuntu-latest` (free cloud runner).
-* **Toolchain:** Java 17 + Android SDK 34/36.
-* **Artifact Output:** `app-debug.apk` and `app-release-unsigned.apk` uploaded to GitHub Run Artifacts & Releases.
-* **User Workflow:**
-  1. Push code from local workspace.
-  2. Cloud builder finishes in 2 minutes.
-  3. User downloads `.apk` directly to phone via mobile browser.
+## 5. Automated Verification Test Suite (24/24 PASS)
+- `test/smoke-test.js`: 9 of 9 tests passed (100%).
+- `test/real-functional-test.js`: 8 of 8 tests passed (100%).
+- `test/root-detector-verification.js`: 7 of 7 vectors verified (100%).
+- Total: 24/24 Test Assertions PASSED.
