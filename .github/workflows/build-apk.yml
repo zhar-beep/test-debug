@@ -1,4 +1,4 @@
-name: Build Game Setup APK
+name: Build Kasane Shell APK
 
 on:
   push:
@@ -23,11 +23,11 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
       - name: Grant Execute Permission to Gradlew
-        run: chmod +x gradlew || true
+        run: chmod +x gradlew
+
+      - name: Accept Android SDK Licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses || true
 
       - name: Build Debug APK with Gradle
         run: ./gradlew assembleDebug --stacktrace --no-daemon
@@ -35,16 +35,18 @@ jobs:
       - name: Upload APK as Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: GameSetup-Debug-APK
+          name: KasaneShell-Debug-APK
           path: app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
 
       - name: Create GitHub Release
         if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+        continue-on-error: true
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: "Game Setup v1.0.${{ github.run_number }}"
-          body: "Automated cloud build for Game Setup (KernelSU Root Script Manager). Built with GitHub Actions."
+          name: "Kasane Shell v1.0.${{ github.run_number }}"
+          body: "Automated cloud build for Kasane Shell (Root MediaTek Telemetry Monitor). Built with GitHub Actions."
           files: app/build/outputs/apk/debug/app-debug.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
