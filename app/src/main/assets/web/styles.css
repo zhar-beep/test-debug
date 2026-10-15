@@ -1,408 +1,1312 @@
 /* ==========================================================================
-   KASANE ACTION RPG DESIGN SYSTEM (APPLE SF PRO & VIVID MOBILE ANIME GLASS)
-   Features:
-   - Wallpaper is strictly bounded inside Mobile Phone Chassis (NO desktop stretch)
-   - High-Contrast Light Mode (Zero washed-out text) & Deep Smoky Dark Mode
-   - Root Status: Pure "Root: YES" / "Root: NO" (No icons)
-   - Apple SF Pro Display & SF Pro Text Typography
-   - Zero Punch-Hole Glitch
-   - Real Apple iOS Frosted Glass on Cards & Menus
-   - Mobile-First Chassis for Infinix Note 30 (FHD+ 1080 x 2460)
+   KASANE SHELL — DESIGN SYSTEM (v3, read-only monitor)
+   --------------------------------------------------------------------------
+   Self-contained and offline-first. No CDN, no utility framework: every
+   surface and control is authored here so the APK renders identically with or
+   without a network connection.
+
+   Register:   product — an instrument, not a landing page.
+   Material:   leather and wood. Warm brown surfaces, wood-toned section
+               titles, and a single gold accent reserved for the one action
+               that matters on each screen.
+   Glass:      dialled back to blur(10px). The interface reads as solid
+               leather rather than crystal.
+   Type:       Inter var for UI (falling back to system SF Pro Display),
+               JetBrains Mono for every number and log line.
    ========================================================================== */
 
-@import url('https://fonts.cdnfonts.com/css/sf-pro-display');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+/* --------------------------------------------------------------------------
+   1. FONTS — self-hosted, latin subset, variable where possible
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: 'Inter var';
+  src: url('assets/fonts/inter-var-latin.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('assets/fonts/jetbrains-mono-400-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('assets/fonts/jetbrains-mono-600-latin.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --------------------------------------------------------------------------
+   2. TOKENS
+   -------------------------------------------------------------------------- */
 
 :root {
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --font-mono: "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+  color-scheme: dark;
 
-  /* Default Dark Mode (Vivid Anime Wallpaper + Dark Translucent Glass Cards) */
-  --bg-color: #05070c;
-  --glass-card: rgba(13, 17, 28, 0.72);
-  --glass-card-hover: rgba(20, 26, 42, 0.85);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.12);
-  
-  --nav-bg: rgba(9, 13, 22, 0.82);
-  --nav-border: rgba(255, 255, 255, 0.15);
-  
-  --text-main: #ffffff;
-  --text-body: #e2e8f0;
-  --text-muted: #94a3b8;
-  
-  --tile-bg: rgba(255, 255, 255, 0.08);
-  --tile-border: rgba(255, 255, 255, 0.14);
-  
-  --kasane-gold: #f59e0b;
-  --kasane-crimson: #f43f5e;
-  --kasane-emerald: #10b981;
+  --font-sans: 'Inter var', 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Display',
+               system-ui, Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
 
-  --chassis-backdrop: rgba(0, 0, 0, 0.18);
+  /* 1-4-9 rhythm */
+  --s1: 4px;
+  --s2: 8px;
+  --s3: 12px;
+  --s4: 16px;
+  --s6: 24px;
+  --s9: 36px;
+
+  --r-chip: 999px;
+  --r-btn: 10px;
+  --r-tile: 12px;
+  --r-row: 16px;
+  --r-card: 20px;
+  --r-sheet: 26px;
+
+  --control-h: 34px;
+  --touch-pad: 5px;
+
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* --- dark: warm leather on near-black --- */
+  --page: #14100d;
+  --leather: rgba(59, 42, 29, 0.78);
+  --leather-hi: rgba(74, 53, 36, 0.9);
+  --nav: rgba(24, 18, 14, 0.82);
+  --tile-bg: rgba(200, 160, 106, 0.08);
+  --tile-hi: rgba(200, 160, 106, 0.14);
+  --inset: rgba(0, 0, 0, 0.3);
+
+  --ink-strong: #f6f1e9;
+  --ink: #e0d6c8;
+  --ink-dim: #a1958a;
+  --ink-faint: #7d7267;
+
+  --wood: #c8a06a;
+  --hairline: rgba(200, 160, 106, 0.2);
+  --hairline-strong: rgba(200, 160, 106, 0.32);
+
+  --shadow-card: 0 10px 28px -14px rgba(0, 0, 0, 0.8);
+  --shadow-pop: 0 24px 60px -18px rgba(0, 0, 0, 0.85);
+
+  --gold: #f59e0b;
+  --gold-hi: #fbbf24;
+  --gold-ink: #fbbf24;
+  --gold-wash: rgba(245, 158, 11, 0.16);
+  --jade: #10b981;
+  --jade-ink: #34d399;
+  --jade-wash: rgba(16, 185, 129, 0.16);
+  --rose: #f43f5e;
+  --rose-ink: #fb7185;
+  --rose-wash: rgba(244, 63, 94, 0.16);
+
+  --ring: rgba(245, 158, 11, 0.65);
+  --chassis-tint: rgba(0, 0, 0, 0.26);
 }
 
-/* Light Theme Overrides (High-Contrast, Ultra-Sharp & Perfectly Readable) */
 html.light,
 body.light {
-  --bg-color: #f1f5f9;
-  --glass-card: rgba(255, 255, 255, 0.88);
-  --glass-card-hover: rgba(255, 255, 255, 0.96);
-  --glass-border: rgba(15, 23, 42, 0.16);
-  --glass-shadow: 0 12px 32px -4px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(15, 23, 42, 0.08);
-  
-  --nav-bg: rgba(255, 255, 255, 0.92);
-  --nav-border: rgba(15, 23, 42, 0.15);
-  
-  --text-main: #090d16;
-  --text-body: #1e293b;
-  --text-muted: #475569;
-  
-  --tile-bg: rgba(241, 245, 249, 0.95);
-  --tile-border: rgba(15, 23, 42, 0.12);
+  color-scheme: light;
 
-  --chassis-backdrop: rgba(255, 255, 255, 0.10);
+  --page: #f4ece0;
+  --leather: rgba(255, 251, 244, 0.88);
+  --leather-hi: rgba(255, 253, 248, 0.97);
+  --nav: rgba(248, 241, 231, 0.88);
+  --tile-bg: rgba(90, 64, 40, 0.06);
+  --tile-hi: rgba(90, 64, 40, 0.11);
+  --inset: rgba(90, 64, 40, 0.07);
+
+  --ink-strong: #2a2018;
+  --ink: #40342a;
+  --ink-dim: #6b5a4a;
+  --ink-faint: #8d7b68;
+
+  --wood: #8a6234;
+  --hairline: rgba(90, 64, 40, 0.16);
+  --hairline-strong: rgba(90, 64, 40, 0.28);
+
+  --shadow-card: 0 8px 22px -14px rgba(60, 40, 22, 0.4);
+  --shadow-pop: 0 24px 60px -20px rgba(60, 40, 22, 0.4);
+
+  --gold-ink: #a8560a;
+  --jade-ink: #047857;
+  --rose-ink: #be123c;
+
+  --chassis-tint: rgba(255, 250, 242, 0.16);
 }
 
-/* Light Mode High-Contrast Rules (100% Readable, Zero Washed-Out Text) */
-html.light .kasane-card,
-body.light .kasane-card {
-  color: #0f172a;
-  background: rgba(255, 255, 255, 0.94);
-  border-color: rgba(15, 23, 42, 0.16);
-  box-shadow: 0 10px 25px -3px rgba(15, 23, 42, 0.14), 0 0 0 1px rgba(15, 23, 42, 0.08);
+/* --------------------------------------------------------------------------
+   3. BASE
+   -------------------------------------------------------------------------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
-html.light .kasane-card:hover,
-body.light .kasane-card:hover {
-  background: rgba(255, 255, 255, 0.98);
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
-html.light .kasane-nav,
-body.light .kasane-nav {
-  color: #0f172a;
-  background: rgba(255, 255, 255, 0.95);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.14);
+html {
+  height: 100%;
 }
 
-html.light .tile-surface,
-body.light .tile-surface {
-  background: rgba(241, 245, 249, 0.95);
-  border-color: rgba(15, 23, 42, 0.15);
-  color: #0f172a;
+body {
+  margin: 0;
+  height: 100%;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.45;
+  letter-spacing: -0.011em;
+  color: var(--ink);
+  background: var(--page);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-html.light .text-white,
-body.light .text-white {
-  color: #090d16 !important;
+h1, h2, h3, p, dl, dd, dt {
+  margin: 0;
 }
 
-html.light .text-slate-200,
-body.light .text-slate-200,
-html.light .text-slate-300,
-body.light .text-slate-300 {
-  color: #334155 !important;
+button {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
 }
 
-html.light .text-slate-400,
-body.light .text-slate-400 {
-  color: #475569 !important;
+code, kbd, pre {
+  font-family: var(--font-mono);
 }
 
-html.light .text-amber-300,
-body.light .text-amber-300 {
-  color: #b45309 !important;
+:focus {
+  outline: none;
 }
 
-html.light .text-emerald-300,
-body.light .text-emerald-300,
-html.light .text-emerald-400,
-body.light .text-emerald-400 {
-  color: #047857 !important;
+:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 6px;
 }
 
-html.light .text-rose-300,
-body.light .text-rose-300,
-html.light .text-rose-400,
-body.light .text-rose-400 {
-  color: #be123c !important;
+::selection {
+  background: var(--gold-wash);
+  color: var(--ink-strong);
 }
 
-/* Full Viewport Wallpaper Layer (Mobile Edge-to-Edge, Bounded on Desktop) */
+/* --------------------------------------------------------------------------
+   4. UTILITIES
+   -------------------------------------------------------------------------- */
+
+.hidden {
+  display: none !important;
+}
+
+.min-0 {
+  min-width: 0;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.ios-emoji {
+  display: inline-block;
+  width: 1.15em;
+  height: 1.15em;
+  vertical-align: -0.19em;
+  object-fit: contain;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.ios-emoji-lg {
+  display: inline-block;
+  width: 1.5em;
+  height: 1.5em;
+  vertical-align: -0.22em;
+  object-fit: contain;
+  pointer-events: none;
+  flex-shrink: 0;
+}
+
+.icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  stroke-width: 2.1;
+}
+
+.stack-4 {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+/* --------------------------------------------------------------------------
+   5. BACKGROUND PLANES (decorative, never interactive)
+   -------------------------------------------------------------------------- */
+
 .user-wallpaper-bg {
   position: fixed;
   inset: 0;
+  z-index: 0;
   background-image: url('assets/user-anime.jpg');
   background-size: cover;
   background-position: center 18%;
   background-repeat: no-repeat;
-  z-index: 0;
   pointer-events: none;
 }
 
 .user-glass-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.15);
   z-index: 1;
+  background: rgba(20, 14, 8, 0.24);
   pointer-events: none;
 }
 
-@media (min-width: 641px) {
-  body.mode-phone-mockup .user-wallpaper-bg,
-  body.mode-phone-mockup .user-glass-overlay {
-    display: none; /* Hide full-screen wallpaper on PC so it never stretches across widescreen monitors */
-  }
-}
-
-* {
-  box-sizing: border-box;
-  -webkit-tap-highlight-color: transparent;
-  user-select: none;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: var(--font-sans);
-  letter-spacing: -0.012em;
-  color: var(--text-main);
-  background-color: #06080e;
-  min-height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* Falling Sakura Petals Animation */
 .sakura-container {
-  position: absolute;
+  position: fixed;
   inset: 0;
-  pointer-events: none;
   z-index: 2;
   overflow: hidden;
+  pointer-events: none;
 }
 
 .sakura-petal {
   position: absolute;
   top: -10%;
   border-radius: 12px 1px 12px 1px;
-  background: linear-gradient(135deg, rgba(254, 205, 211, 0.85), rgba(244, 63, 94, 0.55));
-  box-shadow: 0 0 6px rgba(244, 63, 94, 0.25);
+  background: linear-gradient(135deg, rgba(254, 205, 211, 0.8), rgba(244, 63, 94, 0.5));
   animation: sakura-fall linear infinite, sakura-sway ease-in-out infinite;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 @keyframes sakura-fall {
-  0% { transform: translateY(-5vh) rotate(0deg); opacity: 0; }
-  10% { opacity: 0.9; }
-  90% { opacity: 0.85; }
+  0%   { transform: translateY(-5vh) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.85; }
+  90%  { opacity: 0.8; }
   100% { transform: translateY(105vh) rotate(720deg); opacity: 0; }
 }
 
 @keyframes sakura-sway {
-  0%, 100% { transform: translateX(0px) rotate(0deg); }
-  50% { transform: translateX(35px) rotate(40deg); }
+  0%, 100% { transform: translateX(0) rotate(0deg); }
+  50%      { transform: translateX(30px) rotate(38deg); }
 }
 
-.font-mono {
-  font-family: var(--font-mono);
-}
+/* --------------------------------------------------------------------------
+   6. CHASSIS
+   The wrapper is a fixed-height viewport with an internal scroller. This is
+   what stops the wallpaper from rescaling: with a background sized by
+   `cover`, a wrapper whose height follows its content re-fits the image every
+   time the content changes length.
+   -------------------------------------------------------------------------- */
 
-/* Apple iOS 3D Emoji Class */
-.ios-emoji {
-  display: inline-block;
-  width: 1.18em;
-  height: 1.18em;
-  vertical-align: -0.20em;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-.ios-emoji-lg {
-  display: inline-block;
-  width: 1.45em;
-  height: 1.45em;
-  vertical-align: -0.20em;
-  object-fit: contain;
-  pointer-events: none;
-}
-
-/* ==========================================================================
-   MOBILE CHASSIS (INFINIX NOTE 30 - 1080x2460 / 20.5:9 FHD+)
-   WALLPAPER IS STRICTLY BOUNDED INSIDE THIS MOBILE CHASSIS!
-   ========================================================================== */
 .mobile-simulator-wrapper {
-  margin: 0 auto;
-  min-height: 100vh;
   position: relative;
   z-index: 10;
-  overflow-x: hidden;
+  margin: 0 auto;
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   background-image: url('assets/user-anime.jpg');
   background-size: cover;
   background-position: center 18%;
   background-repeat: no-repeat;
-  transition: max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: max-width 0.32s var(--ease-ios);
 }
 
-/* Subtle backdrop tint inside chassis */
 .mobile-simulator-wrapper::before {
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--chassis-backdrop);
   z-index: 1;
+  background: var(--chassis-tint);
   pointer-events: none;
 }
 
-/* Desktop Presentation Mode: Clean Studio Desk with Mobile Phone in Center */
+.mobile-simulator-wrapper > * {
+  position: relative;
+  z-index: 2;
+}
+
 @media (min-width: 641px) {
   body.mode-phone-mockup {
-    background: #04060b;
-    display: flex;
-    justify-content: center;
-    padding: 24px 0;
+    background: radial-gradient(120% 90% at 50% 0%, #241a12 0%, #0b0806 60%);
+  }
+
+  body.mode-phone-mockup .user-wallpaper-bg,
+  body.mode-phone-mockup .user-glass-overlay {
+    display: none;
   }
 
   body.mode-phone-mockup .mobile-simulator-wrapper {
-    max-width: 420px;
+    max-width: 400px;
     width: 100%;
-    min-height: 890px;
-    border-radius: 40px;
-    border: 7px solid rgba(24, 32, 48, 0.95);
-    box-shadow: 0 30px 70px -15px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.12);
-    overflow: hidden;
+    height: 860px;
+    border-radius: 46px;
+    border: 8px solid #1a1512;
+    box-shadow:
+      0 40px 80px -24px rgba(0, 0, 0, 0.9),
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  body.mode-fullscreen-desktop .mobile-simulator-wrapper {
+    max-width: 940px;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
   }
 }
 
-/* Mobile Devices: Edge-to-Edge Screen Fill */
 @media (max-width: 640px) {
   .mobile-simulator-wrapper {
     width: 100% !important;
     max-width: 100% !important;
-    min-height: 100vh !important;
+    height: 100vh !important;
+    height: 100dvh !important;
     border-radius: 0 !important;
-    border: none !important;
+    border: 0 !important;
   }
 }
 
-body.mode-fullscreen-desktop .mobile-simulator-wrapper {
-  max-width: 960px;
-  width: 100%;
-  border-radius: 0;
-  border: none;
-  box-shadow: none;
-}
+/* --------------------------------------------------------------------------
+   7. MATERIALS — leather, three weights
+   -------------------------------------------------------------------------- */
 
-/* REAL APPLE FROSTED GLASS ON MENU CARDS */
 .kasane-card {
-  position: relative;
-  z-index: 3;
-  background: var(--glass-card);
-  backdrop-filter: blur(28px) saturate(190%);
-  -webkit-backdrop-filter: blur(28px) saturate(190%);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.kasane-card:hover {
-  background: var(--glass-card-hover);
+  background: var(--leather);
+  -webkit-backdrop-filter: blur(10px) saturate(140%);
+  backdrop-filter: blur(10px) saturate(140%);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+  transition: background 0.24s var(--ease-out), border-color 0.24s var(--ease-out);
 }
 
 .kasane-nav {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 40;
-  background: var(--nav-bg);
-  backdrop-filter: blur(32px) saturate(190%);
-  -webkit-backdrop-filter: blur(32px) saturate(190%);
-  border-bottom: 1px solid var(--nav-border);
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  background: var(--nav);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border-bottom: 1px solid var(--hairline);
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
-.tile-surface {
+/* --------------------------------------------------------------------------
+   8. HEADER
+   -------------------------------------------------------------------------- */
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding: var(--s3) var(--s4);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border-radius: 13px;
   background: var(--tile-bg);
-  border: 1px solid var(--tile-border);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--hairline);
 }
 
-/* Buttons */
-.btn-kasane-gold {
-  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
-  color: #ffffff;
-  border: 1px solid #f59e0b;
-  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+.brand-name {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--ink-strong);
+  text-transform: uppercase;
+  line-height: 1.15;
 }
 
-.btn-kasane-gold:hover {
-  filter: brightness(1.08);
+.brand-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-dim);
+  line-height: 1.35;
 }
 
-.btn-kasane-danger {
-  background: linear-gradient(180deg, #f43f5e 0%, #e11d48 50%, #be123c 100%);
-  color: #ffffff;
-  border: 1px solid #e11d48;
-  box-shadow: 0 2px 8px rgba(225, 29, 72, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--s2);
+  flex-shrink: 0;
 }
 
-.btn-kasane-danger:hover {
-  filter: brightness(1.1);
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-chip);
+  background: var(--tile-bg);
+  border: 1px solid var(--hairline);
+  color: var(--ink-dim);
+  transition: color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
 }
 
-.spring-transition {
-  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+.theme-toggle:hover {
+  color: var(--ink-strong);
+  border-color: var(--hairline-strong);
 }
 
-.active-tap:active {
+.theme-toggle .icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* One glyph at a time — no JavaScript needed for the swap */
+.theme-toggle .icon-sun {
+  display: none;
+}
+
+html.light .theme-toggle .icon-sun,
+body.light .theme-toggle .icon-sun {
+  display: block;
+}
+
+html.light .theme-toggle .icon-moon,
+body.light .theme-toggle .icon-moon {
+  display: none;
+}
+
+/* Desktop-only control: hidden until the viewport can hold the chassis */
+.desktop-toggle-wrap {
+  position: fixed;
+  top: 12px;
+  right: 16px;
+  z-index: 55;
+  display: none;
+}
+
+@media (min-width: 641px) {
+  .desktop-toggle-wrap {
+    display: flex;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   9. BUTTONS
+   The visual height stays compact; the hit area is padded to 44px so touch
+   targets stay legal without inflating the layout.
+   -------------------------------------------------------------------------- */
+
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: var(--control-h);
+  padding: 0 11px;
+  border-radius: var(--r-btn);
+  border: 1px solid var(--hairline);
+  background: var(--tile-bg);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+  transition: background 0.2s var(--ease-out), border-color 0.2s var(--ease-out),
+              color 0.2s var(--ease-out), transform 0.2s var(--ease-out),
+              filter 0.2s var(--ease-out);
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--touch-pad)) -5px;
+  border-radius: inherit;
+}
+
+.btn:hover {
+  background: var(--tile-hi);
+  border-color: var(--hairline-strong);
+  color: var(--ink-strong);
+}
+
+.btn:active {
   transform: scale(0.96);
 }
 
-/* Terminal Bottom Sheet */
-.bottom-sheet {
-  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: translateY(100%);
+.btn:disabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
-.bottom-sheet.open {
-  transform: translateY(0);
-}
-
-.sheet-terminal-surface {
-  background: rgba(9, 13, 24, 0.94);
-  backdrop-filter: blur(36px) saturate(200%);
-  -webkit-backdrop-filter: blur(36px) saturate(200%);
-  border-top: 1px solid rgba(255, 255, 255, 0.22);
-}
-
-/* Dynamic Island Floating Pill */
-.dynamic-island {
-  transition: all 0.32s cubic-bezier(0.16, 1, 0.3, 1);
-  transform: translateY(120px);
-  opacity: 0;
-}
-
-.dynamic-island.visible {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-@keyframes terminal-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
-}
-
-.cursor-blink {
-  display: inline-block;
-  width: 7px;
+.btn .icon {
+  width: 14px;
   height: 14px;
-  background-color: #f59e0b;
-  animation: terminal-blink 1s infinite;
-  vertical-align: middle;
-  margin-left: 4px;
 }
+
+/* Filled: the single decisive action on a surface. Gold is the protagonist. */
+.btn-kasane-gold {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 52%, #d97706 100%);
+  border-color: rgba(245, 158, 11, 0.9);
+  color: #ffffff;
+  box-shadow:
+    0 2px 10px rgba(217, 119, 6, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.btn-kasane-gold:hover {
+  filter: brightness(1.07);
+  color: #ffffff;
+}
+
+.btn-kasane-danger {
+  background: linear-gradient(180deg, #fb7185 0%, #f43f5e 52%, #be123c 100%);
+  border-color: rgba(244, 63, 94, 0.9);
+  color: #ffffff;
+  box-shadow:
+    0 2px 10px rgba(190, 18, 60, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-kasane-danger:hover {
+  filter: brightness(1.08);
+  color: #ffffff;
+}
+
+.btn-plain {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-dim);
+}
+
+.btn-plain:hover {
+  background: var(--tile-bg);
+  border-color: var(--hairline);
+  color: var(--ink-strong);
+}
+
+.btn-quiet-danger {
+  background: transparent;
+  border-color: rgba(244, 63, 94, 0.35);
+  color: var(--rose-ink);
+}
+
+.btn-quiet-danger:hover {
+  background: var(--rose-wash);
+  border-color: rgba(244, 63, 94, 0.6);
+  color: var(--rose-ink);
+}
+
+/* --------------------------------------------------------------------------
+   10. SEGMENTED CONTROL
+   -------------------------------------------------------------------------- */
+
+.segmented {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 3px;
+  border-radius: var(--r-row);
+  background: var(--inset);
+  border: 1px solid var(--hairline);
+}
+
+.segmented::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 13px;
+  background: var(--leather-hi);
+  border: 1px solid var(--hairline-strong);
+  box-shadow: 0 2px 8px -3px rgba(0, 0, 0, 0.5);
+  transform: translateX(var(--seg, 0%));
+  transition: transform 0.34s var(--ease-ios);
+  pointer-events: none;
+}
+
+.segmented-btn {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 34px;
+  border-radius: 13px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  transition: color 0.24s var(--ease-out);
+}
+
+.segmented-btn:hover {
+  color: var(--ink);
+}
+
+.segmented-btn.is-active {
+  color: var(--wood);
+}
+
+/* --------------------------------------------------------------------------
+   11. SECTION HEADERS — wood-toned titles
+   -------------------------------------------------------------------------- */
+
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  padding: var(--s4) var(--s4) calc(var(--s6) + env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.card-pad {
+  padding: var(--s4);
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s3);
+  padding-bottom: var(--s3);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--wood);
+}
+
+.section-sub {
+  margin-top: 3px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--ink-dim);
+}
+
+.counter {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  font-feature-settings: 'tnum' 1;
+  flex-shrink: 0;
+}
+
+/* --------------------------------------------------------------------------
+   12. SPEC LIST — seven full-width rows, nothing truncated
+   -------------------------------------------------------------------------- */
+
+.spec-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.spec-row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: var(--s3);
+  align-items: baseline;
+  padding: 9px 0;
+}
+
+.spec-row + .spec-row {
+  border-top: 1px solid var(--hairline);
+}
+
+.spec-row dt {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.spec-row dd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--ink-strong);
+  overflow-wrap: anywhere;
+}
+
+.spec-row dd.is-muted {
+  color: var(--ink-dim);
+}
+
+.spec-row dd.is-warn {
+  color: var(--gold-ink);
+}
+
+.spec-note {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s2);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--ink-dim);
+}
+
+.spec-note-key {
+  flex-shrink: 0;
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* --------------------------------------------------------------------------
+   13. GAUGES — donut + per-core bars (Scene-style realtime view)
+   -------------------------------------------------------------------------- */
+
+.gauge-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s4);
+}
+
+.donut {
+  position: relative;
+  width: 116px;
+  height: 116px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.donut-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.donut-track {
+  fill: none;
+  stroke: var(--tile-bg);
+  stroke-width: 9;
+}
+
+.donut-arc {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.45s var(--ease-out), stroke 0.3s var(--ease-out);
+}
+
+.donut.is-cpu .donut-arc { stroke: var(--gold); }
+.donut.is-gpu .donut-arc { stroke: var(--wood); }
+.donut.is-idle .donut-arc { stroke: var(--ink-faint); }
+
+.donut-center {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 1px;
+  line-height: 1;
+}
+
+.donut-value {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink-strong);
+  font-feature-settings: 'tnum' 1;
+}
+
+.donut-unit {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.donut-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  white-space: nowrap;
+}
+
+.cluster-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  flex: 1;
+  min-width: 0;
+}
+
+.cluster-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+  padding: 7px 10px;
+  border-radius: var(--r-tile);
+  background: var(--tile-bg);
+  border: 1px solid var(--hairline);
+}
+
+.cluster-name {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--wood);
+  flex-shrink: 0;
+}
+
+.cluster-freq {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-strong);
+  font-feature-settings: 'tnum' 1;
+}
+
+.cluster-load {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--ink-dim);
+  font-feature-settings: 'tnum' 1;
+}
+
+.core-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.core-bar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-bottom: 3px;
+}
+
+.core-bar-name {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-dim);
+}
+
+.core-bar-freq {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--ink-strong);
+  font-feature-settings: 'tnum' 1;
+}
+
+.core-bar-track {
+  position: relative;
+  height: 6px;
+  border-radius: var(--r-chip);
+  background: var(--inset);
+  overflow: hidden;
+}
+
+.core-bar-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--r-chip);
+  background: linear-gradient(90deg, #b45309, #f59e0b);
+  transition: width 0.4s var(--ease-out);
+  will-change: width;
+}
+
+.core-bar.is-big .core-bar-fill {
+  background: linear-gradient(90deg, #a16207, #fbbf24);
+}
+
+.core-bar.is-offline .core-bar-fill {
+  background: var(--ink-faint);
+}
+
+.gauge-meta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  flex: 1;
+  min-width: 0;
+}
+
+.meta-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s2);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+.meta-key {
+  font-family: var(--font-sans);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+.meta-value {
+  color: var(--ink-strong);
+  font-weight: 600;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.meta-value.is-muted {
+  color: var(--ink-dim);
+  font-weight: 400;
+}
+
+/* --------------------------------------------------------------------------
+   14. LOGS APP
+   -------------------------------------------------------------------------- */
+
+.log-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--s2);
+}
+
+.log-filter {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.log-filter-btn {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: var(--r-chip);
+  border: 1px solid var(--hairline);
+  background: transparent;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  transition: background 0.2s var(--ease-out), border-color 0.2s var(--ease-out),
+              color 0.2s var(--ease-out);
+}
+
+.log-filter-btn:hover {
+  color: var(--ink-strong);
+  border-color: var(--hairline-strong);
+}
+
+.log-filter-btn.is-active {
+  background: var(--gold-wash);
+  border-color: rgba(245, 158, 11, 0.45);
+  color: var(--gold-ink);
+}
+
+.logs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s2);
+  max-height: 52vh;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.log-entry {
+  padding: 10px 12px;
+  border-radius: var(--r-tile);
+  background: var(--inset);
+  border: 1px solid var(--hairline);
+  border-left-width: 3px;
+  border-left-color: var(--ink-faint);
+}
+
+.log-entry.is-audit { border-left-color: var(--gold); }
+.log-entry.is-diagnostic { border-left-color: var(--jade); }
+.log-entry.is-monitor { border-left-color: var(--wood); }
+
+.log-entry-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s2);
+  margin-bottom: 5px;
+}
+
+.log-tag {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.log-time {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  color: var(--ink-faint);
+  font-feature-settings: 'tnum' 1;
+}
+
+.log-body {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.log-pre {
+  margin: 7px 0 0;
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid var(--hairline);
+  font-size: 10px;
+  line-height: 1.65;
+  color: var(--ink-dim);
+  overflow-x: auto;
+  white-space: pre;
+  -webkit-overflow-scrolling: touch;
+}
+
+html.light .log-pre,
+body.light .log-pre {
+  background: rgba(90, 64, 40, 0.06);
+}
+
+.log-empty {
+  padding: var(--s9) var(--s4);
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--ink-dim);
+  border-radius: var(--r-tile);
+  background: var(--inset);
+  border: 1px dashed var(--hairline);
+}
+
+/* --------------------------------------------------------------------------
+   15. DIALOG — confirmation surface, replaces native confirm()
+   -------------------------------------------------------------------------- */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s4);
+  background: rgba(12, 8, 5, 0.66);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  animation: modal-fade 0.24s var(--ease-out);
+}
+
+html.light .modal,
+body.light .modal {
+  background: rgba(70, 50, 32, 0.4);
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 340px;
+  max-height: 88vh;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: var(--s4);
+  gap: var(--s3);
+  border-radius: var(--r-sheet);
+  background: var(--leather-hi);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  border: 1px solid var(--hairline-strong);
+  box-shadow: var(--shadow-pop);
+  animation: modal-rise 0.32s var(--ease-ios);
+}
+
+@keyframes modal-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes modal-rise {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s3);
+}
+
+.modal-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--ink-strong);
+}
+
+.modal-title.is-danger {
+  color: var(--rose-ink);
+}
+
+.modal-body-text {
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ink-dim);
+  white-space: pre-line;
+}
+
+.modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--s2);
+  padding-top: var(--s3);
+  border-top: 1px solid var(--hairline);
+}
+
+/* --------------------------------------------------------------------------
+   16. TOASTS — non-blocking confirmation of completed work
+   -------------------------------------------------------------------------- */
+
+.toast-wrap {
+  position: absolute;
+  z-index: 80;
+  left: 50%;
+  bottom: 22px;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s2);
+  width: min(92%, 360px);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 10px 13px;
+  border-radius: var(--r-row);
+  background: var(--leather-hi);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid var(--hairline-strong);
+  box-shadow: var(--shadow-pop);
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--ink-strong);
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  animation: toast-in 0.34s var(--ease-ios) forwards;
+}
+
+.toast.is-leaving {
+  animation: toast-out 0.24s var(--ease-out) forwards;
+}
+
+.toast-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--ink-dim);
+}
+
+.toast-msg {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.toast.is-success .toast-dot { background: var(--jade); }
+.toast.is-error .toast-dot   { background: var(--rose); }
+.toast.is-warn .toast-dot    { background: var(--gold); }
+.toast.is-info .toast-dot    { background: var(--ink-dim); }
+
+@keyframes toast-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes toast-out {
+  to { opacity: 0; transform: translateY(8px) scale(0.98); }
+}
+
+/* --------------------------------------------------------------------------
+   17. SCROLLBARS
+   -------------------------------------------------------------------------- */
 
 ::-webkit-scrollbar {
   width: 5px;
@@ -414,6 +1318,25 @@ body.mode-fullscreen-desktop .mobile-simulator-wrapper {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.35);
-  border-radius: 9999px;
+  background: rgba(200, 160, 106, 0.3);
+  border-radius: var(--r-chip);
+}
+
+/* --------------------------------------------------------------------------
+   18. REDUCED MOTION — honour the OS setting, no exceptions
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .sakura-container {
+    display: none;
+  }
 }

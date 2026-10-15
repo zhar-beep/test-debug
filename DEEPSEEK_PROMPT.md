@@ -1,3 +1,10 @@
+> **USANG SEBAGIAN.** Dokumen ini ditulis untuk Kasane Shell v2 (app eksekutor script).
+> Sejak v3 aplikasi ini adalah **pemantau perangkat read-only**: tidak menjalankan script,
+> tidak mengubah izin file, dan tidak menulis ke kernel. Arah terkini ada di
+> [`PRD.md`](./PRD.md) v3.0 dan [`README.md`](./README.md). Kode v2 — termasuk eksekusi
+> script, explorer, chmod, dan emoji picker — tersimpan utuh di
+> [`backup/`](./backup/README.md) beserta suite test-nya.
+
 # PANDUAN MIGRASI KE IDE / AI CODE DENGAN DEEPSEEK v4.1 FLASH
 
 Dokumen ini adalah instruksi instan untuk kamu gunakan saat membuka project ini di IDE baru (seperti VS Code, Cursor, Cline, Claude Code, atau AI Terminal CLI) yang ditenagai oleh **DeepSeek v4.1 Flash**.

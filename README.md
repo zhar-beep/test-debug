@@ -1,127 +1,160 @@
-# Kasane Shell // Game Setup
+# Kasane Shell
 
-> **Modern, High-Performance Android Root Script Runner & Permissions Manager**  
-> Tailored for **Infinix Note 30 (X6833B)** running **KernelSU-Next v3.4.0 (Hybrid)** and **SuSFS v2.3.0** on **AxionOS 2.7 (Android 16, API 36)**.
-
----
-
-## 🌟 Fitur Utama (Key Features)
-
-1. **Workspace Terkunci & Aman di `/data/local/tmp`**:
-   - Direktori default permanen untuk script gaming, optimizer sentuhan, dan bypass thermal.
-   - Otomatis inisialisasi folder dengan `su -c "mkdir -p /data/local/tmp && chmod 777 /data/local/tmp"` pada saat aplikasi dijalankan.
-   - Navigasi breadcrumbs yang mencegah pengguna tersasar keluar sandbox.
-
-2. **Tampilan Kartu Sejajar & Simetris (Single-Row Clean Alignment)**:
-   - Ikon kotak 40×40px di tengah secara vertikal.
-   - Nama script rapi satu baris dengan `truncate` anti-patah baris.
-   - Baris metadata padat menampilkan badge octal (`chmod 777` / `755` / `644`), ukuran file, dan string permission.
-   - Tombol **`Izin`** dan **`Run`** berdampingan sejajar secara horizontal dengan tinggi seragam 32px (`h-8`).
-   - Kartu folder dan kartu script memiliki ukuran, padding, dan tinggi yang presisi identik.
-
-3. **Editor Izin Visual MT Manager (`Izin` Modal)**:
-   - Matriks 9-checkbox untuk Owner (`u`), Group (`g`), dan Other (`o`) (Read `4`, Write `2`, Execute `1`).
-   - Perhitungan kode octal real-time.
-   - Preset 1-klik instan:
-     - `Set 777 (Full)`: `rwxrwxrwx`
-     - `Set 755 (Exe)`: `rwxr-xr-x`
-     - `Set 644 (Read)`: `rw-r--r--`
-
-4. **Konfirmasi Keamanan 2 Tahap (2-Step Run)**:
-   - Tahap 1: Verifikasi nama script dan target path.
-   - Tahap 2: Peringatan keamanan Superuser UID 0 KernelSU.
-   - Otomatis menjalankan `chmod +x` sebelum eksekusi untuk mencegah error `Permission Denied`.
-
-5. **Konsol Terminal Real-Time (iOS Bottom Sheet)**:
-   - Sliding sheet dengan animasi spring dan backdrop blur.
-   - Stream live `stdout` & `stderr` dengan penanda waktu detik presisi `[HH:mm:ss]`.
-   - Tombol kontrol: Auto-Scroll, Salin Log ke Clipboard, Bersihkan Layar, dan **Hentikan Script (Ctrl+C)** via `destroyForcibly()`.
-   - **Dynamic Island Mini-HUD**: Floating pill di bagian bawah layar saat sheet ditutup ketika script masih berjalan.
-
-6. **Status Root Tegas & Desain Kasane RPG**:
-   - Status root teks biner murni: `Root: YES` (hijau) atau `Root: NO` (merah). Zero icon, zero emoji perisai.
-   - Desain terinspirasi `https://kasane.aura.build/` dengan font Apple SF Pro Display.
-   - Wallpaper anime dibatasi di dalam chassis layar HP (tidak melebar di monitor PC).
-   - Mode Terang Kontras Tinggi (Anti Silau, teks hitam pekat `#090d16`) dan Mode Gelap Kaca Smoky.
-   - Tanpa aksen biru (menggunakan vector SVG Kasane Gold `#f59e0b`).
-
-7. **Integrasi Open Source Root Tools (GitHub)**:
-   - `com.github.topjohnwu.libsu:core:5.2.2` (libsu resmi by John Wu).
-   - `com.scottyab:rootbeer-lib:0.1.0` (RootBeer verification).
-   - Deteksi `ksud -V`, driver SuSFS v2.3.0, dan status SELinux.
+> **Pemantau perangkat Android read-only** — frekuensi CPU/GPU realtime, suhu baterai, dan permukaan log diagnostik.
+> Dikembangkan pada perangkat MediaTek Helio G99 yang di-root dengan **KernelSU-Next + SuSFS**.
 
 ---
 
-## 📁 Struktur Folder Project
+## ⚠️ Batas yang disengaja
+
+Versi ini **tidak menulis apa pun** ke sistem. Tidak mengubah frekuensi, tidak mengubah izin file, tidak menjalankan script sebagai root, tidak memasang modul. Ia hanya membaca dan menampilkan.
+
+Batasan itu bukan sekadar niat — ia ditegakkan oleh test suite. Kalau suatu saat kemampuan menulis dikembalikan, test-nya akan gagal lebih dulu.
+
+Kalau kamu mencari versi yang bisa menjalankan script dan mengatur izin file, kode itu masih ada dan utuh di [`backup/`](./backup/README.md).
+
+---
+
+## 🌟 Fitur
+
+1. **Telemetri CPU realtime**
+   - Frekuensi per-core dan per-cluster, dibaca dari `cpufreq` sysfs.
+   - Beban dihitung dari **delta `/proc/stat` antar sampel**, bukan rata-rata sejak boot.
+   - Cluster dideteksi dari kesamaan frekuensi maksimum antar core, jadi tetap benar di SoC dengan jumlah cluster berbeda.
+   - Donut beban, daftar cluster, dan bar proporsi untuk setiap core.
+
+2. **Telemetri GPU realtime**
+   - Dua generasi antarmuka MediaTek diperiksa berurutan, bukan diasumsikan: `gpufreq` (lama) dan `gpufreqv2` (baru).
+   - Frekuensi, batas atas, beban, dan path node yang benar-benar dipakai ikut ditampilkan.
+
+3. **Suhu baterai**
+   - Empat kandidat node diperiksa; yang pertama terbaca dipakai.
+   - Nilai MediaTek dalam persepuluh derajat dikonversi otomatis.
+
+4. **Identitas perangkat dinamis**
+   - Nama perangkat, model, kernel, ROM, resolusi, refresh rate, dan slot boot semuanya dibaca saat runtime.
+   - Nol nilai hardcode di seluruh antarmuka — ada test yang menjaganya.
+
+5. **Logs App: audit, diagnostik, monitoring**
+   - **Diagnostik** melaporkan setiap node yang dicoba, ada atau tidak ada, **beserta sampel mentahnya**. Ini yang membuat kita tahu apa yang benar-benar diekspos perangkat, bukan menebak.
+   - **Salin Semua** menghasilkan teks polos yang siap dibaca manusia maupun model bahasa.
+
+6. **Root read-only dan jujur**
+   - Deteksi nyata lewat libsu, `su -c id`, dan RootBeer sebagai pendapat kedua.
+   - Kalau root tidak ada, metrik GPU turun jadi `n/a` beserta alasannya. Tidak ada chip, tidak ada titik berdenyut, tidak ada angka palsu.
+
+7. **Desain kulit & kayu**
+   - Material coklat kulit, judul menu bernuansa kayu, satu aksen emas `#f59e0b` per layar.
+   - Inter Variable + JetBrains Mono, keduanya **di-host lokal** di `assets/fonts/`. Nol CDN — tampilan tetap utuh tanpa internet.
+   - Mode terang kontras tinggi dan mode gelap.
+
+8. **Hemat baterai**
+   - Polling berhenti total saat tab Monitor tidak aktif, saat app di-background, atau saat halaman disembunyikan.
+
+---
+
+## 📁 Struktur
 
 ```
-splendid-pascal/
-├── .github/workflows/build-apk.yml  # Cloud CI/CD build APK otomatis
-├── app/                             # Modul Android Gradle utama
-│   ├── build.gradle.kts             # Dependensi libsu, rootbeer, coroutines
+cmc/
+├── .github/workflows/build-apk.yml   # Cloud CI/CD build APK
+├── app/
+│   ├── build.gradle.kts              # libsu, rootbeer, coroutines
 │   └── src/main/
-│       ├── AndroidManifest.xml      # Hardware acceleration & fullscreen flags
+│       ├── AndroidManifest.xml       # Offline-only, adaptive icon, hardware acceleration
+│       ├── res/                      # Ikon peluncur & tema jendela
+│       │   ├── drawable/ic_launcher_foreground.xml
+│       │   ├── mipmap-anydpi-v26/ic_launcher.xml
+│       │   └── values/{colors,themes,strings}.xml
 │       ├── java/com/kasane/shell/
-│       │   ├── MainActivity.kt      # WebView host & lifecycle
-│       │   └── RootBridge.kt        # @JavascriptInterface root backend
-│       └── assets/web/              # Web assets untuk APK offline
+│       │   ├── MainActivity.kt       # WebView host, pause/resume polling
+│       │   └── RootBridge.kt         # getTelemetry, probeNodes, checkRoot
+│       └── assets/web/               # Web assets yang dikemas ke APK
 │           ├── index.html
 │           ├── styles.css
 │           ├── app.js
-│           └── assets/ (user-anime.jpg & 21 offline iOS 3D emojis)
-├── assets/                          # Mirror web assets root
+│           └── assets/ (wallpaper, 21 emoji iOS 3D, fonts/)
+├── assets/                           # Mirror root dari web assets
+│   ├── emojis/
+│   └── fonts/                        # Inter Variable + JetBrains Mono
+├── backup/                           # Arsip Kasane Shell v2 (executor) — lihat README-nya
+│   └── kasane-v2-executor/
+│       ├── web/                      # Termasuk logic eksekusi, explorer, chmod, emoji
+│       ├── android/                  # RootBridge.kt v2
+│       └── tests/                    # Suite v2 sebagai daftar periksa pemulihan
 ├── scripts/
-│   └── sync-assets.js               # Smart 2-way sync antar root & Android assets
+│   ├── serve.js                      # Preview lokal + live reload
+│   └── sync-assets.js                # Sinkronisasi root <-> Android assets
 ├── test/
-│   ├── smoke-test.js                # Uji integritas DOM, CSS, dan assets (9/9 PASS)
-│   ├── real-functional-test.js      # Uji build gradle & Kotlin bridge (8/8 PASS)
-│   └── root-detector-verification.js# Uji vektor deteksi root open-source (7/7 PASS)
-├── debug.txt                        # Dokumen lengkap untuk DeepSeek v4.1 Flash
-├── PRD.md                           # Product Requirements Document v2.0
-├── package.json                     # NPM scripts untuk test dan sync
-├── build.gradle.kts                 # Root Gradle build script
-└── settings.gradle.kts              # Gradle project settings
+│   ├── smoke-test.js                 # Struktur, aset, invarian offline (9/9)
+│   ├── real-functional-test.js       # Build, manifest, kontrak native (8/8)
+│   └── root-detector-verification.js # Kontrak probe & read-only (7/7)
+├── PRD.md                            # Product Requirements Document v3.0
+├── package.json
+├── build.gradle.kts
+└── settings.gradle.kts
 ```
 
 ---
 
-## 🧪 Menjalankan Test Suite (24/24 PASS)
-
-Kamu bisa memverifikasi seluruh komponen aplikasi menggunakan perintah:
+## 🧪 Test Suite (24/24 PASS)
 
 ```bash
-# Menjalankan seluruh test suite sekaligus
 npm test
 
-# Atau jalankan satu per satu via Node.js
+# atau satu per satu
 node test/smoke-test.js
 node test/real-functional-test.js
 node test/root-detector-verification.js
 ```
 
+Yang paling penting di dalamnya: suite terakhir memverifikasi bahwa `RootBridge.kt` **tidak memuat satu pun jalur penulisan** — tidak ada `chmod`, tidak ada `destroyForcibly`, tidak ada redirect ke `/proc` atau `/sys`.
+
+---
+
+## 👀 Preview Lokal dengan Live Reload
+
+```bash
+npm run dev
+# → http://localhost:5500
+```
+
+Server menyalurkan berkas dari root project — berkas yang sama persis yang ikut ke APK — jadi yang kamu lihat di browser identik dengan isi aplikasi. Setiap perubahan pada `index.html`, `styles.css`, atau `app.js` memicu reload otomatis.
+
+Tanpa jembatan native, aplikasi berjalan dengan **data sintetis** supaya UI tetap bisa dikembangkan tanpa HP. Data itu ditandai jelas di log sebagai pratinjau, bukan pembacaan perangkat.
+
+Ganti port bila perlu: `PORT=8080 npm run dev`.
+
 ---
 
 ## 🔄 Sinkronisasi Web Assets
 
-Jika kamu mengedit `index.html`, `styles.css`, atau `app.js` di root, jalankan:
+Root dan `app/src/main/assets/web/` harus selalu identik. Setelah mengedit `index.html`, `styles.css`, atau `app.js`:
+
 ```bash
 npm run sync
 ```
-Script ini akan otomatis menyinkronkan perubahan ke folder `app/src/main/assets/web/`.
 
 ---
 
-## 🚀 Build APK via GitHub Actions (Zero Local Tools)
+## 🚀 Build APK via GitHub Actions
 
-Kamu tidak perlu menginstall Android Studio di laptop:
-1. Push project ini ke repository GitHub kamu:
-   ```bash
-   git add .
-   git commit -m "feat: complete Kasane Shell v2.0"
-   git branch -M main
-   git remote add origin https://github.com/USERNAME/REPO-NAME.git
-   git push -u origin main
-   ```
-2. Buka tab **Actions** di repository GitHub kamu.
-3. GitHub Actions akan otomatis meng-compile APK menggunakan Ubuntu runner + JDK 17.
-4. Download file `GameSetup-Debug-APK` dari tab **Releases** atau **Artifacts**, install di Infinix Note 30 kamu, dan berikan izin Superuser KernelSU-Next.
+Tidak perlu Android Studio:
+
+1. Push ke repository GitHub kamu.
+2. Buka tab **Actions** — workflow berjalan otomatis (Ubuntu runner + JDK 17).
+3. Unduh artefak **`GameSetup-Debug-APK`** dari tab **Artifacts** atau **Releases**, install, lalu berikan izin Superuser KernelSU-Next.
+4. Buka **Logs App** → **Diagnostik** → **Salin Semua**, dan simpan hasilnya.
+
+---
+
+## ✅ Yang Perlu Diverifikasi di HP
+
+Pengembangan tidak bisa memastikan ini, dan sengaja tidak menebak:
+
+- Apakah MT6789 memakai `gpufreq` atau `gpufreqv2`.
+- Apakah `/proc/mali/utilization` tersedia untuk Mali-G57 pada kernel ini. Kalau tidak, donut GPU hanya menampilkan frekuensi tanpa beban.
+- Node suhu baterai mana yang valid.
+- Format keluaran `ksud -V` pada KernelSU-Next v3.4.0.
+
+Langkah di atas (Logs App → Diagnostik → Salin Semua) menjawab keempatnya sekaligus: kategori Diagnostik memuat tabel node beserta sampel mentahnya.

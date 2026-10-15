@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!--
+    Kasane Shell theme.
+    The activity is a single fullscreen WebView, so the only job here is to
+    paint the window in the app's own dark surface before the WebView loads.
+  -->
+  <style name="Theme.KasaneShell" parent="@android:style/Theme.NoTitleBar.Fullscreen">
+    <item name="android:windowBackground">@color/kasane_window</item>
+    <item name="android:colorBackground">@color/kasane_window</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:navigationBarColor">@android:color/transparent</item>
+  </style>
+</resources>

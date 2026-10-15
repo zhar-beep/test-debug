@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Launch window matches the app's dark surface so there is no white flash. -->
+  <color name="kasane_window">#0a0a0b</color>
+  <color name="ic_launcher_background">#0a0a0b</color>
+</resources>

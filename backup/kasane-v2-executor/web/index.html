@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Kasane Shell — Root Script Runner</title>
+  <meta name="description" content="Kasane Shell: root shell script orchestrator untuk Infinix Note 30 (KernelSU-Next + SuSFS).">
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#0a0a0b" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f2f0" media="(prefers-color-scheme: light)">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="dark mode-phone-mockup">
+
+  <!-- Background plane: wallpaper + mist. Decorative only. -->
+  <div class="user-wallpaper-bg" aria-hidden="true"></div>
+  <div class="user-glass-overlay" aria-hidden="true"></div>
+  <div id="sakura-container" class="sakura-container" aria-hidden="true"></div>
+
+  <!-- Desktop-only: switch between phone chassis and wide layout -->
+  <div class="desktop-toggle-wrap">
+    <button id="btn-desktop-toggle" type="button" onclick="toggleDesktopView()" class="btn btn-lg">
+      <img src="assets/emojis/phone.png" class="ios-emoji" alt="">
+      <span>Mode Layar Lebar</span>
+    </button>
+  </div>
+
+  <!-- ======================================================================
+       PHONE CHASSIS — Infinix Note 30, 1080x2460 (20.5:9)
+       ====================================================================== -->
+  <div class="mobile-simulator-wrapper">
+
+    <header class="kasane-nav">
+      <div class="app-header">
+        <div class="brand">
+          <div class="brand-mark">
+            <img src="assets/emojis/sakura.png" class="ios-emoji-lg" alt="">
+          </div>
+          <div class="ellipsis">
+            <div class="brand-name">Kasane</div>
+            <p class="brand-sub ellipsis">Infinix Note 30 · FHD+ 1080x2460</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="btn-theme-toggle" type="button" onclick="toggleTheme()"
+                  class="theme-toggle" aria-label="Ganti tema terang atau gelap">
+            <svg class="icon icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg class="icon icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+          </button>
+
+          <div id="root-badge" class="chip chip-jade chip-mono" role="status">Root: YES</div>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+
+      <!-- ====================================================================
+           STATUS ROOT & SPESIFIKASI HP
+           ==================================================================== -->
+      <section class="kasane-card card-pad stack-3" aria-labelledby="hud-heading">
+        <div class="section-head">
+          <div>
+            <h2 id="hud-heading" class="section-title">
+              <span class="live-dot is-gold" aria-hidden="true"></span>
+              Status Root & Spesifikasi HP
+            </h2>
+            <p class="section-sub">Telemetri langsung dari KernelSU-Next dan SuSFS.</p>
+          </div>
+          <button id="btn-recheck-root" type="button" onclick="runDeepDiagnostics()" class="btn btn-kasane-gold">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>Periksa Ulang</span>
+          </button>
+        </div>
+
+        <div class="hud-grid">
+          <div class="hud-tile">
+            <div class="hud-label">
+              <img src="assets/emojis/phone.png" class="ios-emoji" alt="">
+              <span>Perangkat</span>
+            </div>
+            <p id="hud-device-name" class="hud-value ellipsis">Infinix Note 30 (X6833B)</p>
+          </div>
+
+          <div class="hud-tile">
+            <div class="hud-label">
+              <img src="assets/emojis/display.png" class="ios-emoji" alt="">
+              <span>Layar FHD+</span>
+            </div>
+            <p id="hud-display-resolution" class="hud-value is-accent ellipsis">1080 x 2460 FHD+ (120Hz)</p>
+          </div>
+
+          <div class="hud-tile">
+            <div class="hud-label">
+              <img src="assets/emojis/gear.png" class="ios-emoji" alt="">
+              <span>Kernel</span>
+            </div>
+            <p id="hud-kernel-version" class="hud-value is-accent ellipsis">5.10.269-SuiKernel</p>
+          </div>
+
+          <div class="hud-tile">
+            <div class="hud-label">
+              <img src="assets/emojis/label.png" class="ios-emoji" alt="">
+              <span>OS / ROM</span>
+            </div>
+            <p id="hud-android-version" class="hud-value ellipsis">AxionOS 2.7 • Android 16</p>
+          </div>
+
+          <div class="hud-tile">
+            <div class="hud-label">
+              <img src="assets/emojis/slot.png" class="ios-emoji" alt="">
+              <span>Slot Aktif</span>
+            </div>
+            <p id="hud-active-slot" class="hud-value is-jade ellipsis">Slot _b (/dev/block/sdc55)</p>
+          </div>
+
+          <div class="hud-tile">
+            <div class="hud-label">
+              <img src="assets/emojis/folder.png" class="ios-emoji" alt="">
+              <span>Workspace</span>
+            </div>
+            <p class="hud-value is-accent ellipsis">/data/local/tmp</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================================
+           TAB SWITCHER
+           ==================================================================== -->
+      <div class="segmented" role="tablist" aria-label="Bagian aplikasi">
+        <button id="tab-btn-explorer" type="button" role="tab" aria-selected="true" aria-controls="view-explorer"
+                onclick="switchTab('explorer')" class="segmented-btn is-active">
+          <img src="assets/emojis/folder.png" class="ios-emoji" alt="">
+          <span>Explorer</span>
+        </button>
+        <button id="tab-btn-logs" type="button" role="tab" aria-selected="false" aria-controls="view-logs"
+                onclick="switchTab('logs')" class="segmented-btn">
+          <img src="assets/emojis/scroll.png" class="ios-emoji" alt="">
+          <span>Menu Logs</span>
+        </button>
+      </div>
+
+      <!-- ====================================================================
+           VIEW 1 — EXPLORER
+           ==================================================================== -->
+      <div id="view-explorer" class="stack-2" role="tabpanel" aria-labelledby="tab-btn-explorer">
+
+        <div class="kasane-card path-bar">
+          <div class="inline-2 min-0">
+            <button id="btn-folder-up" type="button" onclick="navigateUp()" class="btn btn-icon" title="Kembali ke folder atas" aria-label="Kembali ke folder atas">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 19V5M5 12l7-7 7 7"></path>
+              </svg>
+            </button>
+            <nav id="path-breadcrumbs" class="breadcrumbs no-scrollbar" aria-label="Lokasi folder"></nav>
+          </div>
+
+          <div class="path-tools">
+            <span id="items-count" class="counter">0 item</span>
+            <button type="button" onclick="loadDirectory(state.currentPath)" class="btn btn-icon" title="Segarkan daftar" aria-label="Segarkan daftar">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="file-list" class="stack-2"></div>
+      </div>
+
+      <!-- ====================================================================
+           VIEW 2 — MENU LOGS
+           ==================================================================== -->
+      <div id="view-logs" class="stack-2 hidden" role="tabpanel" aria-labelledby="tab-btn-logs">
+
+        <div id="logs-running-banner" class="running-banner hidden">
+          <div class="spread">
+            <div class="inline-2">
+              <span class="live-dot" aria-hidden="true"></span>
+              <span class="section-title text-2xs">Script Sedang Berjalan</span>
+            </div>
+            <span id="logs-banner-timer" class="counter">0.0s</span>
+          </div>
+
+          <p id="logs-banner-script-name" class="row-name ellipsis mt-2">script.sh</p>
+
+          <div class="inline-2 mt-3">
+            <button type="button" onclick="stopCurrentScript()" class="btn btn-lg btn-kasane-danger grow">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+              </svg>
+              <span>Hentikan Script (Ctrl+C)</span>
+            </button>
+            <button type="button" onclick="copyTerminalLogs()" class="btn btn-lg">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+              </svg>
+              <span>Salin Log</span>
+            </button>
+            <button type="button" onclick="openTerminalSheet()" class="btn btn-lg">
+              <span>Console</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="kasane-card card-pad spread">
+          <div>
+            <h2 class="section-title">
+              <img src="assets/emojis/scroll.png" class="ios-emoji" alt="">
+              <span>Riwayat Eksekusi</span>
+            </h2>
+            <p class="section-sub mt-1">Setiap run tercatat dengan durasi, exit code, dan jumlah baris.</p>
+          </div>
+          <div class="inline-2">
+            <span id="logs-total-count" class="counter">0 Riwayat</span>
+            <button type="button" onclick="clearLogHistory()" class="btn btn-quiet-danger">Hapus</button>
+          </div>
+        </div>
+
+        <div id="logs-history-list" class="stack-2"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ======================================================================
+       MODAL — IZIN FILE (chmod)
+       ====================================================================== -->
+  <div id="permission-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="perm-title">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <h3 id="perm-title" class="modal-title">
+            <img src="assets/emojis/key.png" class="ios-emoji" alt="">
+            <span>Izin File</span>
+          </h3>
+          <p id="perm-filename" class="file-ref-name ellipsis mt-1">touch_boost.sh</p>
+          <p id="perm-filepath" class="file-ref-path ellipsis">/data/local/tmp/touch_boost.sh</p>
+        </div>
+        <button type="button" onclick="closePermissionModal()" class="icon-btn" aria-label="Tutup">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div class="perm-matrix">
+        <div class="perm-row is-head">
+          <span>Peran</span>
+          <span>Baca</span>
+          <span>Tulis</span>
+          <span>Eksekusi</span>
+        </div>
+
+        <div class="perm-row">
+          <span class="perm-role is-owner">Owner (u)</span>
+          <label class="perm-cell"><input type="checkbox" id="perm-u-r" class="perm-checkbox" aria-label="Owner dapat membaca"></label>
+          <label class="perm-cell"><input type="checkbox" id="perm-u-w" class="perm-checkbox" aria-label="Owner dapat menulis"></label>
+          <label class="perm-cell"><input type="checkbox" id="perm-u-x" class="perm-checkbox" aria-label="Owner dapat mengeksekusi"></label>
+        </div>
+
+        <div class="perm-row">
+          <span class="perm-role">Group (g)</span>
+          <label class="perm-cell"><input type="checkbox" id="perm-g-r" class="perm-checkbox" aria-label="Group dapat membaca"></label>
+          <label class="perm-cell"><input type="checkbox" id="perm-g-w" class="perm-checkbox" aria-label="Group dapat menulis"></label>
+          <label class="perm-cell"><input type="checkbox" id="perm-g-x" class="perm-checkbox" aria-label="Group dapat mengeksekusi"></label>
+        </div>
+
+        <div class="perm-row">
+          <span class="perm-role">Other (o)</span>
+          <label class="perm-cell"><input type="checkbox" id="perm-o-r" class="perm-checkbox" aria-label="Other dapat membaca"></label>
+          <label class="perm-cell"><input type="checkbox" id="perm-o-w" class="perm-checkbox" aria-label="Other dapat menulis"></label>
+          <label class="perm-cell"><input type="checkbox" id="perm-o-x" class="perm-checkbox" aria-label="Other dapat mengeksekusi"></label>
+        </div>
+      </div>
+
+      <div class="stack-2">
+        <div class="octal-line">
+          <span class="section-sub">Kode octal</span>
+          <input type="text" id="perm-octal-input" class="octal-readout" readonly aria-label="Kode octal hasil perhitungan">
+        </div>
+
+        <div class="preset-grid">
+          <button type="button" onclick="applyOctalPreset('777')" class="preset-btn is-full">777 Full</button>
+          <button type="button" onclick="applyOctalPreset('755')" class="preset-btn is-exe">755 Exe</button>
+          <button type="button" onclick="applyOctalPreset('644')" class="preset-btn">644 Read</button>
+        </div>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" onclick="closePermissionModal()" class="btn btn-lg btn-plain">Batal</button>
+        <button type="button" onclick="savePermissions()" class="btn btn-lg btn-kasane-gold">Terapkan</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL — PICKER EMOJI SCRIPT
+       ====================================================================== -->
+  <div id="emoji-picker-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="picker-title">
+    <div class="modal-card is-narrow">
+      <div class="modal-head">
+        <div>
+          <h3 id="picker-title" class="modal-title">Emoji Script</h3>
+          <p id="picker-script-name" class="file-ref-name ellipsis mt-1">script.sh</p>
+        </div>
+        <button type="button" onclick="closeEmojiPickerModal()" class="icon-btn" aria-label="Tutup">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <p class="modal-body-text">Tandai tiap script dengan ikonnya sendiri. Pilihan tersimpan di perangkat.</p>
+
+      <div class="emoji-grid">
+        <button type="button" onclick="selectScriptEmoji('lightning')" class="emoji-choice">
+          <img src="assets/emojis/lightning.png" alt=""><span>Boost</span>
+        </button>
+        <button type="button" onclick="selectScriptEmoji('swords')" class="emoji-choice">
+          <img src="assets/emojis/swords.png" alt=""><span>Game</span>
+        </button>
+        <button type="button" onclick="selectScriptEmoji('snowflake')" class="emoji-choice">
+          <img src="assets/emojis/snowflake.png" alt=""><span>Thermal</span>
+        </button>
+        <button type="button" onclick="selectScriptEmoji('gear')" class="emoji-choice">
+          <img src="assets/emojis/gear.png" alt=""><span>Tuning</span>
+        </button>
+        <button type="button" onclick="selectScriptEmoji('phone')" class="emoji-choice">
+          <img src="assets/emojis/phone.png" alt=""><span>Touch</span>
+        </button>
+        <button type="button" onclick="selectScriptEmoji('key')" class="emoji-choice">
+          <img src="assets/emojis/key.png" alt=""><span>Root</span>
+        </button>
+        <button type="button" onclick="selectScriptEmoji('scroll')" class="emoji-choice">
+          <img src="assets/emojis/scroll.png" alt=""><span>Script</span>
+        </button>
+        <button type="button" onclick="selectScriptEmoji('sakura')" class="emoji-choice">
+          <img src="assets/emojis/sakura.png" alt=""><span>Mod</span>
+        </button>
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" onclick="closeEmojiPickerModal()" class="btn btn-lg btn-plain">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL — KONFIRMASI RUN 2 TAHAP
+       ====================================================================== -->
+  <div id="run-confirm-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="confirm-title-1">
+    <div class="modal-card">
+
+      <!-- Step 1 -->
+      <div id="confirm-step-1" class="stack-3">
+        <div class="modal-head">
+          <div>
+            <h3 id="confirm-title-1" class="modal-title">
+              <span class="step-tag">Langkah 1 dari 2</span>
+              <span>Konfirmasi Eksekusi</span>
+            </h3>
+            <p class="section-sub mt-1">Periksa target script sebelum dijalankan.</p>
+          </div>
+          <button type="button" onclick="closeRunConfirmModal()" class="icon-btn" aria-label="Tutup">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="file-ref">
+          <span class="file-ref-label">File script</span>
+          <span id="confirm-file-name" class="file-ref-name">touch_boost.sh</span>
+          <span id="confirm-file-path" class="file-ref-path">/data/local/tmp/touch_boost.sh</span>
+        </div>
+
+        <p class="modal-body-text">
+          Script ini akan dieksekusi dengan hak akses Superuser (Root). Lanjutkan hanya jika kamu mengenali file ini.
+        </p>
+
+        <div class="modal-foot">
+          <button type="button" onclick="closeRunConfirmModal()" class="btn btn-lg btn-plain">Batal</button>
+          <button type="button" onclick="proceedToConfirmStep2()" class="btn btn-lg btn-kasane-gold">Lanjut</button>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div id="confirm-step-2" class="stack-3 hidden">
+        <div class="modal-head">
+          <div>
+            <h3 class="modal-title is-danger">
+              <span class="step-tag">Langkah 2 dari 2</span>
+              <span>Peringatan Root</span>
+            </h3>
+            <p class="section-sub mt-1">Verifikasi terakhir sebelum proses berjalan.</p>
+          </div>
+          <button type="button" onclick="closeRunConfirmModal()" class="icon-btn" aria-label="Tutup">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+              <path d="M18 6 6 18M6 6l12 12"></path>
+            </svg>
+          </button>
+        </div>
+
+        <div class="notice">
+          <div class="notice-head">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <path d="M12 9v4M12 17h.01"></path>
+            </svg>
+            <span>PERINGATAN ROOT KERNELSU</span>
+          </div>
+          <p class="notice-text">
+            <strong id="confirm-file-name-2">script.sh</strong> akan berjalan di
+            <code class="inline-code">/data/local/tmp</code> sebagai Root (UID 0).
+            Script bisa mengubah kernel parameter dan tidak bisa dibatalkan setelah dijalankan.
+          </p>
+        </div>
+
+        <div class="modal-foot is-split">
+          <button type="button" onclick="backToConfirmStep1()" class="btn btn-lg btn-plain">Kembali</button>
+          <button type="button" onclick="executeConfirmedScript()" class="btn btn-lg btn-kasane-danger">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M13 2 3 14h8l-1 8 10-12h-8l1-8z"></path>
+            </svg>
+            <span>Jalankan Sekarang</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL — DETAIL LOG
+       ====================================================================== -->
+  <div id="detailed-log-modal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="modal-log-title">
+    <div class="modal-card is-wide">
+      <div class="modal-head">
+        <div>
+          <h3 id="modal-log-title" class="modal-title">
+            <img src="assets/emojis/scroll.png" class="ios-emoji" alt="">
+            <span>script.sh</span>
+          </h3>
+          <p id="modal-log-meta" class="file-ref-path">Dijalankan: --</p>
+        </div>
+        <button type="button" onclick="closeDetailedLogModal()" class="icon-btn" aria-label="Tutup">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+
+      <div id="modal-log-content" class="log-viewer"></div>
+
+      <div class="modal-foot is-split">
+        <button id="modal-copy-btn" type="button" onclick="copyCurrentModalLog()" class="btn btn-lg btn-kasane-gold">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+            <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+          </svg>
+          <span>Salin Semua</span>
+        </button>
+        <button type="button" onclick="closeDetailedLogModal()" class="btn btn-lg btn-plain">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       KONSOL EKSEKUSI — bottom sheet
+       ====================================================================== -->
+  <div id="sheet-backdrop" class="sheet-backdrop is-closed" onclick="closeTerminalSheet()" aria-hidden="true"></div>
+
+  <section id="terminal-sheet" class="bottom-sheet sheet-terminal-surface" role="dialog" aria-modal="false" aria-labelledby="console-title">
+
+    <div class="sheet-grabber" onclick="closeTerminalSheet()" role="button" tabindex="0" aria-label="Tutup konsol">
+      <span></span>
+    </div>
+
+    <div class="sheet-head">
+      <div class="sheet-title-group">
+        <div id="console-status-badge" class="chip chip-gold chip-mono">
+          <span class="live-dot is-gold" aria-hidden="true"></span>
+          Berjalan
+        </div>
+        <div class="ellipsis">
+          <h2 id="console-title" class="sheet-script ellipsis">script_name.sh</h2>
+          <div class="sheet-meta">
+            <span id="console-start-time">Mulai: --:--:--</span>
+            <span aria-hidden="true">·</span>
+            <span id="console-timer" class="is-timer">0.0s</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet-tools">
+        <button id="btn-autoscroll" type="button" class="tool-btn is-on" title="Auto-scroll" aria-pressed="true" aria-label="Auto-scroll">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 5v14M19 12l-7 7-7-7"></path>
+          </svg>
+        </button>
+        <button type="button" onclick="copyTerminalLogs()" class="tool-btn" title="Salin log" aria-label="Salin log">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+            <path d="M5 15V5a2 2 0 0 1 2-2h10"></path>
+          </svg>
+        </button>
+        <button type="button" onclick="clearTerminal()" class="tool-btn" title="Bersihkan layar" aria-label="Bersihkan layar">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 21h18M5 21 3 9l9-6 9 6-2 12M9 21v-6h6v6"></path>
+          </svg>
+        </button>
+        <button type="button" onclick="stopCurrentScript()" class="btn btn-kasane-danger btn-compact">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+          </svg>
+          <span>Stop</span>
+        </button>
+        <button type="button" onclick="closeTerminalSheet()" class="tool-btn" title="Tutup konsol" aria-label="Tutup konsol">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" aria-hidden="true">
+            <path d="M18 6 6 18M6 6l12 12"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="terminal-content" class="terminal" role="log" aria-live="off" aria-label="Output eksekusi"></div>
+
+    <div class="sheet-foot">
+      <span>Kasane Execution · KernelSU-Next</span>
+      <span>stdout / stderr <span class="caret" aria-hidden="true"></span></span>
+    </div>
+  </section>
+
+  <!-- Dynamic Island mini-HUD -->
+  <div id="dynamic-island" class="dynamic-island" onclick="openTerminalSheet()" role="button" tabindex="0" aria-label="Buka konsol eksekusi">
+    <div class="island-body">
+      <span class="live-dot is-gold" aria-hidden="true"></span>
+      <span id="island-name" class="island-name ellipsis">touch_boost.sh</span>
+      <span id="island-status" class="island-status">Berjalan</span>
+      <span id="island-timer" class="island-timer">0.0s</span>
+    </div>
+  </div>
+
+  <!-- Toast host -->
+  <div id="toast-wrap" class="toast-wrap" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

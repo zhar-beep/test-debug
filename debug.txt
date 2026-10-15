@@ -1,4 +1,13 @@
 ================================================================================
+[USANG SEBAGIAN — diperbarui saat Kasane Shell pindah ke v3]
+Dokumen ini ditulis untuk arsitektur v2 (app eksekutor script). Bagian front-end
+sudah tidak berlaku: Tailwind CDN, cdnfonts, HUD 6 tile, konsol terminal, file
+explorer, dan chmod semuanya sudah dipensiunkan. Arah produk sekarang ada di
+PRD.md v3.0, dan kode v2 utuh tersimpan di backup/kasane-v2-executor/.
+Bagian 1 (hardware & kernel) dan Area 3-4 masih relevan.
+================================================================================
+
+================================================================================
 KASANE SHELL // GAME SETUP — COMPREHENSIVE SYSTEM ARCHITECTURE, PRD & DEBUG SPEC
 TARGET MODEL FOR AUDIT: DeepSeek v4.1 Flash
 TARGET RUNTIME: Android 16 (API 36) | KernelSU-Next v3.4.0 + SuSFS v2.3.0

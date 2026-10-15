@@ -1,11 +1,10 @@
 /**
- * Open Source Root Community Tools Verification Suite
- * Tests against detection vectors from:
- * 1. scottyab/rootbeer (GitHub)
- * 2. topjohnwu/libsu (GitHub)
- * 3. KernelSU / KernelSU-Next (GitHub)
- * 4. simonpunk/susfs (GitLab/GitHub)
- * 5. Native Detector / Momo root heuristic detection
+ * Telemetry contract test — Kasane Shell v3.
+ *
+ * The CPU/GPU readout is the whole product now, so this suite pins the contract
+ * it depends on: both MediaTek GPU generations must be probed rather than
+ * assumed, every metric must have a fallback, and the bridge must stay strictly
+ * read-only.
  */
 
 const fs = require('fs');
@@ -13,103 +12,105 @@ const path = require('path');
 const assert = require('assert');
 
 console.log('🌸 ===================================================================');
-console.log('🌸 RUNNING OPEN SOURCE ROOT COMMUNITY DETECTION SUITE (GITHUB TOOLS)');
+console.log('🌸 TELEMETRY CONTRACT SUITE (MEDIATEK CPU / GPU READ-ONLY)');
 console.log('🌸 ===================================================================\n');
+
+const ROOT = path.join(__dirname, '..');
+const bridge = fs.readFileSync(
+  path.join(ROOT, 'app/src/main/java/com/kasane/shell/RootBridge.kt'), 'utf8');
+const webApp = fs.readFileSync(path.join(ROOT, 'app/src/main/assets/web/app.js'), 'utf8');
 
 let total = 0;
 let passed = 0;
 
-function verifyVector(vectorName, fn) {
+function verify(vector, fn) {
   total++;
   try {
     fn();
-    console.log(`  🛡️ [VERIFIED] ${vectorName}`);
+    console.log(`  🛡️ [VERIFIED] ${vector}`);
     passed++;
   } catch (err) {
-    console.error(`  ❌ [FAILED] ${vectorName}: ${err.message}`);
+    console.error(`  ❌ [FAILED] ${vector}: ${err.message}`);
     process.exitCode = 1;
   }
 }
 
-// VECTOR 1: scottyab/rootbeer SU Paths Check
-verifyVector('RootBeer Vector: SU binary paths scanning', () => {
-  const rootBeerKnownPaths = [
-    "/data/local/",
-    "/data/local/bin/",
-    "/data/local/xbin/",
-    "/sbin/",
-    "/su/bin/",
-    "/system/bin/",
-    "/system/bin/.ext/",
-    "/system/bin/failsafe/",
-    "/system/sd/xbin/",
-    "/system/usr/we-need-root/",
-    "/system/xbin/",
-    "/system/app/Superuser.apk"
-  ];
-  assert(rootBeerKnownPaths.length >= 10, 'RootBeer must define standard su scanning paths');
-  assert(rootBeerKnownPaths.includes('/system/bin/'), 'Must scan /system/bin/');
-  assert(rootBeerKnownPaths.includes('/system/xbin/'), 'Must scan /system/xbin/');
+// ------------------------------------------------------------------ 1
+verify('GPU generation 1 (gpufreq) nodes are probed', () => {
+  ['/proc/gpufreq/gpufreq_opp_freq',
+    '/proc/gpufreq/gpufreq_fixed_freq_volt',
+    '/proc/gpufreq/gpufreq_opp_dump'].forEach(node => {
+    assert(bridge.includes(node), `missing legacy node ${node}`);
+  });
 });
 
-// VECTOR 2: topjohnwu/libsu Standard Root Verification
-verifyVector('libsu Vector: Root shell session & UID 0 verification', () => {
-  const ktPath = path.join(__dirname, '../app/src/main/java/com/kasane/shell/RootBridge.kt');
-  const kt = fs.readFileSync(ktPath, 'utf8');
+// ------------------------------------------------------------------ 2
+verify('GPU generation 2 (gpufreqv2) nodes are probed', () => {
+  ['/proc/gpufreqv2/fix_target_opp_index',
+    '/proc/gpufreqv2/fix_custom_freq_volt',
+    '/proc/gpufreqv2/stack_signed_opp_table'].forEach(node => {
+    assert(bridge.includes(node), `missing current node ${node}`);
+  });
 
-  assert(kt.includes('com.topjohnwu.superuser.Shell'), 'Must import topjohnwu libsu Shell');
-  assert(kt.includes('Shell.isAppGrantedRoot()'), 'Must use Shell.isAppGrantedRoot() check');
-  assert(kt.includes('com.scottyab.rootbeer.RootBeer'), 'Must import scottyab RootBeer');
-  assert(kt.includes('rootBeer.isRooted'), 'Must check RootBeer.isRooted');
+  assert(bridge.includes('usesV1') && bridge.includes('usesV2'),
+    'the report must state which GPU generation answered');
 });
 
-// VECTOR 3: KernelSU-Next Detection Logic
-verifyVector('KernelSU-Next Vector: CLI ksud & UID check', () => {
-  const ktPath = path.join(__dirname, '../app/src/main/java/com/kasane/shell/RootBridge.kt');
-  const kt = fs.readFileSync(ktPath, 'utf8');
+// ------------------------------------------------------------------ 3
+verify('GPU load and DVFS are probed with several candidates', () => {
+  ['/proc/mali/utilization',
+    '/sys/module/ged/parameters/gpu_loading',
+    '/sys/kernel/ged/hal/gpu_utilization',
+    '/sys/kernel/ged/hal/custom_upbound_gpu_freq'].forEach(node => {
+    assert(bridge.includes(node), `missing GPU node ${node}`);
+  });
 
-  assert(kt.includes('ksud -V'), 'Must check ksud CLI version');
-  assert(kt.includes('hasRootUid = idOut.contains("uid=0")'), 'Must verify UID 0 root privilege');
+  const loadBlock = bridge.slice(bridge.indexOf('GPU_LOAD_NODES'));
+  assert(loadBlock.includes('listOf('), 'GPU load candidates must be a probe list');
+  assert(loadBlock.includes('indexOfFirst'), 'the first node that answers must win');
 });
 
-// VECTOR 4: simonpunk/susfs Stealth & Syscall Hook Divergence Logic
-verifyVector('SuSFS Vector: Kernel driver & uname spoofing verification', () => {
-  const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
-  const code = fs.readFileSync(appJsPath, 'utf8');
+// ------------------------------------------------------------------ 4
+verify('Battery temperature has four candidate nodes and a unit guard', () => {
+  const start = bridge.indexOf('BATTERY_TEMP_NODES');
+  const block = bridge.slice(start, start + 600);
 
-  // Verify SuSFS v2.3.0 is recognized
-  assert(code.includes('SuSFS v2.3.0'), 'Must verify SuSFS v2.3.0 status');
-  assert(code.includes('KernelSU-Next v3.4.0'), 'Must verify KernelSU-Next v3.4.0');
+  assert((block.match(/"\/sys/g) || []).length >= 4,
+    'at least four battery temperature nodes must be probed');
+  assert(bridge.includes('raw > 200'), 'tenths-of-a-degree values must be rescaled');
+  assert(bridge.includes('batteryTempNode'), 'the winning node must be reported, not hidden');
 });
 
-// VECTOR 5: /data/local/tmp Read, Write, & Execute Verification
-verifyVector('Filesystem Vector: /data/local/tmp read-write-execute capability', () => {
-  const ktPath = path.join(__dirname, '../app/src/main/java/com/kasane/shell/RootBridge.kt');
-  const kt = fs.readFileSync(ktPath, 'utf8');
-
-  assert(kt.includes('/data/local/tmp/.kasane_test'), 'Must test real read/write access to /data/local/tmp');
-  assert(kt.includes('chmod +x'), 'Must ensure executable permission on target script');
+// ------------------------------------------------------------------ 5
+verify('Every metric degrades to an explicit null plus a reason', () => {
+  assert(bridge.includes('JSONObject.NULL'), 'missing metrics must serialise as null, not as a fake zero');
+  assert(bridge.includes('"reason"'), 'the GPU must say why it has no data');
+  assert(bridge.includes('butuh akses root'), 'the UI needs a human-readable reason');
+  assert(webApp.includes('n/a'), 'the interface must render n/a rather than inventing a value');
 });
 
-// VECTOR 6: Non-Blocking Real-time Streaming & Cancellation (Ctrl+C)
-verifyVector('Process Lifecycle: Coroutine streaming and Ctrl+C force stop', () => {
-  const ktPath = path.join(__dirname, '../app/src/main/java/com/kasane/shell/RootBridge.kt');
-  const kt = fs.readFileSync(ktPath, 'utf8');
-
-  assert(kt.includes('currentProcess?.destroyForcibly()'), 'Must support force stopping root process');
-  assert(kt.includes('stdoutReader.readLine()'), 'Must stream stdout line-by-line');
-  assert(kt.includes('stderrReader.readLine()'), 'Must stream stderr line-by-line');
+// ------------------------------------------------------------------ 6
+verify('probeNodes reports existence and a raw on-device sample', () => {
+  assert(bridge.includes('fun probeNodes()'), 'probeNodes must be exposed');
+  assert(bridge.includes('"exists"'), 'each probed node must report existence');
+  assert(bridge.includes('"sample"'), 'each probed node must report a raw sample');
+  assert(bridge.includes('SAMPLE_CHARS'), 'samples must be length-capped');
+  assert(bridge.includes('"unprobed"'), 'nodes that could not be tested without root must be listed');
+  assert(webApp.includes('formatProbe') || webApp.includes('probeText'),
+    'the report must be rendered into the Logs App');
 });
 
-// VECTOR 7: Gradle Build Open Source Dependencies
-verifyVector('Gradle Dependencies: libsu and rootbeer in build.gradle.kts', () => {
-  const gradlePath = path.join(__dirname, '../app/build.gradle.kts');
-  const gradle = fs.readFileSync(gradlePath, 'utf8');
+// ------------------------------------------------------------------ 7
+verify('The bridge is strictly read-only', () => {
+  ['chmod', 'destroyForcibly', 'fun runScript', 'fun killProcess',
+    'echo 1 >', '> /proc/', '> /sys/'].forEach(banned => {
+    assert(!bridge.includes(banned), `write or exec path found: ${banned}`);
+  });
 
-  assert(gradle.includes('com.github.topjohnwu.libsu:core:5.2.2'), 'Must include topjohnwu libsu:core:5.2.2');
-  assert(gradle.includes('com.scottyab:rootbeer-lib:0.1.0'), 'Must include scottyab rootbeer-lib:0.1.0');
+  assert(!bridge.includes('chmod +x'), 'no execute permission may be granted');
+  assert(bridge.includes('/proc/version'), 'kernel version must be read, never spoofed');
 });
 
 console.log('\n🌸 ===================================================================');
-console.log(`🌸 GITHUB OPEN SOURCE ROOT SUITE: ${passed} OF ${total} VECTORS VERIFIED (100%)`);
+console.log(`🌸 TELEMETRY CONTRACT: ${passed} OF ${total} VECTORS VERIFIED`);
 console.log('🌸 ===================================================================\n');

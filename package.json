@@ -1,13 +1,14 @@
 {
   "name": "kasane-shell-game-setup",
-  "version": "1.0.0",
-  "description": "Android Root Script Orchestrator & Permissions Manager for Infinix Note 30 (KernelSU-Next + SuSFS)",
+  "version": "3.0.0",
+  "description": "Read-only Android device monitor: realtime CPU/GPU frequency, battery temperature, and a copyable diagnostic log surface",
   "main": "app.js",
   "scripts": {
     "test": "node test/smoke-test.js && node test/real-functional-test.js && node test/root-detector-verification.js",
     "test:smoke": "node test/smoke-test.js",
     "test:functional": "node test/real-functional-test.js",
-    "test:root": "node test/root-detector-verification.js",
+    "test:contract": "node test/root-detector-verification.js",
+    "dev": "node scripts/serve.js",
     "sync": "node scripts/sync-assets.js"
   },
   "keywords": [
@@ -16,10 +17,12 @@
     "kernelsu-next",
     "susfs",
     "root",
-    "shell",
-    "mt-manager",
-    "gaming-scripts",
-    "infinix-note-30"
+    "device-monitor",
+    "telemetry",
+    "cpufreq",
+    "gpufreq",
+    "mediatek",
+    "read-only"
   ],
   "author": "Albert",
   "license": "MIT"

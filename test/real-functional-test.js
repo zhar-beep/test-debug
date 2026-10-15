@@ -1,8 +1,8 @@
 /**
- * Rigorous Functional & System Integrity Test for Kasane Shell // Game Setup
- * Validates Gradle build specs, AndroidManifest, Kotlin bridge semantics,
- * UI DOM hierarchy, 2-step confirmation run, Izin button, custom emoji picker,
- * and zero AI-slop visual glitches.
+ * Functional test — Kasane Shell v3.
+ *
+ * Verifies the build contract and the native bridge: what the app is allowed to
+ * do to the device, and what it must no longer be able to do.
  */
 
 const fs = require('fs');
@@ -10,8 +10,12 @@ const path = require('path');
 const assert = require('assert');
 
 console.log('🌸 ================================================================');
-console.log('🌸 RUNNING COMPREHENSIVE FUNCTIONAL TEST SUITE: GAME SETUP ROOT APP');
+console.log('🌸 FUNCTIONAL TEST: KASANE SHELL v3 (BUILD + NATIVE CONTRACT)');
 console.log('🌸 ================================================================\n');
+
+const ROOT = path.join(__dirname, '..');
+const read = (...parts) => fs.readFileSync(path.join(ROOT, ...parts), 'utf8');
+const exists = (...parts) => fs.existsSync(path.join(ROOT, ...parts));
 
 let total = 0;
 let passed = 0;
@@ -28,120 +32,111 @@ function it(desc, fn) {
   }
 }
 
-// 1. Android Manifest & Permissions
-it('AndroidManifest.xml contains valid package and hardware acceleration', () => {
-  const manifestPath = path.join(__dirname, '../app/src/main/AndroidManifest.xml');
-  assert(fs.existsSync(manifestPath), 'AndroidManifest.xml must exist');
-  const manifest = fs.readFileSync(manifestPath, 'utf8');
-  assert(manifest.includes('package="com.kasane.shell"'), 'Package name must be com.kasane.shell');
-  assert(manifest.includes('android:hardwareAccelerated="true"'), 'Hardware acceleration must be true for 60fps/120Hz');
-  assert(manifest.includes('android.permission.INTERNET'), 'INTERNET permission required for Tailwind CDN');
+// ------------------------------------------------------------------ 1
+it('Manifest: offline-only, hardware accelerated, ships its own launcher icon', () => {
+  const manifest = read('app/src/main/AndroidManifest.xml');
+
+  assert(manifest.includes('package="com.kasane.shell"'), 'package must be com.kasane.shell');
+  assert(manifest.includes('android:hardwareAccelerated="true"'), 'hardware acceleration must stay on');
+  assert(!manifest.includes('android.permission.INTERNET'), 'the app is offline: INTERNET must not be declared');
+  assert(!manifest.includes('usesCleartextTraffic'), 'cleartext traffic must not be enabled');
+  assert(manifest.includes('@mipmap/ic_launcher'), 'must use the app-owned adaptive icon');
+  assert(!manifest.includes('sym_def_app_icon'), 'must not fall back to the platform default icon');
+  assert(manifest.includes('@style/Theme.KasaneShell'), 'must use the app theme');
 });
 
-// 2. Gradle build specifications
-it('Gradle configs contain valid SDK and Kotlin setup', () => {
-  const gradleApp = path.join(__dirname, '../app/build.gradle.kts');
-  assert(fs.existsSync(gradleApp), 'app/build.gradle.kts must exist');
-  const content = fs.readFileSync(gradleApp, 'utf8');
-  assert(content.includes('namespace = "com.kasane.shell"'), 'Namespace must be com.kasane.shell');
-  assert(content.includes('kotlinx-coroutines-android'), 'Coroutines dependency required for non-blocking root process execution');
+// ------------------------------------------------------------------ 2
+it('Gradle: namespace, coroutines, libsu and rootbeer are all wired', () => {
+  const gradle = read('app/build.gradle.kts');
+
+  assert(gradle.includes('namespace = "com.kasane.shell"'), 'namespace must be set');
+  assert(gradle.includes('com.github.topjohnwu.libsu:core:5.2.2'), 'libsu must be declared');
+  assert(gradle.includes('com.scottyab:rootbeer-lib:0.1.0'), 'rootbeer must be declared');
+  assert(gradle.includes('kotlinx-coroutines-android'), 'coroutines must be available');
 });
 
-// 3. Kotlin Root Bridge Semantics
-it('RootBridge.kt properly handles non-blocking IO and process termination', () => {
-  const bridgePath = path.join(__dirname, '../app/src/main/java/com/kasane/shell/RootBridge.kt');
-  const kt = fs.readFileSync(bridgePath, 'utf8');
-  assert(kt.includes('Dispatchers.IO'), 'Must use Dispatchers.IO for background root process');
-  assert(kt.includes('ProcessBuilder("su",'), 'Must execute su shell process');
-  assert(kt.includes('evaluateJavascript'), 'Must stream stdout/stderr back to WebView in real time');
-  assert(kt.includes('currentProcess?.destroyForcibly()'), 'Must safely terminate process without unhandled crash');
-  assert(!kt.includes('SIGKILL'), 'Must not contain geek jargon SIGKILL in RootBridge.kt');
+// ------------------------------------------------------------------ 3
+it('Resources: adaptive icon, colours and theme are present', () => {
+  assert(exists('app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml'), 'adaptive icon must exist');
+  assert(exists('app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml'), 'round icon must exist');
+  assert(exists('app/src/main/res/drawable/ic_launcher_foreground.xml'), 'icon foreground must exist');
+  assert(exists('app/src/main/res/values/themes.xml'), 'theme must exist');
+  assert(exists('app/src/main/res/values/colors.xml'), 'colours must exist');
+
+  const icon = read('app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml');
+  assert(icon.includes('@drawable/ic_launcher_foreground'), 'adaptive icon must reference the foreground');
+  assert(icon.includes('@color/ic_launcher_background'), 'adaptive icon must reference a background colour');
 });
 
-// 4. User Wallpaper and iOS Emoji Assets
-it('User anime wallpaper and all 21 offline iOS 3D emojis are present', () => {
-  const userAnime = path.join(__dirname, '../app/src/main/assets/web/assets/user-anime.jpg');
-  assert(fs.existsSync(userAnime), 'user-anime.jpg must exist in web assets');
-  assert(fs.statSync(userAnime).size > 20000, 'user-anime.jpg file size must be >20KB');
+// ------------------------------------------------------------------ 4
+it('RootBridge: exposes the read-only telemetry API', () => {
+  const kt = read('app/src/main/java/com/kasane/shell/RootBridge.kt');
 
-  const emojiList = [
-    'broom.png', 'check.png', 'clipboard.png', 'clock.png', 'cross.png',
-    'display.png', 'folder.png', 'gear.png', 'key.png', 'label.png',
-    'lightning.png', 'phone.png', 'refresh.png', 'sakura.png', 'scroll.png',
-    'shield.png', 'slot.png', 'snowflake.png', 'stop.png', 'stopwatch.png', 'swords.png'
-  ];
+  ['fun checkRoot(): Boolean',
+    'fun getDeviceSpecs(): String',
+    'fun getTelemetry(): String',
+    'fun probeNodes(): String',
+    'fun runRootDiagnostics(): String'].forEach(signature => {
+    assert(kt.includes(signature), `missing ${signature}`);
+  });
 
-  emojiList.forEach(emoji => {
-    const p = path.join(__dirname, '../app/src/main/assets/web/assets/emojis', emoji);
-    assert(fs.existsSync(p), `Missing emoji asset: ${emoji}`);
+  assert((kt.match(/@JavascriptInterface/g) || []).length >= 5,
+    'every exposed method needs @JavascriptInterface');
+});
+
+// ------------------------------------------------------------------ 5
+it('RootBridge: the executor and file-manager API is gone', () => {
+  const kt = read('app/src/main/java/com/kasane/shell/RootBridge.kt');
+
+  ['fun runScript', 'fun listDirectory', 'fun changePermissions', 'fun killProcess',
+    'destroyForcibly', 'ProcessBuilder("su", "-c", "sh', 'sendLogLine'].forEach(gone => {
+    assert(!kt.includes(gone), `retired capability still present: ${gone}`);
   });
 });
 
-// 5. DOM Structure, Top-Level Root & Zero Punch-Hole Glitch
-it('Top-level root status card is at top, hero card is removed, and punch-hole glitch is eliminated', () => {
-  const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
-  const html = fs.readFileSync(htmlPath, 'utf8');
+// ------------------------------------------------------------------ 6
+it('RootBridge: CPU read without root, GPU through one shared libsu session', () => {
+  const kt = read('app/src/main/java/com/kasane/shell/RootBridge.kt');
 
-  const rootHeaderIdx = html.indexOf('id="root-badge"');
-  const rootTeleCardIdx = html.indexOf('Status Root & Spesifikasi HP');
-  const fileListIdx = html.indexOf('id="file-list"');
-
-  assert(rootHeaderIdx !== -1, 'Root badge element must exist in header');
-  assert(rootTeleCardIdx !== -1, 'Status Root & Spesifikasi HP card must exist');
-  assert(rootTeleCardIdx < fileListIdx, 'Root & Telemetry card must be above file-list');
-  assert(!html.includes('Kasane Action RPG • Zero Lag'), 'Hero card section photographed by user must be removed');
-  assert(!html.includes('id="view-root"'), 'Diagnostik tab must be removed');
-  assert(!html.includes('phone-camera-hole'), 'Punch hole glitch must be removed');
-  assert(!html.includes('alt="shield"'), 'Shield emoji slop must be removed');
-  assert(!html.includes('Kill SIGKILL'), 'No geek jargon like Kill SIGKILL allowed');
+  assert(kt.includes('/sys/devices/system/cpu'), 'CPU must be read from cpufreq sysfs');
+  assert(kt.includes('/proc/stat'), 'CPU load must come from /proc/stat');
+  assert(kt.includes('Shell.cmd('), 'privileged reads must go through the shared libsu session');
+  assert(kt.includes('Shell.isAppGrantedRoot()'), 'must gate privileged reads on a real grant');
+  assert(kt.includes('ConcurrentHashMap'), 'load must be a per-core delta, not a lifetime average');
 });
 
-// 6. JavaScript Logic, Izin Chmod, Emoji Picker & 2-Step Run
-it('app.js exports valid JS syntax, MT Manager Izin, Emoji Picker, and 2-step confirmation', () => {
-  const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
-  const code = fs.readFileSync(appJsPath, 'utf8');
+// ------------------------------------------------------------------ 7
+it('MainActivity: wires the new bridge and stops polling in the background', () => {
+  const kt = read('app/src/main/java/com/kasane/shell/MainActivity.kt');
 
-  // Verify timestamp formatting
-  assert(code.includes('getExactTimestamp()'), 'Must define getExactTimestamp');
-  assert(code.includes('requestRunScript'), 'Must define requestRunScript for 2-step confirmation');
-  assert(code.includes('proceedToConfirmStep2'), 'Must define proceedToConfirmStep2');
-  assert(code.includes('executeConfirmedScript'), 'Must define executeConfirmedScript');
-  assert(code.includes('openPermissionModal'), 'Must define openPermissionModal for Izin');
-  assert(code.includes('savePermissions'), 'Must define savePermissions');
-  assert(code.includes('openEmojiPicker'), 'Must define openEmojiPicker for custom script emoji');
-  assert(code.includes('selectScriptEmoji'), 'Must define selectScriptEmoji');
-  assert(code.includes('stopCurrentScript'), 'Must define stopCurrentScript for force stop');
-  assert(code.includes('copyTerminalLogs'), 'Must define copyTerminalLogs');
-  assert(code.includes('copyLogById'), 'Must define copyLogById');
-  assert(code.includes('toggleTheme'), 'Must define toggleTheme for dark mode');
-
-  // Verify mockFS contains gaming scripts
-  assert(code.includes('touch_boost_120hz.sh'), 'Must contain touch_boost_120hz.sh');
-  assert(code.includes('mlbb_extreme_fps.sh'), 'Must contain mlbb_extreme_fps.sh');
-  assert(code.includes('gpu_governor_lock.sh'), 'Must contain gpu_governor_lock.sh');
+  assert(kt.includes('RootBridge(this)'), 'bridge must be constructed without a WebView reference');
+  assert(!kt.includes('terminal-sheet'), 'the terminal sheet reference must be gone');
+  assert(kt.includes('onNativePause'), 'the page must be told when the app pauses');
+  assert(kt.includes('onNativeResume'), 'the page must be told when the app resumes');
+  assert(kt.includes('blockNetworkLoads = true'), 'network loads must be blocked outright');
+  assert(kt.includes('onNativeBackPressed'), 'back handling must be delegated to the page');
 });
 
-// 7. Infinix Note 30 FHD+ Screen Telemetry
-it('Telemetry accurately reflects Infinix Note 30 FHD+ 1080x2460 display', () => {
-  const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
-  const code = fs.readFileSync(appJsPath, 'utf8');
-  assert(code.includes('1080 x 2460 FHD+'), 'Must specify 1080 x 2460 FHD+ resolution');
-  assert(code.includes('Infinix Note 30 (X6833B)'), 'Must specify Infinix Note 30 (X6833B)');
-  assert(code.includes('5.10.269-SuiKernel'), 'Must specify 5.10.269-SuiKernel');
-  assert(code.includes('Slot _b'), 'Must specify Slot _b');
-});
+// ------------------------------------------------------------------ 8
+it('Archive: the retired v2 code is preserved and stays out of the APK', () => {
+  assert(exists('backup/README.md'), 'backup/README.md must explain the archive');
 
-// 8. CI/CD GitHub Actions Build Script
-it('GitHub Actions workflow has complete zero-config APK compilation steps', () => {
-  const ymlPath = path.join(__dirname, '../.github/workflows/build-apk.yml');
-  const yml = fs.readFileSync(ymlPath, 'utf8');
-  assert(yml.includes('Build Game Setup APK'), 'Workflow name must be Build Game Setup APK');
-  assert(yml.includes('chmod +x gradlew'), 'Must make gradlew executable');
-  assert(yml.includes('./gradlew assembleDebug'), 'Must build assembleDebug');
-  assert(yml.includes('name: GameSetup-Debug-APK'), 'Must upload GameSetup-Debug-APK artifact');
-  assert(yml.includes('Create GitHub Release'), 'Must create GitHub Release with APK asset');
+  const snapshot = 'backup/kasane-v2-executor';
+  assert(exists(snapshot, 'web/app.js'), 'the v2 front-end must be archived');
+  assert(exists(snapshot, 'web/styles.css'), 'the v2 stylesheet must be archived');
+  assert(exists(snapshot, 'android/RootBridge.kt'), 'the v2 bridge must be archived');
+  assert(exists(snapshot, 'tests/smoke-test.js'), 'the v2 test suite must be archived');
+
+  const archivedApp = read(snapshot, 'web/app.js');
+  assert(archivedApp.includes('runScriptFile'), 'the archive must still contain the executor logic');
+  assert(archivedApp.includes('openPermissionModal'), 'the archive must still contain the chmod logic');
+
+  const liveApp = read('app/src/main/assets/web/app.js');
+  assert(!liveApp.includes('runScriptFile'), 'the shipped app must not contain the executor logic');
+
+  assert(!exists('app/src/main/assets/web/backup'), 'the archive must never be packaged into the APK');
 });
 
 console.log('\n🌸 ================================================================');
-console.log(`🌸 FUNCTIONAL SUITE COMPLETE: ${passed} OF ${total} TESTS PASSED`);
+console.log(`🌸 FUNCTIONAL TEST: ${passed} OF ${total} TESTS PASSED`);
 console.log('🌸 ================================================================\n');

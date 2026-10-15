@@ -1,9 +1,8 @@
 /**
- * Real Smoke Test Suite for Kasane Shell // Game Setup (SF Pro, Vivid Glass, Custom Emoji & Izin)
- * Validates DOM integrity, CSS rules, timestamp formatting,
- * 2-step confirmation modal, MT Manager chmod modal, custom emoji picker,
- * absence of punch-hole glitch and shield emoji slop,
- * asset files, and Android Kotlin bridge integrity.
+ * Smoke test — Kasane Shell v3 (read-only device monitor).
+ *
+ * Verifies the shipped interface: structure, assets, the offline invariant, and
+ * that none of the retired executor surface is still hanging around.
  */
 
 const fs = require('fs');
@@ -11,193 +10,169 @@ const path = require('path');
 const assert = require('assert');
 
 console.log('🌸 ========================================================');
-console.log('🌸 STARTING RIGOROUS SMOKE TEST: KASANE SHELL (GAME SETUP)');
+console.log('🌸 SMOKE TEST: KASANE SHELL v3 (READ-ONLY MONITOR)');
 console.log('🌸 ========================================================\n');
 
-let totalTests = 0;
-let passedTests = 0;
+const WEB = path.join(__dirname, '../app/src/main/assets/web');
+const ROOT = path.join(__dirname, '..');
 
-function runTest(testName, fn) {
-  totalTests++;
+const webHtml = fs.readFileSync(path.join(WEB, 'index.html'), 'utf8');
+const webCss = fs.readFileSync(path.join(WEB, 'styles.css'), 'utf8');
+const webJs = fs.readFileSync(path.join(WEB, 'app.js'), 'utf8');
+
+let total = 0;
+let passed = 0;
+
+function runTest(name, fn) {
+  total++;
   try {
     fn();
-    console.log(`✅ [PASS] ${testName}`);
-    passedTests++;
+    console.log(`✅ [PASS] ${name}`);
+    passed++;
   } catch (err) {
-    console.error(`❌ [FAIL] ${testName}: ${err.message}`);
+    console.error(`❌ [FAIL] ${name}: ${err.message}`);
     process.exitCode = 1;
   }
 }
 
-// 1. Verify Assets
-runTest('Asset Verification: user-anime.jpg and kasane assets exist', () => {
-  const userAnimeWeb = path.join(__dirname, '../app/src/main/assets/web/assets/user-anime.jpg');
-  const userAnimeRoot = path.join(__dirname, '../assets/user-anime.jpg');
-  assert(fs.existsSync(userAnimeWeb), 'user-anime.jpg must exist in web assets');
-  assert(fs.existsSync(userAnimeRoot), 'user-anime.jpg must exist in root assets');
-  assert(fs.statSync(userAnimeWeb).size > 10000, 'user-anime.jpg size must be valid');
+// ---------------------------------------------------------------- 1
+runTest('Assets: wallpaper, 21 iOS emojis and 3 self-hosted fonts are present', () => {
+  const wallpaper = path.join(WEB, 'assets/user-anime.jpg');
+  assert(fs.existsSync(wallpaper), 'user-anime.jpg must exist');
+  assert(fs.statSync(wallpaper).size > 10000, 'wallpaper must be a real image');
+
+  const emojis = [
+    'broom.png', 'check.png', 'clipboard.png', 'clock.png', 'cross.png',
+    'display.png', 'folder.png', 'gear.png', 'key.png', 'label.png',
+    'lightning.png', 'phone.png', 'refresh.png', 'sakura.png', 'scroll.png',
+    'shield.png', 'slot.png', 'snowflake.png', 'stop.png', 'stopwatch.png', 'swords.png'
+  ];
+  emojis.forEach(name => {
+    assert(fs.existsSync(path.join(WEB, 'assets/emojis', name)), `missing emoji ${name}`);
+  });
+
+  ['inter-var-latin.woff2', 'jetbrains-mono-400-latin.woff2', 'jetbrains-mono-600-latin.woff2']
+    .forEach(font => {
+      const inWeb = path.join(WEB, 'assets/fonts', font);
+      const inRoot = path.join(ROOT, 'assets/fonts', font);
+      assert(fs.existsSync(inWeb), `${font} must ship inside the APK assets`);
+      assert(fs.existsSync(inRoot), `${font} must exist in the root assets mirror`);
+      assert(fs.statSync(inWeb).size > 5000, `${font} looks truncated`);
+    });
 });
 
-runTest('Asset Verification: Offline Apple iOS 3D Emojis pack exists', () => {
-  const emojiDir = path.join(__dirname, '../app/src/main/assets/web/assets/emojis');
-  assert(fs.existsSync(emojiDir), 'emojis directory must exist');
-  const requiredEmojis = ['sakura.png', 'shield.png', 'phone.png', 'display.png', 'gear.png', 'folder.png', 'scroll.png', 'swords.png', 'key.png'];
-  requiredEmojis.forEach(emoji => {
-    const p = path.join(emojiDir, emoji);
-    assert(fs.existsSync(p), `Missing iOS emoji: ${emoji}`);
+// ---------------------------------------------------------------- 2
+runTest('Structure: two tabs exist and the retired executor ids are gone', () => {
+  ['tab-btn-monitor', 'tab-btn-logs', 'view-monitor', 'view-logs'].forEach(id => {
+    assert(webHtml.includes(`id="${id}"`), `missing id="${id}"`);
+  });
+
+  const retired = [
+    'view-explorer', 'file-list', 'path-breadcrumbs', 'btn-folder-up', 'items-count',
+    'permission-modal', 'emoji-picker-modal', 'run-confirm-modal', 'terminal-sheet',
+    'dynamic-island', 'detailed-log-modal', 'logs-history-list', 'sheet-backdrop'
+  ];
+  retired.forEach(id => {
+    assert(!webHtml.includes(`id="${id}"`), `retired element id="${id}" is still in the markup`);
   });
 });
 
-// 2. Verify HTML DOM Structure & Zero AI Slop
-runTest('HTML Verification: All critical UI elements, modals & clean header exist', () => {
-  const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
-  const html = fs.readFileSync(htmlPath, 'utf8');
+// ---------------------------------------------------------------- 3
+runTest('Spec block: exactly seven full-width rows plus a quiet root readout', () => {
+  const rows = (webHtml.match(/class="spec-row"/g) || []).length;
+  assert.strictEqual(rows, 7, `expected 7 spec rows, found ${rows}`);
 
-  // Verify Root status is at the top of the interface
-  const rootIndex = html.indexOf('root-badge');
-  const fileListIndex = html.indexOf('id="file-list"');
-  assert(rootIndex > 0 && rootIndex < fileListIndex, 'Root status card must be positioned at the top above the file list');
+  ['spec-device', 'spec-display', 'spec-kernel', 'spec-os', 'spec-slot', 'spec-cpugpu', 'spec-battery']
+    .forEach(id => assert(webHtml.includes(`id="${id}"`), `missing spec row id="${id}"`));
 
-  // Verify Hero section photographed by user is REMOVED
-  assert(!html.includes('Kasane Action RPG • Zero Lag'), 'Hero card section photographed by user must be removed');
-  assert(!html.includes('id="view-root"'), 'Diagnostik tab must be removed as requested');
+  assert(webHtml.includes('id="spec-root"'), 'root must still be reported, just not as a chip');
+  assert(webHtml.includes('class="spec-note"'), 'root readout must use the quiet note style');
+});
 
-  // Verify NO punch-hole glitch overlapping header
-  assert(!html.includes('phone-camera-hole'), 'Ugly punch-hole simulator must be eliminated to prevent overlapping badges');
+// ---------------------------------------------------------------- 4
+runTest('Root status: no chip, no pulsing dot, no shield — real probe only', () => {
+  assert(!webHtml.includes('root-badge'), 'the Root: YES chip must be gone from the header');
+  assert(!webHtml.includes('live-dot'), 'the pulsing dot must be gone');
+  assert(!webHtml.includes('alt="shield"'), 'shield emoji must not appear');
+  assert(!webCss.includes('.live-dot'), 'the pulsing dot style must be gone from the stylesheet');
+  assert(!webCss.includes('.chip'), 'the chip component must be gone from the stylesheet');
+  assert(webJs.includes('telemetry.rootGranted'), 'root state must come from the live device read');
+  assert(webJs.includes('getTelemetry'), 'root state must be part of the telemetry tick, not a stub');
+});
 
-  // Verify NO shield emoji slop in root badge
-  assert(!html.includes('alt="shield"'), 'Shield emoji must be removed from header root badge');
+// ---------------------------------------------------------------- 5
+runTest('Design: leather material, wood titles, gold kept as the single accent', () => {
+  ['--leather', '--wood', '--gold', '--hairline', '--ink-strong'].forEach(token => {
+    assert(webCss.includes(token), `missing design token ${token}`);
+  });
 
-  const requiredIds = [
-    'sakura-container',
-    'btn-theme-toggle',
-    'view-explorer',
-    'view-logs',
-    'tab-btn-explorer',
-    'tab-btn-logs',
-    'hud-device-name',
-    'hud-kernel-version',
-    'hud-android-version',
-    'hud-active-slot',
-    'root-badge',
-    'file-list',
-    'path-breadcrumbs',
-    'btn-folder-up',
-    'permission-modal',
-    'emoji-picker-modal',
-    'run-confirm-modal',
-    'confirm-step-1',
-    'confirm-step-2',
-    'confirm-file-name',
-    'terminal-sheet',
-    'console-title',
-    'console-start-time',
-    'console-timer',
-    'terminal-content',
-    'dynamic-island',
-    'detailed-log-modal',
-    'modal-log-title',
-    'modal-log-content',
-    'logs-running-banner'
+  assert(/blur\((?:4|1[0-9])px\)/.test(webCss), 'glass must be dialled back below 20px of blur');
+  assert(!/blur\((?:2[6-9]|3[0-9])px\)/.test(webCss), 'the old 26px+ crystal blur must be gone');
+
+  ['SF Pro Display', 'Inter var', 'JetBrains Mono'].forEach(font => {
+    assert(webCss.includes(font), `font stack must still mention ${font}`);
+  });
+
+  assert(webCss.includes('html.light') || webCss.includes('body.light'), 'light theme overrides must exist');
+});
+
+// ---------------------------------------------------------------- 6
+runTest('Components: every view the app renders has a style rule', () => {
+  const required = [
+    '.user-wallpaper-bg', '.user-glass-overlay', '.sakura-container', '.sakura-petal',
+    '.kasane-card', '.kasane-nav', '.segmented', '.btn', '.btn-kasane-gold',
+    '.spec-list', '.spec-row', '.spec-note', '.donut', '.donut-arc',
+    '.core-bars', '.core-bar-fill', '.cluster-item', '.meta-row',
+    '.log-entry', '.log-filter-btn', '.log-pre', '.toast', '.modal'
   ];
 
-  requiredIds.forEach(id => {
-    assert(html.includes(`id="${id}"`), `Missing required element id="${id}" in index.html`);
+  required.forEach(cls => {
+    const escaped = cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    assert(new RegExp(`${escaped}(?![\\w-])`).test(webCss), `missing style rule for ${cls}`);
   });
 });
 
-// 3. Verify No Geek Gimmick Jargon in User Facing Buttons
-runTest('UX Verification: No "SIGKILL" or cryptic jargon in index.html buttons', () => {
-  const htmlPath = path.join(__dirname, '../app/src/main/assets/web/index.html');
-  const html = fs.readFileSync(htmlPath, 'utf8');
-  assert(!html.includes('Kill SIGKILL'), 'Found forbidden jargon "Kill SIGKILL" in UI');
-  assert(html.includes('Hentikan Script (Ctrl+C)'), 'Must contain user-friendly "Hentikan Script (Ctrl+C)" action');
+// ---------------------------------------------------------------- 7
+runTest('Behaviour: no native dialogs, real polling lifecycle, no fake root', () => {
+  // Scan code only: the file's own documentation mentions alert()/confirm() by name.
+  const code = webJs
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .replace(/^[ \t]*\/\/.*$/gm, '');
+
+  assert(!/[^.\w]alert\(/.test(code), 'app.js must not call alert()');
+  assert(!/[^.\w]confirm\(/.test(code), 'app.js must not call confirm()');
+  assert(webJs.includes('showToast('), 'must provide showToast()');
+  assert(webJs.includes('showDialog('), 'must provide showDialog()');
+
+  assert(webJs.includes('document.visibilityState'), 'polling must respect page visibility');
+  assert(webJs.includes('window.onNativePause'), 'must handle the native pause hook');
+  assert(webJs.includes('window.onNativeResume'), 'must handle the native resume hook');
+  assert(webJs.includes('clearInterval'), 'polling must be stoppable');
+
+  assert(!/rootGranted\s*=\s*true/.test(code), 'root state must never be hardcoded');
 });
 
-// 4. Verify Stylesheet Rules, SF Pro & Crisp Wallpaper
-runTest('CSS Verification: SF Pro typography, vivid unblurred wallpaper & frosted cards exist', () => {
-  const cssPath = path.join(__dirname, '../app/src/main/assets/web/styles.css');
-  const css = fs.readFileSync(cssPath, 'utf8');
-
-  const requiredClasses = [
-    'user-wallpaper-bg',
-    'user-glass-overlay',
-    'sakura-container',
-    'sakura-petal',
-    'kasane-card',
-    'btn-kasane-gold',
-    'btn-kasane-danger',
-    'sheet-terminal-surface',
-    'dynamic-island'
-  ];
-
-  requiredClasses.forEach(cls => {
-    assert(css.includes(`.${cls}`), `Missing CSS class .${cls} in styles.css`);
+// ---------------------------------------------------------------- 8
+runTest('Offline invariant: the shipped web layer references no remote URL', () => {
+  ['index.html', 'styles.css', 'app.js'].forEach(file => {
+    const source = fs.readFileSync(path.join(WEB, file), 'utf8');
+    assert(!/https?:\/\//.test(source), `${file} must not reference a remote URL`);
   });
-
-  assert(css.includes('SF Pro Display'), 'Apple SF Pro Display typography must be imported');
-  assert(css.includes('html.light') || css.includes('body.light'), 'Light mode overrides must exist in styles.css');
-  
-  // Verify wallpaper itself is NOT blurred with full-viewport blur
-  assert(!css.includes('.user-glass-overlay {\n  position: fixed;\n  inset: 0;\n  background: var(--wallpaper-overlay);\n  backdrop-filter: blur(14px)'), 'Wallpaper must remain 100% sharp and unblurred');
+  assert(!/cdn\.tailwindcss\.com|fonts\.googleapis\.com|fonts\.cdnfonts\.com/.test(webHtml + webCss),
+    'the retired CDNs must not come back');
 });
 
-// 5. Test 2-Step Confirmation, Izin Chmod & Custom Emoji Logic
-runTest('Logic Verification: 2-step confirmation, MT Manager Izin & Emoji Picker in app.js', () => {
-  const appJsPath = path.join(__dirname, '../app/src/main/assets/web/app.js');
-  const code = fs.readFileSync(appJsPath, 'utf8');
-
-  assert(code.includes('requestRunScript'), 'Must contain requestRunScript');
-  assert(code.includes('proceedToConfirmStep2'), 'Must contain proceedToConfirmStep2');
-  assert(code.includes('executeConfirmedScript'), 'Must contain executeConfirmedScript');
-  assert(code.includes('openPermissionModal'), 'Must contain openPermissionModal for Izin');
-  assert(code.includes('savePermissions'), 'Must contain savePermissions');
-  assert(code.includes('openEmojiPicker'), 'Must contain openEmojiPicker');
-  assert(code.includes('selectScriptEmoji'), 'Must contain selectScriptEmoji');
-  assert(code.includes('stopCurrentScript'), 'Must contain stopCurrentScript (Force Stop)');
-  assert(code.includes('copyLogById'), 'Must contain copyLogById');
-  assert(code.includes('toggleTheme'), 'Must contain toggleTheme');
-});
-
-// 6. Test Exact Timestamp Formatting (Must contain Hours, Minutes, and Seconds [HH:mm:ss])
-runTest('Timestamp Verification: Logs format with exact seconds [HH:mm:ss]', () => {
-  function getExactTimestamp(date = new Date()) {
-    const h = String(date.getHours()).padStart(2, '0');
-    const m = String(date.getMinutes()).padStart(2, '0');
-    const s = String(date.getSeconds()).padStart(2, '0');
-    return `${h}:${m}:${s}`;
-  }
-
-  const timeFormatted = getExactTimestamp();
-  const timeRegex = /^\d{2}:\d{2}:\d{2}$/;
-  assert(timeRegex.test(timeFormatted), `Timestamp format invalid: ${timeFormatted}`);
-});
-
-// 7. Verify Android Native Bridge Code
-runTest('Android Bridge Verification: RootBridge.kt contains required methods', () => {
-  const bridgePath = path.join(__dirname, '../app/src/main/java/com/kasane/shell/RootBridge.kt');
-  const kt = fs.readFileSync(bridgePath, 'utf8');
-
-  assert(kt.includes('@JavascriptInterface'), 'Missing JavascriptInterface annotations');
-  assert(kt.includes('fun checkRoot(): Boolean'), 'Missing checkRoot method');
-  assert(kt.includes('fun getDeviceSpecs(): String'), 'Missing getDeviceSpecs method');
-  assert(kt.includes('fun runRootDiagnostics(): String'), 'Missing runRootDiagnostics method');
-  assert(kt.includes('fun listDirectory(dirPath: String): String'), 'Missing listDirectory method');
-  assert(kt.includes('fun changePermissions(filePath: String, octal: String): Boolean'), 'Missing changePermissions method');
-  assert(kt.includes('fun runScript(scriptPath: String)'), 'Missing runScript method');
-  assert(kt.includes('fun killProcess()'), 'Missing killProcess method');
-});
-
-// 8. Verify GitHub Actions Workflow
-runTest('CI/CD Verification: GitHub Actions build-apk.yml configuration', () => {
-  const ymlPath = path.join(__dirname, '../.github/workflows/build-apk.yml');
-  const yml = fs.readFileSync(ymlPath, 'utf8');
-  assert(yml.includes('actions/checkout@v4'), 'Missing checkout step');
-  assert(yml.includes('actions/setup-java@v4'), 'Missing setup-java step');
-  assert(yml.includes('gradlew assembleDebug'), 'Missing assembleDebug build command');
-  assert(yml.includes('actions/upload-artifact@v4'), 'Missing upload-artifact step');
+// ---------------------------------------------------------------- 9
+runTest('Identity: no device is hardcoded anywhere in the interface', () => {
+  const forbidden = ['Infinix', 'X6833B', 'SuiKernel', 'AxionOS', 'sdc55', 'MT6789'];
+  [['index.html', webHtml], ['styles.css', webCss], ['app.js', webJs]].forEach(([file, source]) => {
+    forbidden.forEach(term => {
+      assert(!source.includes(term), `${file} still hardcodes "${term}"`);
+    });
+  });
+  assert(webJs.includes('getDeviceSpecs'), 'device identity must be read from the bridge');
 });
 
 console.log('\n🌸 ========================================================');
-console.log(`🌸 SMOKE TEST RESULTS: ${passedTests} OF ${totalTests} TESTS PASSED (100%)`);
+console.log(`🌸 SMOKE TEST: ${passed} OF ${total} TESTS PASSED`);
 console.log('🌸 ========================================================\n');
